@@ -1,0 +1,1878 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<query>
+	<!-- 게시판관리 STRART -->
+	<queryinfo>
+        <query-id>UCINF210S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+            SELECT BOARD_TP_SEQ
+                 , BOARD_KND_CD
+                 , dbo.FN_CODEBOOK('COM009', BOARD_KND_CD) AS BOARD_KND
+                 , BOARD_NM
+                 , USE_F
+                 , LUP_ORD
+                 , dbo.FN_USER(RG_ID, '') AS RG_NM
+                 , RG_DT + ' ' + RG_TM AS RG_DTM
+                 , dbo.FN_USER(MDF_ID, '') AS MDF_NM
+                 , MDF_DT + ' ' + MDF_TM AS MDF_DTM
+            FROM   UC_COM_BOARD_TYPE
+            WHERE BOARD_TP_SEQ  IN (SELECT BOARD_TP_SEQ FROM UC_COM_BOARD_AUTH E, UC_COM_USER F WHERE E.OBJ_GRD_CD = GRD_CD AND F.USER_ID = ?)
+            AND BOARD_TP_SEQ NOT IN (22)
+            @board_knd
+            @board_nm
+            @use_f
+            ORDER  BY BOARD_KND_CD, LUP_ORD
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="userid"		type="STRING"	/>
+			<query-argument id="board_knd"	type="STRING"	condition="AND    BOARD_KND_CD = ?"/>
+			<query-argument id="board_nm"	type="STRING"	condition="AND    BOARD_NM LIKE '%'+?+'%'"/>
+			<query-argument id="use_f"		type="STRING"	condition="AND    USE_F = ?"/>
+        </query-arguments>
+        <query-descript>게시판 관리 - 게시판 리스트</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCINF210I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-statement><![CDATA[
+			INSERT INTO UC_COM_BOARD_TYPE
+			(
+				BOARD_NM
+				, BOARD_KND_CD
+				, USE_F
+				, LUP_ORD
+				, RG_DT
+				, RG_TM
+				, RG_ID
+				, MDF_DT
+				, MDF_TM
+				, MDF_ID
+			) VALUES (
+				?
+				, ?
+				, ?
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+			)
+        ]]>
+		</query-statement>
+		<query-arguments>
+            <query-argument id="board_nm"		type="STRING"/>
+            <query-argument id="board_knd_cd"	type="STRING"/>
+          	<query-argument id="use_f"			type="STRING"/>
+          	<query-argument id="lup_ord"		type="INTEGER"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+		</query-arguments>
+		<query-descript>게시판 추가</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF210U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-statement>
+        <![CDATA[
+            UPDATE UC_COM_BOARD_TYPE SET
+				BOARD_NM = ?
+				, BOARD_KND_CD = ?
+				, USE_F = ?
+				, LUP_ORD = ?
+				, MDF_DT = CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID = ?
+			WHERE BOARD_TP_SEQ = ?
+      ]]>
+        </query-statement>
+        <query-arguments>
+          	<query-argument id="board_nm"		type="STRING"/>
+            <query-argument id="board_knd_cd"	type="STRING"/>
+          	<query-argument id="use_f"			type="STRING"/>
+          	<query-argument id="lup_ord"		type="INTEGER"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="board_tp_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 게시판 UPDATE  </query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF210D</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-statement>
+        <![CDATA[
+            DELETE FROM UC_COM_BOARD_TYPE WHERE BOARD_TP_SEQ = ?
+      ]]>
+        </query-statement>
+        <query-arguments>
+          	<query-argument id="board_tp_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 게시판 DELETE  </query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF211S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				0 AS CHK
+				, A.BOARD_TP_SEQ
+				, OBJ_GRD_CD
+				, dbo.FN_CODEBOOK('SYS007', OBJ_GRD_CD) AS GRADE
+				, ISNULL(A.READ_AUTH_F, 0) AS R_AUTH_F
+				, ISNULL(A.WRT_AUTH_F, 0) AS W_AUTH_F
+			FROM UC_COM_BOARD_AUTH A
+			WHERE A.BOARD_TP_SEQ = ?
+			ORDER BY OBJ_GRD_CD
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_tp_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>게시판 관리 - 게시판권한 대상등급</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF212S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				0 AS CHK
+				, CODE AS OBJ_GRD_CD
+				, CODE_NM AS GRADE
+				, 1 AS R_AUTH_F
+				, 0 AS W_AUTH_F
+			FROM UC_COM_CODEBOOK
+			WHERE UP_CD = 'SYS007' AND CODE <> '000'
+				AND CODE NOT IN( SELECT OBJ_GRD_CD FROM UC_COM_BOARD_AUTH WHERE BOARD_TP_SEQ = ?)
+			ORDER BY CODE
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_tp_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>게시판 관리 - 게시판권한 미대상등급</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF211I</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+		<query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO UC_COM_BOARD_AUTH
+			(
+				BOARD_TP_SEQ
+				, OBJ_GRD_CD
+				, READ_AUTH_F
+				, WRT_AUTH_F
+				, RG_DT
+				, RG_TM
+				, RG_ID
+				, MDF_DT
+				, MDF_TM
+				, MDF_ID
+			)VALUES(
+				?
+				, ?
+				, ?
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+			)
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_tp_seq"	type="INTEGER"/>
+			<query-argument id="obj_grd_cd"		type="STRING"/>
+			<query-argument id="r_auth_f"		type="STRING"/>
+			<query-argument id="w_auth_f"		type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+        </query-arguments>
+        <query-descript>게시판 관리 - 게시판권한자 추가</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF211U</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+		<query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			UPDATE  UC_COM_BOARD_AUTH SET
+				READ_AUTH_F = ?
+				, WRT_AUTH_F = ?
+				, MDF_DT = CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID = ?
+			WHERE BOARD_TP_SEQ = ?
+				AND OBJ_GRD_CD = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="r_auth_f"	type="STRING"/>
+			<query-argument id="w_auth_f"	type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+			<query-argument id="board_tp_seq"	type="INTEGER"/>
+			<query-argument id="obj_grd_cd"		type="STRING"/>
+        </query-arguments>
+        <query-descript>게시판 관리 - 게시판권한자 수정</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF211D</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+		<query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM UC_COM_BOARD_AUTH
+			WHERE BOARD_TP_SEQ = ?
+				AND OBJ_GRD_CD = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_tp_seq"	type="INTEGER"/>
+			<query-argument id="obj_grd_cd"		type="STRING"/>
+        </query-arguments>
+        <query-descript>게시판 관리 - 게시판권한자 삭제</query-descript>
+    </queryinfo>
+
+	<!-- 게시판 STRART -->
+	<queryinfo>
+		<query-id>UCINF117S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+            SELECT A.BOARD_TP_SEQ
+                 , A.BOARD_NM
+            FROM   UC_COM_BOARD_TYPE A, UC_COM_BOARD_AUTH B
+            WHERE  A.BOARD_TP_SEQ = B.BOARD_TP_SEQ AND A.BOARD_KND_CD = '02'
+            AND    B.OBJ_GRD_CD = ?
+            AND    A.BOARD_TP_SEQ NOT IN (17, 22)
+            ORDER  BY lup_ord
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="gradecd"		type="STRING"/>
+		</query-arguments>
+		<query-descript>게시판명 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCINF118S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+				READ_AUTH_F
+				, WRT_AUTH_F
+			FROM UC_COM_BOARD_AUTH a, UC_COM_USER B
+			WHERE BOARD_TP_SEQ = ?
+			AND   b.USER_ID = ?
+			AND   obj_grd_cd = grd_Cd
+			AND BOARD_TP_SEQ NOT IN (22)
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="board_tp_seq"	type="INTEGER"/>
+			<query-argument id="userid"	type="STRING"/>
+		</query-arguments>
+		<query-descript>게시판 권한 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCINF119S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+				A.BOARD_TP_SEQ AS CODE
+				, A.BOARD_NM AS CODENM
+			FROM UC_COM_BOARD_TYPE A, UC_COM_BOARD_AUTH B
+			WHERE A.BOARD_TP_SEQ = B.BOARD_TP_SEQ AND A.BOARD_KND_CD = '02'
+				AND B.OBJ_GRD_CD = ?
+			ORDER BY lup_ord
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="gradecd"		type="STRING"/>
+		</query-arguments>
+		<query-descript>게시판명 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF213S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				A.BOARD_ID
+				, A.BOARD_NM
+				, A.USE_F
+				, B.USER_ID
+				, B.R_AUTH
+				, B.W_AUTH
+				, B.D_AUTH
+				, DECODE(B.R_AUTH, '1', '▣', '□') AS R_AUTH_SPAN
+				, DECODE(B.W_AUTH, '1', '▣', '□') AS W_AUTH_SPAN
+				, DECODE(B.D_AUTH, '1', '▣', '□') AS D_AUTH_SPAN
+			FROM UC_COM_BOARD A, UC_COM_BOARD_INSP_OBJ B
+			WHERE A.BOARD_ID = ?
+				AND B.USER_ID(+) = ?
+				AND A.BOARD_ID = B.BOARD_ID(+)
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_id"			type="STRING"	/>
+			<query-argument id="user_id"			type="STRING"	 />
+        </query-arguments>
+        <query-descript>게시판 정보 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF214S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				row_number() over(ORDER BY A.BOARD_SEQ DESC) rnum
+				, A.BOARD_SEQ
+				, A.BOARD_TP_SEQ
+				, C.BOARD_NM
+				, A.BOARD_SBJT
+				, A.BOARD_CONT
+				, A.QRY_CNT
+				, A.RPLY_CNT
+				, B.USER_NM AS RG_NM
+				, A.RG_DT + ' ' + A.RG_TM AS RG_DTM
+				, dbo.FN_USER(A.MDF_ID, '') AS MDF_NM
+				, A.MDF_DT + ' ' + A.MDF_TM AS MDF_DTM
+				, A.RG_ID
+				, A.MDF_ID
+				, (SELECT COUNT(file_seq) FROM UC_COM_FILE WHERE prg_id='BOARD' AND up_seq=A.BOARD_SEQ) filecnt
+				, (SELECT COUNT(board_seq) FROM  UC_COM_BOARD_RPLY D WHERE  A.BOARD_SEQ = D.BOARD_SEQ) AS rply_cnt
+			FROM UC_COM_BOARD A, UC_COM_USER B, UC_COM_BOARD_TYPE C
+			WHERE A.RG_ID = B.USER_ID
+			AND   A.BOARD_TP_SEQ = C.BOARD_TP_SEQ
+			AND   A.RG_DT BETWEEN ? AND ?
+			AND	A.BOARD_TP_SEQ  IN (SELECT BOARD_TP_SEQ FROM UC_COM_BOARD_AUTH E, UC_COM_USER F WHERE E.OBJ_GRD_CD = F.GRD_CD AND F.USER_ID = ?)
+			AND A.BOARD_TP_SEQ NOT IN (17, 22)
+			@board_tp_seq
+			@searchType
+			@searchText
+			@q_board_sbjt
+			@q_board_cont
+			--ORDER BY A.BOARD_SEQ DESC
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="startdt"		type="STRING"	option="M"/>
+			<query-argument id="enddt"			type="STRING"	option="M"/>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="board_tp_seq"	type="INTEGER"	condition="AND A.board_tp_seq = ? "/>
+			<query-argument id="searchType"		type="QUERY"	condition="AND @searchType "/>
+			<query-argument id="searchText"		type="STRING"	condition="LIKE '%'+?+'%' "/>
+        	<query-argument id="q_board_sbjt"	type="STRING" 	condition="AND    A.BOARD_SBJT LIKE '%'+?+'%'"/>
+        	<query-argument id="q_board_cont"	type="STRING" 	condition="AND    A.BOARD_CONT LIKE '%'+?+'%'"/>
+        </query-arguments>
+        <query-descript>게시판 목록 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF214I</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-statement><![CDATA[
+			INSERT INTO UC_COM_BOARD
+			(
+				BOARD_TP_SEQ
+				, BOARD_SBJT
+				, BOARD_CONT
+				, QRY_CNT
+				, RPLY_CNT
+				, RG_DT
+				, RG_TM
+				, RG_ID
+				, MDF_DT
+				, MDF_TM
+				, MDF_ID
+			) VALUES (
+				?
+				, ?
+				, ?
+				, 0
+				, 0
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+			)
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_tp_seq"	type="INTEGER"	/>
+			<query-argument id="board_sbjt"		type="STRING"	/>
+			<query-argument id="board_cont"		type="STRING"	/>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="userid"			type="STRING"	/>
+        </query-arguments>
+        <query-descript>게시글 등록</query-descript>
+    </queryinfo>
+    <queryinfo>
+	    <query-id>UCINF214S_1</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			SELECT IDENT_CURRENT('UC_COM_BOARD') AS seq
+        ]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript>마지막 게시글 순번 가져오기</query-descript>
+    </queryinfo>
+	<queryinfo>
+        <query-id>UCINF214U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-statement><![CDATA[
+			UPDATE UC_COM_BOARD SET
+				BOARD_SBJT = ?
+				, BOARD_CONT = ?
+				, MDF_DT = CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID = ?
+			WHERE BOARD_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_sbjt"		type="STRING"	/>
+			<query-argument id="board_cont"		type="STRING"	/>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="board_seq"		type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>게시글 수정</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF216U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-statement><![CDATA[
+			UPDATE UC_COM_BOARD SET
+				@filenm
+				, MDF_DT = CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID = ?
+			WHERE BOARD_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="filenm"			type="QUERY"	condition="@filenm = '' "/>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="board_seq"		type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>첨부파일 삭제</query-descript>
+    </queryinfo>
+		<queryinfo>
+        <query-id>UCINF220S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>FREE</query-view-type>
+        <query-statement><![CDATA[
+			SELECT	A.BOARD_CONT
+			     , (SELECT BOARD_NM FROM UC_COM_BOARD_TYPE WHERE BOARD_TP_SEQ =A.BOARD_TP_SEQ) BOARD_NM --공통 - 임시로 가져온다
+			FROM UC_COM_BOARD A
+			WHERE   A.BOARD_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>게시판 내용 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF115U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-statement><![CDATA[
+			UPDATE UC_COM_BOARD SET
+				QRY_CNT = QRY_CNT+1
+				, MDF_DT = CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID = ?
+			WHERE BOARD_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="board_seq"		type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>조회수 +1</query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCINF115U_1</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-insensitive>false</query-insensitive>
+        <query-statement><![CDATA[
+            UPDATE UC_COM_BOARD
+            SET    qry_cnt   = qry_cnt + 1
+            WHERE  board_seq = ?
+            AND    rg_id    <> ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="board_seq"     	type="INTEGER"/>
+			<query-argument id="userid"     	type="STRING"/>
+        </query-arguments>
+        <query-descript>게시판 조회수 증가</query-descript>
+    </queryinfo>
+	<queryinfo>
+        <query-id>UCINF116U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+       	<query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			UPDATE UC_COM_BOARD SET
+				RPLY_CNT = RPLY_CNT+1
+				, MDF_DT = CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID = ?
+			WHERE BOARD_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="board_seq"		type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>댓글수 +1</query-descript>
+    </queryinfo>
+	<queryinfo>
+        <query-id>UCINF117U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			UPDATE UC_COM_BOARD SET
+				RPLY_CNT = RPLY_CNT-1
+				, MDF_DT = CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID = ?
+			WHERE BOARD_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="board_seq"		type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>댓글수 -1</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF214D</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-statement><![CDATA[
+			DELETE FROM UC_COM_BOARD
+			WHERE BOARD_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_seq"		type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>게시글 삭제</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF215S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				BOARD_SEQ
+				, RPLY_SEQ
+				, RPLY_CONT
+		      --, RG_DT+' '+RG_TM AS RPLY_RG_DTM
+				, dbo.FN_USER(RG_ID, '') AS RPLY_RG_NM
+			  --, MDF_DT+' '+MDF_TM AS RPLY_MDF_DTM
+			  --, dbo.FN_USER(MDF_ID, '') AS RPLY_MDF_NM
+              --, SUBSTRING(CONVERT(VARCHAR(10), CAST(rg_dt as DATETIME), 102),3,8)+' '
+              --+ SUBSTRING(rg_tm,1,2)+':'+SUBSTRING(rg_tm,3,2) RPLY_RG_DTM
+                , REPLACE(substring(dbo.uf_sysdate(MDF_DT+MDF_TM,'YYYY-MM-DD HH:MI:SS',''),3,14),'-','.') RPLY_RG_DTM
+                , RG_ID
+			FROM UC_COM_BOARD_RPLY
+			WHERE BOARD_SEQ = ?
+			ORDER BY RPLY_SEQ ASC
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_seq"			type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>게시판 댓글 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF215I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO UC_COM_BOARD_RPLY
+			(
+				BOARD_SEQ
+				, RPLY_CONT
+				, RG_DT
+				, RG_TM
+				, RG_ID
+				, MDF_DT
+				, MDF_TM
+				, MDF_ID
+			) VALUES (
+				?
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+			)
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_seq"		type="INTEGER"	/>
+			<query-argument id="rply_cont"		type="STRING"	/>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="userid"			type="STRING"	/>
+        </query-arguments>
+        <query-descript>댓글 등록</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF215U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-statement><![CDATA[
+			UPDATE UC_COM_BOARD_RPLY SET
+				RPLY_CONT = ?
+				, MDF_DT = CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID = ?
+			WHERE RPLY_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="rply_cont"		type="STRING"	/>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="rply_seq"		type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>댓글 수정</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF215D</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM UC_COM_BOARD_RPLY
+			WHERE RPLY_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="rply_seq"		type="STRING"	/>
+        </query-arguments>
+        <query-descript>댓글 삭제</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF216D</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-statement><![CDATA[
+			DELETE FROM UC_COM_BOARD_RPLY
+			WHERE BOARD_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_seq"		type="STRING"	/>
+        </query-arguments>
+        <query-descript>게시판-댓글 삭제</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF130I</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+        INSERT INTO UC_COM_FILE
+        (
+			up_seq, prg_id, file_nm, new_file_nm
+			, rg_dt, rg_tm, rg_id, mdf_dt, mdf_tm, mdf_id
+		)
+		SELECT (SELECT IDENT_CURRENT('UC_COM_BOARD')), ?, ?, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="prg_id"     	type="STRING"/>
+        	<query-argument id="file_nm"     	type="STRING"/>
+        	<query-argument id="new_file_nm"	type="STRING"/>
+        	<query-argument id="userid"    	 	type="STRING"/>
+        	<query-argument id="userid"    	 	type="STRING"/>
+        </query-arguments>
+        <query-descript>업로드 파일 최초 저장 공통</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCINF130D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+        DELETE FROM UC_COM_FILE
+		WHERE prg_id = ?
+			AND up_seq = ?
+			@file_seq
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="prg_id"     		type="STRING"/>
+        	<query-argument id="up_seq"     		type="INTEGER"/>
+        	<query-argument id="file_seq"     		type="INTEGER" condition=" AND file_seq = ?"/>
+        </query-arguments>
+        <query-descript>업로드 파일 삭제 공통</query-descript>
+    </queryinfo>
+
+	<!-- 자료실 Start -->
+		<queryinfo>
+		<query-id>UCINF216S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+            SELECT A.DATA_SEQ
+                 , A.DATA_SBJT
+                 , A.ATCH_FILE_NM
+                 , A.RG_DT+' '+A.RG_TM AS RG_DTM
+                 , B.USER_NM AS RG_NM
+                 , A.MDF_DT+' '+A.MDF_TM AS MDF_DTM
+                 , DBO.FN_USER(A.MDF_ID, '') AS MDF_NM
+                 , A.DATA_CONT
+                 , B.USER_NM +' ['+B.USER_ID+']' AS RG_NM_ID
+            FROM   UC_COM_DATA A, UC_COM_USER B
+            WHERE  A.RG_ID = B.USER_ID
+            @data_sbjt
+            @data_cont
+            @user_nm
+            @user_id
+            @atch_file_nm
+            ORDER BY A.DATA_SEQ DESC
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="data_sbjt" 		type="STRING" condition="AND    A.DATA_SBJT    LIKE '%'+?+'%'"/>
+			<query-argument id="data_cont" 		type="STRING" condition="AND    A.DATA_CONT    LIKE '%'+?+'%'"/>
+			<query-argument id="user_nm" 		type="STRING" condition="AND    B.USER_NM      LIKE '%'+?+'%'"/>
+			<query-argument id="user_id" 		type="STRING" condition="AND    B.USER_ID      = ?"/>
+			<query-argument id="atch_file_nm" 	type="STRING" condition="AND    A.ATCH_FILE_NM LIKE '%'+?+'%'"/>
+		</query-arguments>
+		<query-descript> 자료 조회 (infDataList.js) </query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCINF122I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-statement><![CDATA[
+			INSERT INTO UC_COM_DATA
+			(
+				DATA_SBJT
+				, DATA_CONT
+				, ATCH_FILE_NM
+				, RG_DT
+				, RG_TM
+				, RG_ID
+				, MDF_DT
+				, MDF_TM
+				, MDF_ID
+			)VALUES(
+				?
+				, ?
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+			)
+        ]]>
+		</query-statement>
+		<query-arguments>
+            <query-argument id="data_sbjt"		type="STRING"/>
+            <query-argument id="data_cont"		type="STRING"/>
+          	<query-argument id="file_nm"		type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+		</query-arguments>
+		<query-descript>자료 등록</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF121U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement>
+        <![CDATA[
+            UPDATE UC_COM_DATA SET
+				DATA_SBJT		= ?
+				, DATA_CONT		= ?
+				, ATCH_FILE_NM 	= ?
+				, MDF_DT		= CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM		= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID		= ?
+        	WHERE DATA_SEQ = ?
+      ]]>
+        </query-statement>
+        <query-arguments>
+            <query-argument id="data_sbjt"		type="STRING"/>
+            <query-argument id="data_cont"		type="STRING"/>
+          	<query-argument id="file_nm"		type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="data_seq"		type="INTEGER"/>
+        </query-arguments>
+        <query-descript>자료 수정</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF122U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement>
+        <![CDATA[
+            UPDATE UC_COM_DATA SET
+				ATCH_FILE_NM	= ''
+				, MDF_DT		= CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM		= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID		= ?
+        	WHERE DATA_SEQ = ?
+      ]]>
+        </query-statement>
+        <query-arguments>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="data_seq"		type="INTEGER"/>
+        </query-arguments>
+        <query-descript>파일 삭제</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCINF122D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-statement><![CDATA[
+  			DELETE UC_COM_DATA
+        	WHERE DATA_SEQ = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="data_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript>자료 삭제</query-descript>
+	</queryinfo>
+
+	<!-- Q&A Start -->
+	<queryinfo>
+        <query-id>UCINF217S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				PRJ_SEQ
+				, PRJ_NM
+			FROM UC_PRJ
+			WHERE CONVERT(VARCHAR(8),GETDATE(),112) BETWEEN RL_ST_DT AND RL_END_DT
+			ORDER BY PRJ_SEQ
+		]]>
+        </query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript>현재(진행중인)프로젝트 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCINF218S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+            SELECT *
+            FROM
+            (
+                SELECT QNA_SEQ
+                     , QUEST_TITLE
+                     , PRJ_SEQ
+                     , (SELECT PRJ_NM FROM UC_PRJ WHERE PRJ_SEQ=A.PRJ_SEQ) PRJ_NM
+                     , QUEST_TYPE
+                     , QUEST_MN_ID
+                     , DBO.FN_USER(QUEST_MN_ID,'') QUEST_MN_NM
+                     , PROC_STAT
+                     , QRY_CNT
+                     , RPLY_CNT
+                     , DBO.UF_SYSDATE(REG_DT,'YYYY-MM-DD HH:MI:SS','') REG_DT
+                FROM   UC_INF_QNA A
+                WHERE  USE_YN='Y'
+                @strt_dt @end_dt
+                @prj_seq
+                @quest_type
+                @q_proc_stat
+                @quest_title
+                @quest_cntn
+                @answ_cntn
+            ) B
+            WHERE 1=1
+            @quest_mn_nm
+            ORDER  BY QNA_SEQ DESC
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="strt_dt"		type="STRING"	option="M" condition="AND    REG_DT BETWEEN ?+'000000' "/>
+        	<query-argument id="end_dt"			type="STRING"	option="M" condition="AND ?+'235959' "/>
+			<query-argument id="prj_seq"		type="INTEGER"	condition="AND    PRJ_SEQ = ?"/>
+			<query-argument id="quest_type"		type="STRING"	condition="AND    QUEST_TYPE = ?"/>
+			<query-argument id="q_proc_stat"	type="STRING"	condition="AND    PROC_STAT = ?"/>
+			<query-argument id="quest_title"	type="STRING"	condition="AND    QUEST_TITLE LIKE '%'+?+'%' "/>
+			<query-argument id="quest_cntn"		type="STRING"	condition="AND    QUEST_CNTN LIKE '%'+?+'%' "/>
+			<query-argument id="answ_cntn"		type="STRING"	condition="AND    ANSW_CNTN LIKE '%'+?+'%' "/>
+			<query-argument id="quest_mn_nm"	type="STRING"	condition="AND    B.QUEST_MN_NM LIKE '%'+?+'%' "/>
+        </query-arguments>
+        <query-descript> QNA 목록조회 (infQnA.js) </query-descript>
+    </queryinfo>
+	<queryinfo>
+		<query-id>UCINF221U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-insensitive>false</query-insensitive>
+		<query-statement><![CDATA[
+            UPDATE UC_INF_QNA
+            SET    QRY_CNT   = QRY_CNT + 1
+            WHERE  QNA_SEQ = ?
+            AND    QUEST_MN_ID  <> ?
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="qna_seq"     	type="INTEGER"/>
+			<query-argument id="userid"     	type="STRING"/>
+		</query-arguments>
+		<query-descript> QNA 조회수 업데이트 (infQnA.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+        <query-id>UCINF221S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>FREE</query-view-type>
+        <query-statement><![CDATA[
+            SELECT QNA_SEQ
+                 , QUEST_TITLE
+                 , PRJ_SEQ
+                 , (SELECT PRJ_NM FROM UC_PRJ WHERE PRJ_SEQ=A.PRJ_SEQ) PRJ_NM
+                 , QUEST_TYPE
+                 , QUEST_MN_ID
+                 , DBO.FN_USER(QUEST_MN_ID,'') QUEST_MN_NM
+                 , DBO.FN_USER(ANSW_MN_ID,'') ANSW_MN_NM
+                 , PROC_STAT
+                 , dbo.FN_CODEBOOK('INF001', PROC_STAT) AS PROC_STAT_NM
+                 , QRY_CNT
+                 , 0 RPLY_CNT
+                 , DBO.UF_SYSDATE(REG_DT,'YYYY-MM-DD HH:MI:SS','') REG_DT
+                 , DBO.UF_SYSDATE(CHG_DT,'YYYY-MM-DD HH:MI:SS','') CHG_DT
+                 , DBO.FN_USER(REG_USER_ID,'') REG_USER_NM
+                 , DBO.FN_USER(CHG_USER_ID,'') CHG_USER_NM
+                 , QUEST_CNTN
+                 , ANSW_CNTN
+                 , (CASE WHEN ANSW_DT IS NOT NULL THEN DBO.UF_SYSDATE(ANSW_DT,'YYYY-MM-DD HH:MI:SS','') ELSE ANSW_DT END) ANSW_DT
+            FROM   UC_INF_QNA A
+            WHERE  USE_YN  = 'Y'
+            AND    QNA_SEQ = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="qna_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript> QNA 상세조회 (infQnA.js) </query-descript>
+    </queryinfo>
+	<!--queryinfo>
+        <query-id>UCINF219S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				ANW_SEQ
+				, ANW_CONT
+				, RG_DT+' '+RG_TM AS A_RG_DTM
+				, dbo.FN_USER(RG_ID, '') AS A_RG_NM
+				, MDF_DT+' '+MDF_TM AS A_MDF_DTM
+				, dbo.FN_USER(MDF_ID, '') AS A_MDF_NM
+			FROM UC_COM_ANW
+			WHERE QST_SEQ = ?
+			ORDER BY ANW_SEQ DESC
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="qst_seq"		type="INTEGER"	condition="AND qst_seq = ? "/>
+        </query-arguments>
+        <query-descript>답변 조회</query-descript>
+    </queryinfo-->
+	<queryinfo>
+		<query-id>UCINF123I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+            INSERT INTO UC_INF_QNA
+            (
+                QUEST_TITLE , QUEST_CNTN , PRJ_SEQ  , QUEST_TYPE , QUEST_MN_ID
+              , PROC_STAT   , QRY_CNT    , RPLY_CNT , USE_YN
+              , REG_USER_ID , REG_DT
+              , CHG_USER_ID , CHG_DT
+            )
+            VALUES
+            (
+                ?   , ?, ?, ?, ?
+              , '01', 0, 0, 'Y'
+              , ?   , REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '')
+              , ?   , REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '')
+            )
+        ]]></query-statement>
+		<query-arguments>
+            <query-argument id="quest_title"	type="STRING"/>
+          	<query-argument id="quest_cntn"		type="STRING"/>
+          	<query-argument id="prj_seq"		type="INTEGER"/>
+          	<query-argument id="quest_type"		type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+		</query-arguments>
+		<query-descript> 질문 등록 (infQnA.js) </query-descript>
+	</queryinfo>
+    <queryinfo>
+	    <query-id>UCINF123S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			SELECT IDENT_CURRENT('UC_INF_QNA') AS qna_seq
+        ]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript> 마지막 게시글 순번 가져오기 (infQnA.js) </query-descript>
+    </queryinfo>
+	<queryinfo>
+		<query-id>UCINF123U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+            UPDATE UC_INF_QNA
+            SET    QUEST_TITLE = ?
+                 , QUEST_CNTN  = ?
+                 , PRJ_SEQ     = ?
+                 , QUEST_TYPE  = ?
+                 , CHG_DT      = REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '')
+                 , CHG_USER_ID = ?
+            WHERE  QNA_SEQ     = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="quest_title"	type="STRING"/>
+			<query-argument id="quest_cntn"		type="STRING"/>
+			<query-argument id="prj_seq"		type="INTEGER"/>
+			<query-argument id="quest_type"		type="STRING"/>
+			<query-argument id="userid"			type="STRING"/>
+			<query-argument id="qna_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript> 질문 수정 (infQnA.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCINF123D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+            DELETE UC_INF_QNA WHERE QNA_SEQ = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="qna_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript> 질문 삭제 (infQnA.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCINF123D2</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+            UPDATE UC_INF_QNA
+            SET    USE_YN      = 'N'
+                 , CHG_DT      = REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '')
+                 , CHG_USER_ID = ?
+            WHERE  QNA_SEQ     = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="userid"			type="STRING"/>
+			<query-argument id="qna_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript> 질문 삭제2 (infQnA.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCINF124U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+            UPDATE UC_INF_QNA
+            SET    ANSW_CNTN   = ?
+                 , PROC_STAT   = ?
+                 , ANSW_MN_ID  = ?
+                 , ANSW_DT     = (CASE WHEN ?='03' THEN REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '') ELSE NULL END)
+                 , CHG_DT      = REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '')
+                 , CHG_USER_ID = ?
+            WHERE  QNA_SEQ     = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="answ_cntn"	type="STRING"/>
+			<query-argument id="proc_stat"	type="STRING"/>
+			<query-argument id="userid"		type="STRING"/>
+			<query-argument id="proc_stat"	type="STRING"/>
+			<query-argument id="userid"		type="STRING"/>
+			<query-argument id="qna_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript> 답변 수정 (infQnA.js) </query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCINF124D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-statement><![CDATA[
+  			DELETE UC_COM_ANW
+        	WHERE QST_SEQ = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="qst_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript>질문-답변 삭제</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCINF124I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-statement><![CDATA[
+			INSERT INTO UC_COM_ANW
+			(
+				QST_SEQ
+				, ANW_CONT
+				, USE_F
+				, RG_DT
+				, RG_TM
+				, RG_ID
+				, MDF_DT
+				, MDF_TM
+				, MDF_ID
+			)VALUES(
+				?
+				, ?
+				, 'Y'
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+			)
+        ]]>
+		</query-statement>
+		<query-arguments>
+            <query-argument id="qst_seq"		type="INTEGER"/>
+          	<query-argument id="anw_cont"		type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+		</query-arguments>
+		<query-descript>답변 등록</query-descript>
+	</queryinfo>
+
+
+
+	<queryinfo>
+		<query-id>UCINF125D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-statement><![CDATA[
+  			DELETE UC_COM_ANW
+        	WHERE ANW_SEQ = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="anw_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript>답변 삭제</query-descript>
+	</queryinfo>
+
+    <queryinfo>
+        <query-id>UCINF126S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-insensitive>true</query-insensitive>
+        <query-statement><![CDATA[
+            SELECT notice_seq
+                 , notice_seq AS seq
+                 , notice_type
+                 , notice_type AS notice_type_nm
+                 , notice_sbjt
+                 , qry_cnt
+                 , rg_id
+                 , dbo.FN_USER(rg_id, '') AS rg_nm
+                 , rg_dt
+                 , rg_tm
+                 , mdf_id
+                 , mdf_dt
+                 , mdf_tm
+                 , dbo.FN_USER(mdf_id, '') AS mdf_nm
+                 , valid_strt_dt
+                 , valid_end_dt
+                 , notice_cont
+                 , board_tp_seq
+                 , pwd
+            FROM   UC_COM_NOTICE A
+            WHERE  BOARD_TP_SEQ = ?
+            @q_datefrom @q_dateto
+            @notice_type
+            @q_notice_sbjt
+            @q_notice_cont
+            @q_rg_id
+            ORDER  BY notice_type DESC, notice_seq DESC
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="board_tp_seq"     	type="INTEGER" />
+	        <query-argument id="q_datefrom"     	type="STRING" option="M" condition="AND    A.rg_dt BETWEEN ?"/>
+	        <query-argument id="q_dateto"     		type="STRING" option="M" condition="AND ?"/>
+        	<query-argument id="notice_type"     	type="STRING" condition="AND    A.notice_type = ?"/>
+        	<query-argument id="q_notice_sbjt"    	type="STRING" condition="AND    A.notice_sbjt LIKE '%'+?+'%'"/>
+        	<query-argument id="q_notice_cont"    	type="STRING" condition="AND    A.notice_cont LIKE '%'+?+'%'"/>
+        	<query-argument id="q_rg_id"     		type="STRING" condition="AND    A.rg_id = ?"/>
+        </query-arguments>
+        <query-descript>공지사항 조회</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCINF126S_2</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-insensitive>true</query-insensitive>
+        <query-statement><![CDATA[
+		SELECT notice_cont
+		FROM   UC_COM_NOTICE
+		WHERE  notice_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="notice_seq"     	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>공지사항 내용 조회</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCINF126I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-insensitive>true</query-insensitive>
+        <query-statement><![CDATA[
+            INSERT INTO UC_COM_NOTICE
+            (
+                notice_type   , notice_sbjt  , notice_cont, qry_cnt, board_tp_seq
+              , valid_strt_dt , valid_end_dt , pwd
+              , rg_id         , rg_dt        , rg_tm
+              , mdf_id        , mdf_dt       , mdf_tm
+            )
+            VALUES
+            (
+                ?, ?, ?, 0, ?
+              , ?, ?, ?
+              , ?, CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+              , ?, CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+            )
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="notice_type"     	type="STRING"/>
+        	<query-argument id="notice_sbjt"     	type="STRING"/>
+        	<query-argument id="notice_cont"     	type="STRING"/>
+        	<query-argument id="board_tp_seq"     	type="INTEGER"/>
+			<query-argument id="valid_strt_dt"		type="STRING" option="M"/>
+        	<query-argument id="valid_end_dt"		type="STRING" option="M"/>
+        	<query-argument id="pwd"     			type="STRING"/>
+        	<query-argument id="userid"     		type="STRING"/>
+        	<query-argument id="userid"     		type="STRING"/>
+        </query-arguments>
+        <query-descript>공지사항 추가</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCINF126U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-insensitive>true</query-insensitive>
+        <query-statement><![CDATA[
+            UPDATE UC_COM_NOTICE
+            SET    notice_type   = ?
+                 , notice_sbjt   = ?
+                 , notice_cont   = ?
+                 , valid_strt_dt = ?
+                 , valid_end_dt  = ?
+                 , pwd           = ?
+                 , mdf_id        = ?
+                 , mdf_dt        = CONVERT(VARCHAR(8),GETDATE(),112)
+                 , mdf_tm        = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+            WHERE  notice_seq    = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="notice_type"     	type="STRING"/>
+        	<query-argument id="notice_sbjt"     	type="STRING"/>
+        	<query-argument id="notice_cont"     	type="STRING"/>
+        	<query-argument id="valid_strt_dt"		type="STRING" option="M"/>
+        	<query-argument id="valid_end_dt"		type="STRING" option="M"/>
+        	<query-argument id="pwd"     			type="STRING"/>
+        	<query-argument id="userid"     		type="STRING"/>
+        	<query-argument id="notice_seq"     	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>공지사항 수정</query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCINF126U_2</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-insensitive>false</query-insensitive>
+        <query-statement><![CDATA[
+            UPDATE UC_COM_NOTICE
+            SET    qry_cnt    = qry_cnt + 1
+            WHERE  notice_seq = ?
+            AND    rg_id     <> ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="notice_seq"     	type="INTEGER"/>
+			<query-argument id="userid"     		type="STRING"/>
+        </query-arguments>
+        <query-descript>공지사항 조회수 증가</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCINF126D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-insensitive>false</query-insensitive>
+        <query-statement><![CDATA[
+            DELETE FROM UC_COM_NOTICE WHERE notice_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="notice_seq"     	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>공지사항 삭제</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+	    <query-id>UCINF127S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			SELECT IDENT_CURRENT('UC_COM_NOTICE') AS seq
+        ]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript>마지막 공지사항 순번 가져오기</query-descript>
+    </queryinfo>
+
+    <!-- 쪽지보내기  START -->
+    <queryinfo>
+	<query-id>UCINF001S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement>
+				SELECT USER_NM, USER_ID, '0' AS CHK
+				FROM UC_COM_USER
+		</query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>쪽지보낼 사람 불러오기</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+	<query-id>UCINF002I</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+		INSERT INTO UC_COM_MSG(
+				  send_dt
+				, send_tm
+				, send_id, recv_id
+				, recv_dt
+				, recv_tm
+				, read_yn, title, contents)
+
+				values(
+
+				CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				,?,?
+				,CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				,'N',?,?
+				)
+				]]>
+		</query-statement>
+		<query-arguments>
+			<query-argument id="send_id" type="STRING" />
+			<query-argument id="recv_id" type="STRING" />
+			<query-argument id="title" type="STRING" />
+			<query-argument id="contents" type="STRING" />
+		</query-arguments>
+		<query-descript>쪽지 보내기</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCINF011S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+		SELECT COUNT(*) AS cnt
+		  FROM uc_com_msg
+		 WHERE recv_id = ?
+		   AND read_yn = 'N'
+		]]>
+		</query-statement>
+		<query-arguments>
+			<query-argument id="user_id" type="STRING" />
+		</query-arguments>
+		<query-descript>신규쪽지 조회</query-descript>
+	</queryinfo>
+
+      <queryinfo>
+    	<query-id>UCINF021S</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type>GRID</query-view-type>
+    	<query-statement>
+			SELECT 	'1' as chk,
+			 			a.read_yn,
+				   		a.send_dt,
+				   		a.send_tm,
+				   		a.title,
+				   		a.send_id,
+				   		a.contents,
+				   		b.user_nm as send_nm
+			FROM		UC_COM_MSG a, UC_COM_USER b
+			WHERE 		recv_id = ?
+			AND			b.user_id = a.send_id
+			ORDER BY 	send_dt 	DESC,
+						send_tm		DESC
+		</query-statement>
+		<query-arguments>
+			<query-argument id="recv_id" 	type="STRING" />
+		</query-arguments>
+		<query-descript>쪽지 목록</query-descript>
+	</queryinfo>
+
+
+	<queryinfo>
+        <query-id>UCINF021D</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement>
+			DELETE 		FROM 	UC_COM_MSG
+	  		WHERE 		send_dt = ?
+	  		AND			send_tm = ?
+	  		AND			send_id = ?
+	  		AND			recv_id = ?
+		</query-statement>
+        <query-arguments>
+        	<query-argument id="send_dt" 	type="STRING" option="M"/>
+        	<query-argument id="send_tm" 	type="STRING" option="M"/>
+        	<query-argument id="send_id" 	type="STRING"/>
+        	<query-argument id="recv_id" 	type="STRING"/>
+        </query-arguments>
+        <query-descript>보낸 쪽지 삭제</query-descript>
+    </queryinfo>
+
+
+
+    <queryinfo>
+        <query-id>UCINF021U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement>
+			UPDATE 		UC_COM_MSG
+	  		SET 		read_yn = 'Y'
+	  		WHERE		send_dt = ?
+	  		AND			send_tm = ?
+	  		AND			send_id = ?
+	  		AND			recv_id = ?
+		</query-statement>
+        <query-arguments>
+        	<query-argument id="send_dt" 	type="STRING"/>
+        	<query-argument id="send_tm" 	type="STRING"/>
+        	<query-argument id="send_id" 	type="STRING"/>
+        	<query-argument id="recv_id" 	type="STRING"/>
+        </query-arguments>
+        <query-descript>보낸 쪽지 업데이트</query-descript>
+    </queryinfo>
+
+
+    <queryinfo>
+        <query-id>UCINF301U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-insensitive>true</query-insensitive>
+        <query-statement><![CDATA[
+            UPDATE UC_COM_NOTICE
+            SET    notice_type   = ?
+                 , notice_sbjt   = ?
+                 , notice_cont   = ?
+                 , valid_strt_dt = ?
+                 , valid_end_dt  = ?
+                 , mdf_id        = ?
+                 , mdf_dt        = CONVERT(VARCHAR(8),GETDATE(),112)
+                 , mdf_tm        = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+            WHERE  notice_seq    = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="notice_type"     	type="STRING"/>
+        	<query-argument id="notice_sbjt"     	type="STRING"/>
+        	<query-argument id="notice_cont"     	type="STRING"/>
+        	<query-argument id="valid_strt_dt"		type="STRING" option="M"/>
+        	<query-argument id="valid_end_dt"		type="STRING" option="M"/>
+        	<query-argument id="userid"     		type="STRING"/>
+        	<query-argument id="notice_seq"     	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>공지사항 수정</query-descript>
+    </queryinfo>
+	<queryinfo>
+		<query-id>UCINF128S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            SELECT QNA_SEQ
+                 , RPLY_SEQ
+                 , RPLY_CNTN
+                 , REG_USER_ID
+                 , dbo.FN_USER(REG_USER_ID, '') AS REG_USER_NM
+                 , REPLACE(SUBSTRING(DBO.UF_SYSDATE(CHG_DT,'YYYY-MM-DD HH:MI:SS',''),3,14),'-','.') RPLY_CHG_DT
+            FROM   UC_INF_QNA_RPLY
+            WHERE  QNA_SEQ = ?
+            ORDER  BY RPLY_SEQ ASC
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="qna_seq"			type="INTEGER"	/>
+		</query-arguments>
+		<query-descript> QNA댓글 조회 (infQnA.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCINF128I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+            INSERT INTO UC_INF_QNA_RPLY
+            (
+                QNA_SEQ
+              , RPLY_CNTN
+              , REG_DT
+              , REG_USER_ID
+              , CHG_DT
+              , CHG_USER_ID
+            )
+            VALUES
+            (
+                ?
+              , ?
+              , REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '') , ?
+              , REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '') , ?
+            )
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="qna_seq"		type="INTEGER"	/>
+			<query-argument id="rply_cntn"		type="STRING"	/>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="userid"			type="STRING"	/>
+		</query-arguments>
+		<query-descript> QNA댓글 등록 (infQnA.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCINF128D</query-id>
+		<query-exec-type>DELETE</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+            DELETE FROM UC_INF_QNA_RPLY WHERE RPLY_SEQ = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="rply_seq"		type="STRING"	/>
+		</query-arguments>
+		<query-descript> QNA댓글 삭제 (infQnA.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCINF128U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+            UPDATE UC_INF_QNA_RPLY
+            SET    RPLY_CNTN   = ?
+                 , CHG_USER_ID = ?
+                 , CHG_DT      = REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '')
+            WHERE RPLY_SEQ     = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="rply_cntn"		type="STRING"	/>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="rply_seq"		type="INTEGER"	/>
+		</query-arguments>
+		<query-descript> QNA댓글 수정 (infQnA.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCINF129U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            UPDATE UC_INF_QNA
+            SET    RPLY_CNT    = RPLY_CNT+1
+                 , CHG_DT      = REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '')
+                 , CHG_USER_ID = ?
+            WHERE  QNA_SEQ     = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="qna_seq"		type="INTEGER"	/>
+		</query-arguments>
+		<query-descript> QNA댓글수 증가 (infQnA.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCINF130U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            UPDATE UC_INF_QNA
+            SET    RPLY_CNT    = RPLY_CNT-1
+                 , CHG_DT      = REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '')
+                 , CHG_USER_ID = ?
+            WHERE  QNA_SEQ     = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="userid"			type="STRING"	/>
+			<query-argument id="qna_seq"		type="INTEGER"	/>
+		</query-arguments>
+		<query-descript> QNA댓글수 감소 (infQnA.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+        <query-id>UCINF131S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>CODE</query-view-type>
+        <query-statement><![CDATA[
+            SELECT BOARD_TP_SEQ  
+                  , BOARD_NM  
+            FROM   UC_COM_BOARD_TYPE
+            WHERE  BOARD_KND_CD = '03'
+            AND    USE_F        = 'Y'
+            ORDER  BY LUP_ORD
+		]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript> 홈페이지 게시판 콤보 (infNoticeHomePage.js) </query-descript>
+    </queryinfo>
+	<queryinfo>
+		<query-id>UCINF132I</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            INSERT INTO UC_COM_FILE
+            (
+                UP_SEQ , PRG_ID , FILE_NM , NEW_FILE_NM
+              , RG_DT  , RG_TM  , RG_ID
+              , MDF_DT , MDF_TM , MDF_ID
+            )
+            (SELECT IDENT_CURRENT('UC_COM_NOTICE'), ?, ?, ?
+                  , CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(CHAR , GETDATE(), 108), ':', ''), ?
+                  , CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(CHAR , GETDATE(), 108), ':', ''), ?
+            )
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="prg_id"     	type="STRING"/>
+			<query-argument id="file_nm"     	type="STRING"/>
+			<query-argument id="new_file_nm"	type="STRING"/>
+			<query-argument id="userid"    	 	type="STRING"/>
+			<query-argument id="userid"    	 	type="STRING"/>
+		</query-arguments>
+		<query-descript>업로드 파일 최초 저장 공통</query-descript>
+	</queryinfo>    
+	
+	<queryinfo>
+        <query-id>UCINF230S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				row_number() over(ORDER BY A.BOARD_SEQ DESC) rnum
+				, A.BOARD_SEQ
+				, A.BOARD_TP_SEQ
+				, C.BOARD_NM
+				, A.BOARD_SBJT
+				, A.BOARD_CONT
+				, A.QRY_CNT
+				, A.RPLY_CNT
+				, B.USER_NM AS RG_NM
+				, A.RG_DT
+				, A.RG_DT + ' ' + A.RG_TM AS RG_DTM
+				, dbo.FN_USER(A.MDF_ID, '') AS MDF_NM
+				, A.MDF_DT + ' ' + A.MDF_TM AS MDF_DTM
+				, A.MDF_DT
+				, A.RG_ID
+				, A.MDF_ID
+				, (SELECT COUNT(file_seq) FROM UC_COM_FILE WHERE prg_id='BOARD' AND up_seq=A.BOARD_SEQ) filecnt
+				, (SELECT COUNT(board_seq) FROM  UC_COM_BOARD_RPLY D WHERE  A.BOARD_SEQ = D.BOARD_SEQ) AS rply_cnt
+			FROM UC_COM_BOARD A, UC_COM_USER B, UC_COM_BOARD_TYPE C
+			WHERE A.RG_ID = B.USER_ID
+			AND   A.BOARD_TP_SEQ = C.BOARD_TP_SEQ
+			@board_tp_seq
+			@msearch
+			@msearch
+			ORDER BY A.BOARD_SEQ DESC
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_tp_seq"	type="INTEGER"	condition="AND A.board_tp_seq = ? "/>
+        	<query-argument id="msearch"			type="STRING" 		condition="AND  ( A.BOARD_SBJT LIKE '%'+?+'%'  " />
+        	<query-argument id="msearch"			type="STRING" 		condition="OR A.BOARD_CONT LIKE '%'+?+'%' )" />
+        </query-arguments>
+        <query-descript>모바일 웹 게시판 목록 조회</query-descript>
+    </queryinfo>
+    
+    
+	<queryinfo>
+        <query-id>UCINF231S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>FREE</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				A.BOARD_SEQ
+				, A.BOARD_TP_SEQ
+				, C.BOARD_NM
+				, A.BOARD_SBJT
+				, A.BOARD_CONT
+				, A.QRY_CNT
+				, A.RPLY_CNT
+				, B.USER_NM AS RG_NM
+				, A.RG_DT
+				, A.RG_TM
+				, REPLACE(substring(dbo.uf_sysdate(A.RG_DT+A.RG_TM,'YYYY-MM-DD HH:MI:SS',''),3,14),'-','.') AS RG_DTM
+				, dbo.FN_USER(A.MDF_ID, '') AS MDF_NM
+				, REPLACE(substring(dbo.uf_sysdate(A.MDF_DT+A.MDF_TM,'YYYY-MM-DD HH:MI:SS',''),3,14),'-','.') AS MDF_DTM
+				, A.MDF_DT
+				, A.RG_ID
+				, A.MDF_ID
+				, (SELECT COUNT(file_seq) FROM UC_COM_FILE WHERE prg_id='BOARD' AND up_seq=A.BOARD_SEQ) filecnt
+				, (SELECT COUNT(board_seq) FROM  UC_COM_BOARD_RPLY D WHERE  A.BOARD_SEQ = D.BOARD_SEQ) AS rply_cnt
+			FROM UC_COM_BOARD A, UC_COM_USER B, UC_COM_BOARD_TYPE C
+			WHERE A.RG_ID = B.USER_ID
+			AND   A.BOARD_TP_SEQ = C.BOARD_TP_SEQ
+			AND   A.BOARD_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_seq"			type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>모바일 웹 게시판 상세조회</query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCINF232S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				A.BOARD_SEQ
+				, A.BOARD_TP_SEQ
+				, A.BOARD_SBJT
+				, A.BOARD_CONT
+				, A.QRY_CNT
+				, A.RPLY_CNT
+				, (SELECT COUNT(board_seq) FROM  UC_COM_BOARD_RPLY D WHERE  A.BOARD_SEQ = D.BOARD_SEQ) AS rply_cnt
+				, 'prev1' AS type
+			FROM (
+				SELECT 
+				 	ROW_NUMBER() OVER(ORDER BY board_seq DESC) AS rnum
+					, *  
+				FROM uc_com_board WHERE board_seq < ? AND board_tp_seq = ?
+			)  a
+			WHERE a.rnum = 1
+			UNION ALL
+			SELECT 
+				A.BOARD_SEQ
+				, A.BOARD_TP_SEQ
+				, A.BOARD_SBJT
+				, A.BOARD_CONT
+				, A.QRY_CNT
+				, A.RPLY_CNT
+				, (SELECT COUNT(board_seq) FROM  UC_COM_BOARD_RPLY D WHERE  A.BOARD_SEQ = D.BOARD_SEQ) AS rply_cnt
+				, 'next1' AS type
+			FROM (
+				SELECT 
+				  	ROW_NUMBER() OVER(ORDER BY board_seq ASC) AS rnum
+					, * 
+				FROM uc_com_board WHERE board_seq > ? AND board_tp_seq = ?
+			)  a
+			WHERE a.rnum = 1
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_seq"			type="INTEGER"	/>
+			<query-argument id="board_tp_seq"		type="INTEGER"	/>
+			<query-argument id="board_seq"			type="INTEGER"	/>
+			<query-argument id="board_tp_seq"		type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>모바일 웹 게시판 이전, 다음글 정보 조회</query-descript>
+    </queryinfo>
+ 
+	<queryinfo>
+        <query-id>UCINF233U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			UPDATE uc_com_board
+			SET qry_cnt = (CASE WHEN rg_id <> ? THEN qry_cnt+1 ELSE qry_cnt END)
+			WHERE board_seq = ? AND board_tp_seq = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+        	<query-argument id="userid"			type="STRING"/>
+			<query-argument id="board_seq"		type="INTEGER"	/>
+			<query-argument id="board_tp_seq"	type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>모바일 웹 게시판 조회건수 업데이트</query-descript>
+    </queryinfo>
+    
+    
+	<queryinfo>
+        <query-id>UCINF234S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				BOARD_SEQ
+				, RPLY_SEQ
+				, RPLY_CONT
+		      --, RG_DT+' '+RG_TM AS RPLY_RG_DTM
+				, dbo.FN_USER(RG_ID, '') AS RPLY_RG_NM
+			  --, MDF_DT+' '+MDF_TM AS RPLY_MDF_DTM
+			  --, dbo.FN_USER(MDF_ID, '') AS RPLY_MDF_NM
+              --, SUBSTRING(CONVERT(VARCHAR(10), CAST(rg_dt as DATETIME), 102),3,8)+' '
+              --+ SUBSTRING(rg_tm,1,2)+':'+SUBSTRING(rg_tm,3,2) RPLY_RG_DTM
+                , REPLACE(substring(dbo.uf_sysdate(MDF_DT+MDF_TM,'YYYY-MM-DD HH:MI:SS',''),3,14),'-','.') RPLY_RG_DTM
+                , RG_ID
+			FROM UC_COM_BOARD_RPLY
+			WHERE BOARD_SEQ = ?
+			ORDER BY RPLY_SEQ ASC
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="board_seq"			type="INTEGER"	/>
+        </query-arguments>
+        <query-descript>모바일 웹 게시판 댓글 조회</query-descript>
+    </queryinfo>
+    
+	<queryinfo>
+	    <query-id>UCINF235S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>FREE</query-view-type>
+        <query-statement><![CDATA[
+			SELECT IDENT_CURRENT('UC_COM_BOARD') AS seq
+        ]]>
+        </query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript>모바일 웹 게시판 게시글 시퀀스 조회 </query-descript>
+    </queryinfo>
+    
+</query>
+
+

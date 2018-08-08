@@ -1,0 +1,1056 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<!--
+  PROJ : Nexfron Intranet
+  NAME : holiday.xml
+  DESC : 휴가 관련 쿼리
+  Author : 김은수 과장
+  VER  : 1.0
+  Copyright 2009 Nexfron All rights reserved
+  ============================================================================================
+  								변		경		사		항
+  ============================================================================================
+  VERSION		DATE		AUTHOR		DESCRIPTION
+  ============================================================================================
+  1.0		2009.08.14		김은수		주석추가
+  -->
+
+<query>
+
+	<!-- 휴가 공통 쿼리 시작 -->
+
+	<queryinfo>
+		<query-id>UCHLD000S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+					hldy_knd_seq AS code
+					, hldy_knd_nm AS codenm
+			FROM UC_HLDY_KND
+			ORDER BY hldy_ord
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>휴가 종류 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCHLD001S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            SELECT B.prj_seq AS code
+                 , B.prj_nm  AS codenm
+            FROM   UC_PRJ B
+            WHERE  prj_knd_cd = '03'
+			AND PRJ_C_DTL_CD = '9901'
+			AND pogr_stat = '02'
+            ORDER BY rl_st_dt, prj_seq
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>  프로젝트 조회 </query-descript>
+	</queryinfo>
+
+	<!-- 휴가 공통 쿼리 끝 -->
+
+	<!-- 휴가 관리 시작 -->
+
+	<queryinfo>
+		<query-id>UCHLD010S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+					0 AS chk
+					, hldy_knd_seq
+					, hldy_knd_nm
+					, hf_hldy_f_cd
+					, hldy_dy
+					, ddct_f_cd
+					, rg_id
+					, rg_dt
+					, hldy_ord
+			FROM UC_HLDY_KND
+			WHERE 1=1
+				  @q_ddct_f_cd
+				  @q_hldy_knd_nm
+			ORDER BY hldy_ord ASC
+		]]></query-statement>
+		<query-arguments>
+            <query-argument id="q_ddct_f_cd"	type="STRING"	condition=" AND ddct_f_cd = ? "/>
+            <query-argument id="q_hldy_knd_nm"	type="STRING"	condition=" AND hldy_knd_nm LIKE ? + '%' "/>
+		</query-arguments>
+		<query-descript>휴가 종류 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+    	<query-id>UCHLD010I</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			INSERT INTO
+			UC_HLDY_KND(	hldy_knd_nm
+							, hldy_dy
+							, hf_hldy_f_cd
+							, ddct_f_cd
+							, rg_id
+							, rg_dt
+							, rg_tm
+							, hldy_ord)
+			VALUES( ?, ?, ?, ?, ?
+					, CONVERT(varchar(8),GETDATE(), 112)
+			        , REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+					, ?)
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="hldy_knd_nm"	type="STRING"/>
+     		<query-argument id="hldy_dy"		type="FLOAT"/>
+     		<query-argument id="hf_hldy_f_cd"	type="STRING"/>
+     		<query-argument id="ddct_f_cd"		type="STRING"/>
+     		<query-argument id="userid"			type="STRING"/>
+     		<query-argument id="hldy_ord"		type="INTEGER"/>
+   		</query-arguments>
+   		<query-descript>휴가 종류 등록</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+    	<query-id>UCHLD010U</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			UPDATE UC_HLDY_KND
+					SET hldy_knd_nm = ?
+						, hldy_dy = ?
+						, hf_hldy_f_cd = ?
+						, ddct_f_cd = ?
+						, hldy_ord = ?
+			WHERE  	hldy_knd_seq = ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="hldy_knd_nm"	type="STRING"/>
+     		<query-argument id="hldy_dy"		type="FLOAT"/>
+     		<query-argument id="hf_hldy_f_cd"	type="STRING"/>
+     		<query-argument id="ddct_f_cd"		type="STRING"/>
+     		<query-argument id="hldy_ord"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"	type="INTEGER"/>
+   		</query-arguments>
+   		<query-descript>휴가 종류 등록</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCHLD010D</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-message></query-message>
+		<query-statement><![CDATA[
+			DELETE FROM UC_HLDY_KND
+			WHERE hldy_knd_seq = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript>휴가 종류 삭제</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCHLD011S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT  0 AS chk
+					, A.user_id
+					, A.user_nm
+					, ? AS bse_y
+			FROM UC_COM_USER A
+			WHERE NOT EXISTS (
+								SELECT hldy_id
+								FROM UC_HLDY_DY B
+								WHERE A.user_id = B.hldy_id
+								AND b.bse_y = ?
+							  )
+				  @q_userid
+				  @q_usernm
+			  AND use_f = 'Y'
+			ORDER BY a.user_nm
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="q_bse_y"	type="STRING"/>
+			<query-argument id="q_bse_y"	type="STRING"/>
+			<query-argument id="q_userid"	type="STRING"	condition=" AND A.user_id = ? "/>
+			<query-argument id="q_usernm"	type="STRING"	condition=" AND A.user_nm LIKE ? + '%' "/>
+		</query-arguments>
+		<query-descript>사용자 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCHLD012S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT  0 AS chk
+					, hldy_id AS user_id
+					, DBO.FN_USER(hldy_id, '') AS user_nm
+					, bse_y
+					, pmt_dy
+					, use_dy
+					, rmn_dy
+			FROM UC_HLDY_DY
+			WHERE bse_y = ?
+			ORDER BY user_nm
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="q_bse_y"	type="STRING"/>
+		</query-arguments>
+		<query-descript>사용자 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+    	<query-id>UCHLD012I</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			INSERT INTO
+			UC_HLDY_DY(	hldy_id
+						, bse_y
+						, pmt_dy
+						, use_dy
+						, rmn_dy
+						, rg_id
+						, rg_dt
+						, rg_tm )
+			VALUES( ?, ?, ?, 0, ?, ?
+					, CONVERT(varchar(8),GETDATE(), 112)
+			        , REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+					)
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="user_id"	type="STRING"/>
+     		<query-argument id="bse_y"		type="STRING"/>
+     		<query-argument id="pmt_dy"		type="FLOAT"/>
+     		<query-argument id="pmt_dy"		type="FLOAT"/>
+     		<query-argument id="userid"		type="STRING"/>
+   		</query-arguments>
+   		<query-descript>휴가 일수 등록</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+    	<query-id>UCHLD012U</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			UPDATE UC_HLDY_DY
+					SET pmt_dy = CONVERT(NUMERIC(10,1), ?)
+					,  rmn_dy = CONVERT(NUMERIC(10,1), ?) - use_dy
+			WHERE  	hldy_id = ?
+			AND		bse_y = ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="pmt_dy"		type="STRING"/>
+     		<query-argument id="pmt_dy"		type="STRING"/>
+     		<query-argument id="user_id"	type="STRING"/>
+     		<query-argument id="bse_y"		type="STRING"/>
+   		</query-arguments>
+   		<query-descript>휴가 일수 수정</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCHLD012D</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-message></query-message>
+		<query-statement><![CDATA[
+			DELETE FROM UC_HLDY_DY
+			WHERE bse_y = ?
+			AND	  hldy_id = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="bse_y"		type="STRING"/>
+			<query-argument id="hldy_id"		type="STRING"/>
+		</query-arguments>
+		<query-descript>휴가 일수 삭제</query-descript>
+	</queryinfo>
+
+	<!-- 휴가 관리 끝 -->
+
+	<!-- 휴가 신청/조회 시작 -->
+
+	<queryinfo>
+		<query-id>UCHLD020S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>FREE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+					bse_y
+					, DBO.FN_CODEBOOK('HLD002', bse_y) AS bse_y_nm
+					, ISNULL(pmt_dy, 0) AS pmt_dy
+					, ISNULL(use_dy, 0) AS use_dy
+					, ISNULL(rmn_dy, 0) AS rmn_dy
+			FROM UC_HLDY_DY
+			WHERE hldy_id = ?
+			AND bse_y = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="q_userid"	type="STRING"/>
+			<query-argument id="q_bse_y"	type="STRING"/>
+		</query-arguments>
+		<query-descript>내 휴가 정보 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCHLD020S_1</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>FREE</query-view-type>
+		<query-statement><![CDATA[
+            SELECT bse_y
+                , DBO.FN_CODEBOOK('HLD002', bse_y) AS bse_y_nm
+                , ISNULL(pmt_dy, 0) AS pmt_dy
+                , ISNULL(use_dy, 0) AS use_dy
+                , ISNULL(rmn_dy, 0) AS rmn_dy
+            FROM  UC_HLDY_DY
+            WHERE hldy_id = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="q_userid"	type="STRING"/>
+		</query-arguments>
+		<query-descript> 내 휴가정보 조회 (hldHolidayList.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCHLD021S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+            SELECT A.hldy_seq      , A.hldy_id  , A.bse_y   , A.hldy_knd_seq , A.prj_seq
+                 , A.st_dt strt_dt , A.end_dt   , A.hldy_dy , A.hldy_plc     , A.cntc_tel_no
+                 , A.hldy_rsn      , A.hldy_rmk , A.rg_id   , A.rg_dt        , A.rg_tm
+                 , (CASE WHEN B.sign_hst_id  IS NULL THEN '06' --임시저장
+                         WHEN B.rtn_f_cd = 'Y'       THEN '05'
+                         ELSE B.sign_prgs_stts_cd
+                    END) AS sign_prgs_stts_cd
+                 , DBO.FN_CODEBOOK('SYS019',
+                   (CASE WHEN B.sign_hst_id  IS NULL THEN '06' --임시저장
+                         WHEN B.rtn_f_cd = 'Y'       THEN '05'
+                         ELSE B.sign_prgs_stts_cd
+                    END)) AS sign_prgs_stts_nm
+                 , B.sign_stg_cd
+                 , DBO.FN_CODEBOOK('SYS018', B.sign_stg_cd ) AS sign_stg_nm
+                 , B.rtn_f_cd
+                 , (CASE WHEN B.sign_hst_id  IS NULL THEN 'X'
+                         WHEN B.sign_f_cd1 = 'N' THEN B.sign_id1
+                         WHEN B.sign_f_cd2 = 'N' THEN B.sign_id2
+                         WHEN B.sign_f_cd3 = 'N' THEN B.sign_id3
+                         ELSE '결재완료'
+                    END) AS sign_id
+                 , (CASE WHEN B.sign_hst_id  IS NULL THEN '임시저장'
+                         WHEN B.sign_f_cd1 = 'N' THEN DBO.FN_USER(B.sign_id1,'')
+                 	     WHEN B.sign_f_cd2 = 'N' THEN DBO.FN_USER(B.sign_id2,'')
+                 	     WHEN B.sign_f_cd3 = 'N' THEN DBO.FN_USER(B.sign_id3,'')
+                         ELSE '결재완료'
+                    END) AS sign_nm
+                 , (CASE WHEN B.sign_hst_id  IS NULL THEN '임시저장'
+                         WHEN B.sign_f_cd1 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '1')
+                         WHEN B.sign_f_cd2 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '2')
+                         WHEN B.sign_f_cd3 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '3')
+                         ELSE '결재완료'
+                    END) AS now_sign_stg
+            FROM   UC_HLDY A
+            LEFT   OUTER JOIN UC_SIGN_HST B  ON (A.hldy_seq = B.sign_hst_id AND B.sign_tp_cd = '01')
+            WHERE  A.rg_dt BETWEEN ? AND ?
+            AND    A.hldy_id = ?
+            @q_sign_prgs_stts_cd
+            ORDER  BY rg_dt DESC, rg_tm DESC
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="strt_q_date"			type="STRING"	option="M"/>
+			<query-argument id="end_q_date"				type="STRING"	option="M"/>
+			<query-argument id="q_userid"				type="STRING"	/>
+			<query-argument id="q_sign_prgs_stts_cd"	type="STRING"	condition="AND    B.sign_prgs_stts_cd = ? "/>
+		</query-arguments>
+		<query-descript> 휴가신청내역 조회 (hldHolidayList.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+	<query-id>UCHLD021I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            INSERT INTO UC_HLDY
+            (
+                hldy_id  , bse_y    , hldy_knd_seq , prj_seq     , st_dt
+              , end_dt   , hldy_dy  , hldy_plc     , cntc_tel_no , alnc_c_cd	--사용하지 않는것 같음 UCHLD033S(휴가사용내역 조회) 확인후 삭제
+              , hldy_rsn , hldy_rmk , rg_id        , rg_dt       , rg_tm
+              , mdf_id   , mdf_dt   , mdf_tm
+            )
+            VALUES
+            (
+                ?, ?, ?, ?, ?
+              , ?, ?, ?, ?, '01'
+              , ?, ?, ?
+              , CONVERT(varchar(8),GETDATE(), 112)
+              , REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+              , ?
+              , CONVERT(varchar(8),GETDATE(), 112)
+              , REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+            )
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="hldy_id"		type="STRING"/>
+			<query-argument id="bse_y"       	type="STRING"/>
+			<query-argument id="hldy_knd_seq"	type="INTEGER"/>
+			<query-argument id="prj_seq"      	type="INTEGER"/>
+			<query-argument id="strt_dt"       	type="STRING"	option="M"/>
+			<query-argument id="end_dt"      	type="STRING"	option="M"/>
+			<query-argument id="hldy_dy"     	type="FLOAT"/>
+			<query-argument id="hldy_plc"    	type="STRING"/>
+			<query-argument id="cntc_tel_no" 	type="STRING"	option="M"/>
+			<query-argument id="hldy_rsn"    	type="STRING"/>
+			<query-argument id="hldy_rmk"    	type="STRING"/>
+			<query-argument id="hldy_id"       	type="STRING"/>
+			<query-argument id="hldy_id"       	type="STRING"/>
+		</query-arguments>
+		<query-descript> 휴가정보 등록 (hldHolidayList.js) </query-descript>
+	</queryinfo>
+<!--  	<queryinfo>
+		<query-id>UCHLD022I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            INSERT INTO UC_SIGN_HST
+            (
+                sign_tp_cd  , sign_hst_id
+              , sign_id1    , sign_f_cd1 , sign_dt1
+              , sign_id2    , sign_f_cd2 , sign_dt2
+              , sign_id3    , sign_f_cd3 , sign_dt3
+              , sign_stg_cd , rtn_f_cd   , sign_prgs_stts_cd
+              , rg_id       , rg_dt      , rg_tm
+              , mdf_id      , mdf_dt     , mdf_tm
+            )
+            SELECT '01' ,(CASE ? WHEN 'INSERT' THEN IDENT_CURRENT('UC_HLDY') ELSE ? END)
+                 , sign_id1    , 'N' , ''
+                 , sign_id2    , (CASE sign_stg_cd WHEN 2 THEN 'N' WHEN 3 THEN 'N' ELSE NULL END) , ''
+                 , sign_id3    , (CASE sign_stg_cd WHEN 3 THEN 'N' ELSE NULL END) , ''
+                 , sign_stg_cd , 'N' , '01'
+                 , ? , CONVERT(VARCHAR(8),GETDATE(), 112)
+                 , REPLACE(CONVERT(VARCHAR(8),GETDATE(),114), ':', '')
+                 , ? , CONVERT(VARCHAR(8),GETDATE(), 112)
+                 , REPLACE(CONVERT(VARCHAR(8),GETDATE(),114), ':', '')
+            FROM   UC_SIGN_INFO
+            WHERE  SIGN_TP_CD = '01'
+            AND    PRJ_SEQ    = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="saveflag"	type="STRING"/>
+			<query-argument id="hldy_seq"	type="INTEGER"/>
+			<query-argument id="hldy_id"	type="STRING"/>
+			<query-argument id="hldy_id"	type="STRING"/>
+			<query-argument id="prj_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript> 휴가결재등록 (hldHolidayList.js) </query-descript>
+	</queryinfo>-->
+<!--  	<queryinfo>
+		<query-id>UCHLD022I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            INSERT INTO UC_SIGN_HST
+            (
+                sign_tp_cd  , sign_hst_id
+              , sign_id1    , sign_f_cd1 , sign_dt1
+              , sign_id2    , sign_f_cd2 , sign_dt2
+              , sign_id3    , sign_f_cd3 , sign_dt3
+              , sign_stg_cd , rtn_f_cd   , sign_prgs_stts_cd
+              , rg_id       , rg_dt      , rg_tm
+              , mdf_id      , mdf_dt     , mdf_tm
+            )
+            SELECT '01' ,(CASE ? WHEN 'INSERT' THEN IDENT_CURRENT('UC_HLDY') ELSE ? END)
+                 , isnull(b.USER_ID, c.USER_ID) sign_id1    , 'N' , ''
+                 , case when b.user_id is null then null else c.USER_ID end sign_id2    , 'N' , ''
+                 , null sign_id3    , null , ''
+                 , case when b.user_id is null then 1 else 2 end sign_stg_cd , 'N' , '01'
+                 , ? , CONVERT(VARCHAR(8),GETDATE(), 112)
+                 , REPLACE(CONVERT(VARCHAR(8),GETDATE(),114), ':', '')
+                 , ? , CONVERT(VARCHAR(8),GETDATE(), 112)
+                 , REPLACE(CONVERT(VARCHAR(8),GETDATE(),114), ':', '')
+            FROM   UC_COM_USER a
+				   LEFT JOIN UC_COM_USER b
+				       ON ( (b.view_org_3 is NOT null AND a.VIEW_ORG_3 = 	b.view_org_3	) 
+						     OR (b.view_org_3 is null AND a.VIEW_ORG_2 = 	b.view_org_2	) ) 
+				        AND  B.GRD_CD='06'
+				        AND  b.USE_F='Y' 
+				   LEFT JOIN UC_COM_USER c 
+				      ON   a.view_org_1 = C.view_org_1 
+				        AND  C.GRD_CD='03' and C.USE_F='Y'
+			WHERE a.USER_id=?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="saveflag"	type="STRING"/>
+			<query-argument id="hldy_seq"	type="INTEGER"/>
+			<query-argument id="hldy_id"	type="STRING"/>
+			<query-argument id="hldy_id"	type="STRING"/>
+			<query-argument id="hldy_id"	type="STRING"/>
+		</query-arguments>
+		<query-descript> 휴가결재등록 (hldHolidayList.js) </query-descript>
+	</queryinfo>-->
+	<queryinfo>
+		<query-id>UCHLD021U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            UPDATE UC_HLDY
+            SET    hldy_knd_seq = ?
+                 , prj_seq      = ?
+                 , st_dt        = ?
+                 , end_dt       = ?
+                 , hldy_dy      = ?
+                 , hldy_plc     = ?
+                 , cntc_tel_no  = ?
+                 , hldy_rsn     = ?
+                 , mdf_id       = ?
+                 , mdf_dt       = CONVERT(varchar(8),GETDATE(), 112)
+                 , mdf_tm       = REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+            WHERE  hldy_seq     = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="hldy_knd_seq"	type="INTEGER"/>
+			<query-argument id="prj_seq"		type="INTEGER"/>
+			<query-argument id="strt_dt"		type="STRING"	option="M"/>
+			<query-argument id="end_dt"			type="STRING"	option="M"/>
+			<query-argument id="hldy_dy"		type="FLOAT"/>
+			<query-argument id="hldy_plc"		type="STRING"/>
+			<query-argument id="cntc_tel_no"	type="STRING"	option="M"/>
+			<query-argument id="hldy_rsn"		type="STRING"/>
+			<query-argument id="hldy_id"		type="STRING"/>
+			<query-argument id="hldy_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript> 휴가정보 수정 (hldHolidayList.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+	<query-id>UCHLD022U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-message></query-message>
+		<query-statement><![CDATA[
+            UPDATE A
+            SET    A.sign_id1          = B.sign_id1
+                 , A.sign_dt1          = ''
+                 , A.sign_f_cd1        = 'N'
+                 , A.sign_id2          = B.sign_id2
+                 , A.sign_dt2          = ''
+                 , A.sign_f_cd2        = CASE B.sign_stg_cd WHEN 2 THEN 'N' ELSE NULL END
+                 , A.sign_id3          = B.sign_id3s
+                 , A.sign_dt3          = ''
+                 , A.sign_f_cd3        = CASE B.sign_stg_cd WHEN 3 THEN 'N' ELSE NULL END
+                 , A.sign_stg_cd       = B.sign_stg_cd
+                 , A.rtn_f_cd          = 'N'
+                 , A.sign_prgs_stts_cd = '01'
+                 , A.sign_rsn          = ''
+            FROM   UC_SIGN_HST A
+            RIGHT  OUTER JOIN UC_SIGN_INFO B ON A.sign_tp_cd = B.sign_tp_cd
+            WHERE  B.sign_tp_cd  = '01'
+            AND    B.prj_seq     = ?
+            AND    A.sign_hst_id = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="prj_seq"	type="INTEGER"/>
+			<query-argument id="hldy_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript> 휴가결재수정 (현재 사용안함, hldHolidayList.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCHLD022S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>FREE</query-view-type>
+		<query-statement><![CDATA[
+			
+            SELECT CASE WHEN DDCT_F_CD='N' and hldy_dy > 30 then 
+            		 (SELECT COUNT(*) hldy_dy
+                               FROM   UC_COM_CLD
+                               WHERE  bse_dt BETWEEN ? AND ?)
+                   ELSE            
+            		 CASE WHEN hf_hldy_f_cd='Y'
+                         THEN hldy_dy
+                         ELSE (SELECT COUNT(*) hldy_dy
+                               FROM   UC_COM_CLD
+                               WHERE  dayw NOT IN (1,7)
+                               AND    hldy_f <> 'Y'
+                               AND    bse_dt BETWEEN ? AND ?) END
+                  END AS hldy_dy, DDCT_F_CD,hldy_dy HLDY_posb_DY
+            FROM   UC_HLDY_KND
+            WHERE  hldy_knd_seq = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="strt_dt"		type="STRING"	option="M"/>
+			<query-argument id="end_dt"			type="STRING"	option="M"/>
+			<query-argument id="strt_dt"		type="STRING"	option="M"/>
+			<query-argument id="end_dt"			type="STRING"	option="M"/>
+			<query-argument id="hldy_knd_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript>휴가 일수 조회 (hldHolidayList.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCHLD021D</query-id>
+		<query-exec-type>DELETE</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+            DELETE FROM UC_HLDY WHERE HLDY_SEQ = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="hldy_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript> 휴가 삭제 (hldHolidayList.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCHLD022D</query-id>
+		<query-exec-type>DELETE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            DELETE FROM UC_SIGN_HST WHERE sign_tp_cd = '01' AND sign_hst_id = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="hldy_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript> 휴가결재삭제 (현재 사용안함, hldHolidayList.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCHLD023U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-message></query-message>
+		<query-statement><![CDATA[
+            UPDATE UC_SIGN_HST
+            SET    rtn_f_cd          = 'N'
+                 , sign_prgs_stts_cd = '05'
+                 , mdf_id            = ?
+                 , mdf_dt            = CONVERT(varchar(8),GETDATE(), 112)
+                 , mdf_tm            = REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+            WHERE  sign_tp_cd        = '01'
+            AND    sign_hst_id       = ?
+		]]></query-statement>
+		<query-arguments>
+		<query-argument id="hldy_id"	type="STRING"/>
+		<query-argument id="hldy_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript> 휴가 취소 (현재 사용안함, hldHolidayList.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCHLD023S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+            SELECT (CASE GROUPING_ID(BSE_Y) WHEN 1 THEN '소계'
+                         ELSE DBO.FN_CODEBOOK('HLD002',A.BSE_Y) END) BSE_Y
+                 , SUM(ISNULL(A.PMT_DY,0.0)) PMT_DY
+                 , SUM(ISNULL(A.USE_DY,0.0)) USE_DY
+                 , SUM(ISNULL(A.RMN_DY,0.0)) RMN_DY
+            FROM   UC_HLDY_DY A
+            WHERE  HLDY_ID=?
+            GROUP  BY A.BSE_Y WITH ROLLUP
+            ORDER  BY 1
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="q_userid" type="STRING"/>
+		</query-arguments>
+		<query-descript>휴가사용내역조회</query-descript>
+	</queryinfo>
+	<!-- 휴가 신청/조회 끝 -->
+
+	<!-- 휴가 결재 시작 -->
+
+	<queryinfo>
+		<query-id>UCHLD030S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+            SELECT alnc         , rtn         , hldy_seq        , hldy_id           , bse_y
+                 , hldy_knd_seq , hldy_knd_nm , prj_seq         , st_dt             , end_dt
+                 , hldy_dy      , hldy_plc    , cntc_tel_no     , hldy_rsn          , hldy_rmk
+                 , rg_id        , hldy_nm     , rg_dt           , sign_prgs_stts_cd , sign_prgs_stts_nm
+                 , sign_stg_cd  , sign_stg_nm , rtn_f_cd        , sign_id           , sign_nm
+                 , now_sign_stg , sign_rsn    , now_sign_stg_cd , rg_tm
+            FROM   (
+                   SELECT 0 AS alnc      , 0 AS rtn   , A.hldy_seq    , A.hldy_id  , A.bse_y
+                        , A.hldy_knd_seq
+                        , ( SELECT hldy_knd_nm FROM UC_HLDY_KND WHERE hldy_knd_seq = A.hldy_knd_seq ) AS hldy_knd_nm
+                        , A.prj_seq      , A.st_dt    , A.end_dt
+                        , A.hldy_dy      , A.hldy_plc , A.cntc_tel_no , A.hldy_rsn , A.hldy_rmk
+                        , A.rg_id        , DBO.FN_USER(A.rg_id, '') AS hldy_nm     , A.rg_dt
+                        , (CASE WHEN B.rtn_f_cd = 'Y' THEN '05' ELSE B.sign_prgs_stts_cd END) AS sign_prgs_stts_cd
+                        , (CASE WHEN B.rtn_f_cd = 'Y' THEN '반려' ELSE DBO.FN_CODEBOOK('SYS019', B.sign_prgs_stts_cd) END) AS sign_prgs_stts_nm
+
+                        , B.sign_stg_cd  , DBO.FN_CODEBOOK('SYS018', B.sign_stg_cd ) AS sign_stg_nm , B.rtn_f_cd
+                        ,      CASE WHEN B.sign_f_cd1 = 'N' THEN b.sign_id1
+                          ELSE CASE WHEN B.sign_f_cd2 = 'N' THEN B.sign_id2
+                          ELSE CASE WHEN B.sign_f_cd3 = 'N' THEN B.sign_id3
+                          ELSE '결재완료' END END END AS sign_id
+                        ,      CASE WHEN B.sign_f_cd1 = 'N' THEN DBO.FN_USER(B.sign_id1,'')
+                          ELSE CASE WHEN B.sign_f_cd2 = 'N' THEN DBO.FN_USER(B.sign_id2,'')
+                          ELSE CASE WHEN B.sign_f_cd3 = 'N' THEN DBO.FN_USER(B.sign_id3,'')
+                          ELSE '결재완료' END END END AS sign_nm
+                        ,      CASE WHEN B.sign_f_cd1 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '1')
+                          ELSE CASE WHEN B.sign_f_cd2 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '2')
+                          ELSE CASE WHEN B.sign_f_cd3 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '3')
+                          ELSE '결재완료' END END END AS now_sign_stg
+                        , B.sign_rsn
+                        , CASE WHEN B.sign_f_cd1 = 'N' THEN '1'
+                               WHEN B.sign_f_cd2 = 'N' THEN '2'
+                               WHEN B.sign_f_cd3 = 'N' THEN '3'
+                          END AS now_sign_stg_cd
+                        , A.rg_tm
+                   FROM   UC_HLDY A, UC_SIGN_HST B
+                   WHERE  A.hldy_seq   = B.sign_hst_id
+                   AND    B.sign_tp_cd = '01'
+                   AND    A.rg_dt BETWEEN ? AND ?
+                   @q_hldy_knd_seq
+                   @q_sign_prgs_stts_cd
+                   @q_hldy_id
+                   ) C
+            WHERE  1 = 1
+            @q_sign_id
+            ORDER  BY C.rg_dt DESC, rg_tm DESC
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="q_date_from"			type="STRING"	option="M"/>
+			<query-argument id="q_date_to"				type="STRING"	option="M"/>
+			<query-argument id="q_hldy_knd_seq"			type="INTEGER"	condition="AND    A.hldy_knd_seq = ? "/>
+			<query-argument id="q_sign_prgs_stts_cd"	type="STRING"	condition="AND    B.sign_prgs_stts_cd = ? "/>
+			<query-argument id="q_hldy_id"				type="STRING"	condition="AND    A.rg_id = ? "/>
+			<query-argument id="q_sign_id"				type="STRING"	condition="AND    C.sign_id = ? "/>
+		</query-arguments>
+		<query-descript>휴가 신청 내역 조회</query-descript>
+	</queryinfo>
+	<queryinfo>
+    	<query-id>UCHLD030U</query-id>
+    	<query-exec-type>UPDATE</query-exec-type>
+    	<query-view-type>NONE</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			UPDATE UC_SIGN_HST
+				SET	  sign_dt1		= 	CASE WHEN sign_prgs_stts_cd = '01' THEN
+												CASE ? WHEN 'A' THEN CONVERT(varchar(8),GETDATE(), 112) ELSE '' END
+											 ELSE sign_dt1
+										END
+					, sign_dt2		=	CASE WHEN sign_prgs_stts_cd = '02' THEN
+												CASE ? WHEN 'A' THEN CONVERT(varchar(8),GETDATE(), 112) ELSE '' END
+											 ELSE sign_dt2
+										END
+					, sign_dt3		=	CASE WHEN sign_prgs_stts_cd = '03' THEN
+												CASE ? WHEN 'A' THEN CONVERT(varchar(8),GETDATE(), 112) ELSE '' END
+											 ELSE sign_dt3
+										END
+					, sign_f_cd1	=	CASE WHEN sign_prgs_stts_cd = '01' THEN
+												CASE ? WHEN 'A' THEN 'Y' ELSE 'N' END
+											 ELSE sign_f_cd1
+										END
+					, sign_f_cd2	=	CASE WHEN sign_prgs_stts_cd = '02' THEN
+												CASE ? WHEN 'A' THEN 'Y' ELSE 'N' END
+											 ELSE sign_f_cd2
+										END
+					, sign_f_cd3	=	CASE WHEN sign_prgs_stts_cd = '03' THEN
+												CASE ? WHEN 'A' THEN 'Y' ELSE 'N' END
+											 ELSE sign_f_cd3
+										END
+					, rtn_f_cd		=	CASE ? WHEN 'R' THEN 'Y' ELSE 'N' END
+					, sign_prgs_stts_cd	=	CASE ?
+												WHEN 'A' THEN 	-- 승인
+													CASE sign_prgs_stts_cd
+														WHEN '01' THEN
+															CASE WHEN CAST(sign_prgs_stts_cd AS int) < CAST(sign_stg_cd AS int) THEN '02' ELSE '04' END
+														WHEN '02' THEN
+															CASE WHEN CAST(sign_prgs_stts_cd AS int) < CAST(sign_stg_cd AS int) THEN '03' ELSE '04' END
+														WHEN '03' THEN '04'
+														ELSE sign_prgs_stts_cd
+													END
+												WHEN 'R' THEN
+													CASE sign_prgs_stts_cd
+														WHEN '02' THEN '01'
+														WHEN '03' THEN '02'
+														WHEN '04' THEN --최종결재 단계
+															CASE sign_stg_cd
+																WHEN 1 THEN '01'
+																WHEN 2 THEN '02'
+																WHEN 3 THEN '03'
+															END
+														ELSE sign_prgs_stts_cd
+													END
+											END
+					, sign_rsn		= ?
+			WHERE sign_tp_cd = '01'
+			AND   sign_hst_id = ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="sign_rsn"			type="STRING"/>
+     		<query-argument id="hldy_seq"			type="INTEGER"/>
+   		</query-arguments>
+   		<query-descript>휴가 결재 UPDATE </query-descript>
+	</queryinfo>
+
+	<queryinfo>
+    	<query-id>UCHLD031U</query-id>
+    	<query-exec-type>UPDATE</query-exec-type>
+    	<query-view-type>NONE</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			UPDATE UC_HLDY_DY
+				SET rmn_dy =	CASE ?	-- 승인/반려
+									WHEN 'A' THEN
+										CASE ?		--현재결재상태
+											WHEN '01' THEN
+												CASE WHEN CAST(? AS int) < ? THEN ISNULL(rmn_dy, 0)		--결재결재상태/총단계코드
+													 ELSE
+													 	CASE (SELECT ddct_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ? )
+													 		WHEN 'Y' THEN
+													 			CASE (SELECT hf_hldy_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ? )
+																	WHEN 'Y' THEN
+																		ISNULL(rmn_dy, 0) - 0.5
+																	ELSE (ISNULL(rmn_dy, 0) - ?)	-- 휴가일수
+																END
+													 		ELSE ISNULL(rmn_dy, 0)
+													 	END
+												END
+											WHEN '02' THEN
+												CASE WHEN CAST(? AS int) < ? THEN ISNULL(rmn_dy, 0)		--결재결재상태/총단계코드
+													 ELSE
+													 	CASE (SELECT ddct_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ? )
+													 		WHEN 'Y' THEN
+																CASE (SELECT hf_hldy_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ? )
+																	WHEN 'Y' THEN
+																		ISNULL(rmn_dy, 0) - 0.5
+																	ELSE (ISNULL(rmn_dy, 0) - ?)	-- 휴가일수
+																END
+															ELSE ISNULL(rmn_dy, 0)
+														END
+												END
+											WHEN '03' THEN
+												CASE (SELECT ddct_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ? )
+													WHEN 'Y' THEN
+														CASE (SELECT hf_hldy_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ? )
+															WHEN 'Y' THEN
+																ISNULL(rmn_dy, 0) - 0.5
+															ELSE (ISNULL(rmn_dy, 0) - ?)	-- 휴가일수
+														END
+													ELSE ISNULL(rmn_dy, 0)
+												END
+											ELSE ISNULL(rmn_dy, 0)
+										END
+									WHEN 'R' THEN
+										rmn_dy
+								END
+							,
+					use_dy =	CASE ?	-- 승인/반려
+									WHEN 'A' THEN
+										CASE ?		--현재결재상태
+											WHEN '01' THEN
+												CASE WHEN CAST(? AS int) < ? THEN ISNULL(use_dy, 0)		--결재결재상태/총단계코드
+													 ELSE
+													 	CASE (SELECT ddct_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ? )
+													 		WHEN 'Y' THEN
+																CASE (SELECT hf_hldy_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ?)
+																	WHEN 'Y' THEN
+																		ISNULL(use_dy, 0) + 0.5
+																	ELSE (ISNULL(use_dy, 0) + ? )	-- 휴가일수
+																END
+															ELSE ISNULL(use_dy, 0)
+														END
+												END
+											WHEN '02' THEN
+												CASE WHEN CAST(? AS int) < ? THEN ISNULL(use_dy, 0)		--결재결재상태/총단계코드
+													 ELSE
+													 	CASE (SELECT ddct_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ? )
+													 		WHEN 'Y' THEN
+																CASE (SELECT hf_hldy_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ?)
+																	WHEN 'Y' THEN
+																		ISNULL(use_dy, 0) + 0.5
+																	ELSE (ISNULL(use_dy, 0) + ? )	-- 휴가일수
+																END
+															ELSE ISNULL(use_dy, 0)
+														END
+												END
+											WHEN '03' then
+												CASE (SELECT ddct_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ? )
+													WHEN 'Y' THEN
+														CASE (SELECT hf_hldy_f_cd FROM uc_hldy_knd WHERE hldy_knd_seq = ?)
+															WHEN 'Y' THEN
+																ISNULL(use_dy, 0) + 0.5
+															ELSE (ISNULL(use_dy, 0) + ? )	-- 휴가일수
+														END
+													ELSE ISNULL(use_dy, 0)
+												END
+											ELSE ISNULL(use_dy, 0)
+										END
+									WHEN 'R' THEN
+										use_dy
+								END
+			FROM UC_HLDY_DY
+			WHERE  	hldy_id = ?
+			AND		bse_y = ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_stg_cd"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_stg_cd"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		<!-- 반려시 휴가일수가 잘못 계산되는 문제로 수정 (결재완료되면 다시 결재할 수 없기 때문에 반려시 일수계산을 하지 않음)
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_stg_cd"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_stg_cd"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		-->
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_stg_cd"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_stg_cd"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		<!--
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_stg_cd"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		<query-argument id="sign_prgs_stts_cd"	type="STRING"/>
+     		<query-argument id="sign_stg_cd"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_knd_seq"		type="INTEGER"/>
+     		<query-argument id="hldy_dy"			type="FLOAT"/>
+     		-->
+     		<query-argument id="hldy_id"		type="STRING"/>
+     		<query-argument id="bse_y"			type="STRING"/>
+   		</query-arguments>
+   		<query-descript>휴가 결재 UPDATE </query-descript>
+	</queryinfo>
+
+	<queryinfo>
+    	<query-id>UCHLD032U</query-id>
+    	<query-exec-type>UPDATE</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			UPDATE UC_HLDY
+					SET hldy_rmk = ?
+						, mdf_id = ?
+						, mdf_dt = CONVERT(varchar(8),GETDATE(), 112)
+						, mdf_tm = REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+			WHERE  	hldy_seq = ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="hldy_rmk"		type="STRING"/>
+     		<query-argument id="user_id"		type="STRING"/>
+     		<query-argument id="hldy_seq"		type="INTEGER"/>
+   		</query-arguments>
+   		<query-descript>휴가 비고 업데이트</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCHLD032S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+			        A.hldy_seq
+			        , A.hldy_id
+			        , DBO.FN_USER(A.hldy_id, '') AS hldy_nm
+			        , A.bse_y
+					, A.hldy_knd_seq
+					, A.st_dt
+					, A.end_dt
+					, A.hldy_dy
+					, A.hldy_plc
+					, A.cntc_tel_no
+					, A.hldy_rsn
+					, A.hldy_rmk
+			        , A.rg_id
+			        , A.rg_dt
+			        , (CASE WHEN B.rtn_f_cd = 'Y' THEN '05' ELSE B.sign_prgs_stts_cd END) AS sign_prgs_stts_cd
+			        , B.rtn_f_cd
+			FROM UC_HLDY A, UC_SIGN_HST B
+			WHERE A.hldy_seq = B.sign_hst_id
+			AND B.sign_tp_cd='01'
+			AND A.bse_y = ?
+			AND A.hldy_id = ?
+			ORDER BY A.rg_dt DESC
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="q_bse_y"		type="STRING"/>
+            <query-argument id="q_userid"		type="STRING"/>
+		</query-arguments>
+		<query-descript>휴가 신청 내역 조회</query-descript>
+	</queryinfo>
+	<!-- 휴가 결재 끝 -->
+
+	<queryinfo>
+		<query-id>UCHLD033S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT    user_nm + '[' + user_id + ']' hldy_id
+					, sum(case when hldy_knd_seq = 1 or hldy_knd_seq = 23 or hldy_knd_seq = 24 then hldy_dy else 0 end) hldy_knd_seq_01
+					, sum(case when hldy_knd_seq = 11 then hldy_dy else 0 end) hldy_knd_seq_11
+					, sum(case when hldy_knd_seq = 12 then hldy_dy else 0 end) hldy_knd_seq_12
+					, sum(case when hldy_knd_seq = 25 then hldy_dy else 0 end) hldy_knd_seq_25
+					, sum(case when hldy_knd_seq = 26 then hldy_dy else 0 end) hldy_knd_seq_26
+					, sum(case when hldy_knd_seq = 27 then hldy_dy else 0 end) hldy_knd_seq_27
+					, sum(case when hldy_knd_seq = 28 then hldy_dy else 0 end) hldy_knd_seq_28
+					, sum(case when (hldy_knd_seq >= 13 and hldy_knd_seq <= 21) then hldy_dy else 0 end) hldy_knd_seq_etc
+					, sum(hldy_dy) tot
+					, sum(case when bse_y < ? then hldy_dy else 0 end) hldy_pre_year
+					, sum(case when bse_y = ? then hldy_dy else 0 end) hldy_this_year
+			FROM   uc_com_user a LEFT OUTER JOIN uc_hldy b
+					ON (a.user_id = b.hldy_id AND b.alnc_c_cd = '01' AND substring(b.st_dt, 1, 4) = ?)
+			WHERE  a.use_f = 'Y' AND a.user_id <> 'nexfron'
+			GROUP BY user_id, user_nm
+			ORDER BY user_nm
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="q_bse_y"		type="STRING"/>
+			<query-argument id="q_bse_y"		type="STRING"/>
+			<query-argument id="q_bse_y"		type="STRING"/>
+		</query-arguments>
+		<query-descript>휴가사용내역조회</query-descript>
+	</queryinfo>
+</query>
+

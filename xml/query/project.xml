@@ -1,0 +1,1815 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<query>
+	<queryinfo>
+		<query-id>UCPRJ010C</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+        <query-view-type>CODE</query-view-type>
+		<query-statement><![CDATA[
+
+			SELECT
+				 '2' AS step
+				,code
+				,code_nm
+			FROM UC_COM_CODEBOOK
+			WHERE	up_cd 	= 'PRJ006'
+				AND code   	!= '000'
+              	AND etc1  	= ?
+           ORDER BY  lup_ord
+
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="prj_c_cd"     	type="STRING"/>
+        </query-arguments>
+        <query-descript>프로젝트 구분 상세 콤보 조회  (prjExeMng.js)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+        <query-id>UCPRJ010S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+	      	SELECT
+	      		 prj_seq
+	      		,prj_c_cd
+	      		,dbo.fn_codebook('PRJ001', prj_c_cd) prj_c_cd_nm
+	      		,prj_nm
+	      		,prj_desc
+	      		,prj_loc
+	      		,rl_st_dt
+	      		,rl_end_dt
+	      		,cntr_man_m
+	      		,rl_etrn_m_m
+	      		,pgs_rt
+	      		,end_f_cd
+	      		,dbo.fn_codebook('COM002', end_f_cd) end_f_cd_nm
+	      		,prj_c_dtl_cd
+	      		,coper_co
+	      		,clnt_co
+	      		,etrn_m
+	      		,dvlp_tool
+	      		,dbms
+	      		,prj_knd_cd
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,dbo.fn_user(rg_id, '') rg_nm
+	      		,mdf_dt
+	      		,mdf_tm
+	      		,mdf_id
+	      		,dbo.fn_user(mdf_id, '') mdf_nm
+				, jdk_ver
+				, was_type
+				, work_range
+				, pogr_stat
+				, rmk
+				,dbo.fn_codebook('PRJ011', pogr_stat) pogr_stat_nm
+			FROM UC_PRJ
+			WHERE rl_st_dt <= ?
+				AND rl_end_dt >= ?
+				@prj_knd_cd
+				@prj_c_cd
+				@prj_nm
+				@pogr_stat
+			ORDER BY rl_st_dt desc, prj_c_cd, prj_nm
+      	]]></query-statement>
+        <query-arguments>
+        	 <query-argument id="enddt" 		type="STRING" option="M"/>
+        	 <query-argument id="startdt" 		type="STRING" option="M"/>
+        	 <query-argument id="prj_knd_cd" 	type="STRING" condition=" AND prj_knd_cd = ? "/>
+        	 <query-argument id="prj_c_cd" 		type="STRING" condition=" AND prj_c_cd = ? "/>
+        	 <query-argument id="prj_nm" 		type="STRING" condition=" AND prj_nm like '%'+?+'%' "/>
+        	 <query-argument id="pogr_stat" 	type="STRING" condition=" AND pogr_stat = ? "/>
+        </query-arguments>
+        <query-descript>프로젝트 실행 조회 (prjExeMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ010I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO UC_PRJ
+			(
+	      		  prj_c_cd   , prj_nm          , prj_desc    , prj_loc , rl_st_dt
+	      		, rl_end_dt  , cntr_man_m      , rl_etrn_m_m , pgs_rt  , end_f_cd
+	      		, rg_dt      , rg_tm           , rg_id       , mdf_dt  , mdf_tm
+	      		, mdf_id     , prj_c_dtl_cd    , coper_co    , clnt_co , etrn_m
+	      		, dvlp_tool  , dbms            , prj_knd_cd  , jdk_ver , was_type
+                , work_range , pogr_stat       , rmk
+	        )VALUES
+	        (
+	      		 ? ,? ,? ,? ,?
+	      		,? ,? ,? ,? ,(CASE WHEN ?='04' THEN 'Y' ELSE 'N' END )
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,? ,? ,? ,? ,?
+	      		,? ,? ,? ,? ,?
+	      		,? ,? ,?
+	        )
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="prj_c_cd" 		type="STRING"/>
+        	<query-argument id="prj_nm" 		type="STRING"/>
+        	<query-argument id="prj_desc" 		type="STRING"/>
+        	<query-argument id="prj_loc" 		type="STRING"/>
+        	<query-argument id="rl_st_dt" 		type="STRING" option="M"/>
+
+        	<query-argument id="rl_end_dt" 		type="STRING" option="M"/>
+        	<query-argument id="cntr_man_m" 	type="FLOAT"/>
+        	<query-argument id="rl_etrn_m_m" 	type="FLOAT"/>
+        	<query-argument id="pgs_rt" 		type="FLOAT"/>
+        	<query-argument id="pogr_stat" 		type="STRING"/>
+
+        	<query-argument id="userid" 		type="STRING"/>
+
+        	<query-argument id="userid" 		type="STRING"/>
+        	<query-argument id="prj_c_dtl_cd" 	type="STRING"/>
+        	<query-argument id="coper_co" 		type="STRING"/>
+        	<query-argument id="clnt_co" 		type="STRING"/>
+        	<query-argument id="etrn_m" 		type="FLOAT"/>
+
+        	<query-argument id="dvlp_tool" 		type="STRING"/>
+        	<query-argument id="dbms" 			type="STRING"/>
+        	<query-argument id="prj_knd_cd" 	type="STRING"/>
+			<query-argument id="jdk_ver" 		type="STRING"/>
+			<query-argument id="was_type" 		type="STRING"/>
+
+        	<query-argument id="work_range" 	type="STRING"/>
+        	<query-argument id="pogr_stat" 		type="STRING"/>
+        	<query-argument id="rmk" 			type="STRING"/>
+
+        </query-arguments>
+        <query-descript>프로젝트 실행 등록(prjExeMng.js)</query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCPRJ010I_1</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement>
+			INSERT INTO UC_SIGN_INFO
+			(
+				 prj_seq
+				,sign_tp_cd
+				,sign_stg_cd
+				,sign_id1
+				,sign_id2
+				,sign_id3
+				,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,mdf_dt
+	      		,mdf_tm
+	      		,mdf_id
+			)
+			SELECT
+				--(SELECT MAX(prj_seq) FROM UC_PRJ WHERE rg_id = ?)
+				IDENT_CURRENT('uc_prj')
+				,sign_tp_cd
+				,sign_stg_cd
+				,sign_id1
+				,sign_id2
+				,sign_id3
+				,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	      	FROM UC_SIGN_INFO
+	      	WHERE prj_seq = 17
+			AND  sign_tp_cd = '02'
+        </query-statement>
+        <query-arguments>
+        	<query-argument id="userid" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        </query-arguments>
+        <query-descript>결재자정보 등록 ( sysApprovalMng.js )</query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCPRJ010U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			UPDATE UC_PRJ SET
+	      		 prj_c_cd		= ?
+	      		,prj_nm			= ?
+	      		,prj_desc		= ?
+	      		,prj_loc		= ?
+	      		,rl_st_dt		= ?
+	      		,rl_end_dt		= ?
+	      		,cntr_man_m		= ?
+	      		,rl_etrn_m_m	= ?
+	      		,pgs_rt			= ?
+	      		,end_f_cd		= (CASE WHEN ?='04' THEN 'Y' ELSE 'N' END )
+	      		,mdf_dt			= CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,mdf_tm			= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,mdf_id			= ?
+
+	      		,prj_c_dtl_cd	= ?
+	      		,coper_co		= ?
+	      		,clnt_co		= ?
+	      		,etrn_m			= ?
+	      		,dvlp_tool		= ?
+	      		,dbms			= ?
+	      		,prj_knd_cd		= ?
+
+	      		,jdk_ver		= ?
+	      		,was_type		= ?
+	      		,work_range		= ?
+	      		,pogr_stat		= ?
+	      		,rmk		 	= ?
+
+	  		WHERE prj_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="prj_c_cd" 		type="STRING"/>
+        	<query-argument id="prj_nm" 		type="STRING"/>
+        	<query-argument id="prj_desc" 		type="STRING"/>
+        	<query-argument id="prj_loc" 		type="STRING"/>
+        	<query-argument id="rl_st_dt" 		type="STRING" option="M"/>
+        	<query-argument id="rl_end_dt" 		type="STRING" option="M"/>
+        	<query-argument id="cntr_man_m" 	type="FLOAT"/>
+        	<query-argument id="rl_etrn_m_m" 	type="FLOAT"/>
+        	<query-argument id="pgs_rt" 		type="FLOAT"/>
+
+        	<query-argument id="pogr_stat" 		type="STRING"/>
+
+        	<query-argument id="userid" 		type="STRING"/>
+        	<query-argument id="prj_c_dtl_cd" 	type="STRING"/>
+        	<query-argument id="coper_co" 		type="STRING"/>
+        	<query-argument id="clnt_co" 		type="STRING"/>
+        	<query-argument id="etrn_m" 		type="FLOAT"/>
+        	<query-argument id="dvlp_tool" 		type="STRING"/>
+        	<query-argument id="dbms" 			type="STRING"/>
+        	<query-argument id="prj_knd_cd" 	type="STRING"/>
+
+			<query-argument id="jdk_ver" 		type="STRING"/>
+			<query-argument id="was_type" 		type="STRING"/>
+        	<query-argument id="work_range" 	type="STRING"/>
+        	<query-argument id="pogr_stat" 		type="STRING"/>
+        	<query-argument id="rmk" 			type="STRING"/>
+
+        	<query-argument id="prj_seq" 		type="INTEGER"/>
+        </query-arguments>
+        <query-descript>프로젝트 실행 수정(prjExeMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ010D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type>none</query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM UC_PRJ
+	  		WHERE prj_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="prj_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>프로젝트 실행 삭제(prjExeMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ011D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM UC_PRJ_MBR
+	  		WHERE prj_seq = ?
+	  			@user_id
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="prj_seq" 	type="INTEGER"/>
+        	<query-argument id="user_id" 	type="STRING"  condition=" and user_id=? "/>
+        </query-arguments>
+        <query-descript>프로젝트 실행 MB삭제(prjExeMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ011S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+	      	SELECT
+	      		 prj_seq
+	      		,user_id
+	      		,dbo.fn_user(user_id, '') user_nm
+	      		,etrn_c_cd
+	      		,dbo.fn_codebook('PRJ002', etrn_c_cd) etrn_c_cd_nm
+	      		,etrn_du_dt
+	      		,etrn_dt
+	      		,ot_du_dt
+	      		,ot_dt
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,dbo.fn_user(rg_id, '') rg_nm
+	      		,mdf_dt
+	      		,mdf_tm
+	      		,mdf_id
+	      		,dbo.fn_user(mdf_id, '') mdf_nm
+				,chrgjob
+				,job_c_cd
+			FROM UC_PRJ_MBR
+			WHERE prj_seq = ?
+			ORDER BY user_id
+      	]]></query-statement>
+        <query-arguments>
+        	 <query-argument id="prj_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>프로젝트 실행 MB조회 (prjExeMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ011I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO UC_PRJ_MBR
+			(
+	      		 prj_seq
+	      		,user_id
+	      		,etrn_c_cd
+	      		,etrn_du_dt
+	      		,etrn_dt
+	      		,ot_du_dt
+	      		,ot_dt
+				,chrgjob
+				,job_c_cd
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,mdf_dt
+	      		,mdf_tm
+	      		,mdf_id
+
+	        )VALUES
+	        (
+	      		 ?
+	      		,?
+	      		,?
+				,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+				,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	        )
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="prj_seq" 	type="INTEGER"/>
+        	<query-argument id="user_id" 	type="STRING"/>
+        	<query-argument id="etrn_c_cd" 	type="STRING"/>
+        	<query-argument id="etrn_du_dt" type="STRING" option="M"/>
+        	<query-argument id="etrn_dt" 	type="STRING" option="M"/>
+        	<query-argument id="ot_du_dt" 	type="STRING" option="M"/>
+        	<query-argument id="ot_dt" 		type="STRING" option="M"/>
+			<query-argument id="chrgjob" 	type="STRING"/>
+			<query-argument id="job_c_cd" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        </query-arguments>
+        <query-descript>프로젝트 실행 MB등록(prjExeMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ011U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			UPDATE UC_PRJ_MBR SET
+	      		 etrn_c_cd 	= ?
+	      		,etrn_du_dt	= ?
+	      		,etrn_dt	= ?
+	      		,ot_du_dt	= ?
+	      		,ot_dt		= ?
+				,chrgjob		= ?
+				,job_c_cd		= ?
+	      		,mdf_dt		= CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,mdf_tm		= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,mdf_id		= ?
+	  		WHERE prj_seq = ?
+				AND user_id = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="etrn_c_cd" 	type="STRING"/>
+        	<query-argument id="etrn_du_dt" type="STRING" option="M"/>
+        	<query-argument id="etrn_dt" 	type="STRING" option="M"/>
+        	<query-argument id="ot_du_dt"	type="STRING" option="M"/>
+        	<query-argument id="ot_dt" 		type="STRING" option="M"/>
+			<query-argument id="chrgjob" 	type="STRING"/>
+			<query-argument id="job_c_cd" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        	<query-argument id="prj_seq" 	type="STRING"/>
+        	<query-argument id="user_id" 	type="STRING"/>
+        </query-arguments>
+        <query-descript>프로젝트 실행 MB수정(prjExeMng.js)</query-descript>
+    </queryinfo>
+	<queryinfo>
+		<query-id>UCPRJ012S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>FREE</query-view-type>
+		<query-statement>
+            SELECT up_cd, code, code_nm, 0 chk
+            FROM   UC_COM_CODEBOOK
+            WHERE  up_cd = ?
+            AND    code !='000'
+            AND    use_f = 'Y'
+            ORDER  BY lup_ord
+		</query-statement>
+		<query-arguments>
+			<query-argument id="up_cd" 	type="STRING"  />
+		</query-arguments>
+		<query-descript> 코드조회( dasProjectStat.js )</query-descript>
+	</queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ020S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+	      	SELECT
+	      		 b.mtnc_seq
+	      		,b.mtnc_nm
+	      		,a.clnt_nm
+	      		,a.sch_seq
+	      		,a.system_nm
+	      		,a.cntr_cd
+	      		,a.mtnc_cd
+	      		,a.rnm_mtd_cd
+	      		,a.rnm_strt_date
+	      		,a.rnm_end_date
+	      		,a.sch_cont
+	      		,a.prcs_cont
+	      		,a.prcs_k_id
+	      		,dbo.fn_user(prcs_k_id,'') prcs_k_nm
+	      		,a.cf_nm
+	      		,a.pgm_nm
+				,a.req_nm
+				,a.req_date
+				,a.req_tel
+				,a.proc_time
+				,a.rsn_cont
+	      		,a.rg_dt
+	      		,a.rg_tm
+	      		,a.rg_id
+	      		,dbo.fn_user(a.rg_id, '') rg_nm
+	      		,a.mdf_dt
+	      		,a.mdf_tm
+	      		,a.mdf_id
+	      		,dbo.fn_user(a.mdf_id, '') mdf_nm
+	      		,(SELECT count(*) FROM uc_com_file WHERE prg_id='COM_SCH' and up_seq = A.sch_seq) file_cnt
+	      		, dbo.FN_CODEBOOK('PRJ019', a.end_yn) end_yn_nm
+	      		, a.end_yn
+	      		, a.rg_dt + ' ' + a.rg_tm AS rg_dtm
+	      		, a.mdf_dt + ' ' + a.mdf_tm AS mdf_dtm
+			FROM UC_COM_SCH a, UC_mtnc b
+			WHERE a.mtnc_seq = b.mtnc_seq
+				@mtnc_seq
+				@clnt_nm
+				@cntr_cd
+				@mtnc_cd
+				@rnm_mtd_cd
+				@req_strt_date
+				@req_end_date
+				@prcs_k_id
+				@end_yn
+			ORDER BY req_date desc
+      	]]></query-statement>
+        <query-arguments>
+        	 <query-argument id="mtnc_seq" 		type="STRING" condition=" AND a.mtnc_seq = ? "/>
+        	 <query-argument id="clnt_nm" 		type="STRING" condition=" AND clnt_nm like '%'+?+'%' "/>
+        	 <query-argument id="cntr_cd" 		type="STRING" condition=" AND cntr_cd = ? "/>
+        	 <query-argument id="mtnc_cd" 		type="STRING" condition=" AND mtnc_cd = ? "/>
+        	 <query-argument id="rnm_mtd_cd" 	type="STRING" condition=" AND rnm_mtd_cd = ? "/>
+        	 <query-argument id="req_strt_date" type="STRING" option="M" condition=" AND req_date BETWEEN ? "/>
+        	 <query-argument id="req_end_date" 	type="STRING" option="M" condition=" AND ? "/>
+        	 <query-argument id="prcs_k_id" 	type="STRING" condition=" AND prcs_k_id = ? "/>
+        	 <query-argument id="end_yn" 		type="STRING" condition=" AND end_yn = ? "/>
+        </query-arguments>
+        <query-descript>유지보수 조회 (prjMtncMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ020I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO UC_COM_SCH
+			(
+	      		 mtnc_seq
+	      		,clnt_nm
+	      		,system_nm
+	      		,cntr_cd
+	      		,mtnc_cd
+	      		,rnm_mtd_cd
+	      		,rnm_strt_date
+	      		,rnm_end_date
+	      		,sch_cont
+	      		,prcs_cont
+	      		,prcs_k_id
+	      		,cf_nm
+	      		,pgm_nm
+				,req_nm
+				,req_date
+				,req_tel
+				,rnm_comp_date
+				,proc_time
+				,rsn_cont
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,mdf_dt
+	      		,mdf_tm
+	      		,mdf_id
+           ,end_yn
+	        )VALUES
+	        (
+	      		 ?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+           ,?
+	        )
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="mtnc_seq" 	type="INTEGER"/>
+        	<query-argument id="clnt_nm" 	type="STRING"/>
+        	<query-argument id="system_nm" 	type="STRING"/>
+        	<query-argument id="cntr_cd" 	type="STRING"/>
+        	<query-argument id="mtnc_cd" 	type="STRING"/>
+        	<query-argument id="rnm_mtd_cd" 	type="STRING"/>
+        	<query-argument id="rnm_strt_date" 	type="STRING" option="M"/>
+        	<query-argument id="rnm_end_date" 	type="STRING" option="M"/>
+        	<query-argument id="sch_cont" 	type="STRING"/>
+        	<query-argument id="prcs_cont" 	type="STRING"/>
+        	<query-argument id="prcs_k_id" 	type="STRING"/>
+        	<query-argument id="cf_nm" 		type="STRING"/>
+        	<query-argument id="pgm_nm" 		type="STRING" />
+        	<query-argument id="req_nm" 		type="STRING"/>
+        	<query-argument id="req_date" 		type="STRING" option="M"/>
+        	<query-argument id="req_tel" 		type="STRING" option="M"/>
+        	<query-argument id="rnm_comp_date" 	type="STRING" option="M"/>
+        	<query-argument id="proc_time" 		type="STRING"/>
+        	<query-argument id="rsn_cont" 		type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+          <query-argument id="end_yn" 	type="STRING"/>
+        </query-arguments>
+        <query-descript>유지보수 등록 (prjMtncMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ020U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			UPDATE UC_COM_SCH SET
+	      		 mtnc_seq		= ?
+	      		,clnt_nm		= ?
+	      		,system_nm		= ?
+	      		,cntr_cd		= ?
+	      		,mtnc_cd		= ?
+	      		,rnm_mtd_cd		= ?
+	      		,rnm_strt_date	= ?
+	      		,rnm_end_date	= ?
+	      		,sch_cont		= ?
+	      		,prcs_cont		= ?
+	      		,prcs_k_id		= ?
+	      		,cf_nm			= ?
+	      		,pgm_nm         = ?
+				,req_nm         = ?
+				,req_date       = ?
+				,req_tel        = ?
+				,rnm_comp_date  = ?
+				,proc_time      = ?
+				,rsn_cont       = ?
+	      		,mdf_dt		= CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,mdf_tm		= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,mdf_id		= ?
+           ,end_yn     = ?
+	  		WHERE sch_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="mtnc_seq" 	type="INTEGER"/>
+        	<query-argument id="clnt_nm" 	type="STRING"/>
+        	<query-argument id="system_nm" 	type="STRING"/>
+        	<query-argument id="cntr_cd" 	type="STRING"/>
+        	<query-argument id="mtnc_cd" 	type="STRING"/>
+        	<query-argument id="rnm_mtd_cd" 	type="STRING"/>
+        	<query-argument id="rnm_strt_date" 	type="STRING" option="M"/>
+        	<query-argument id="rnm_end_date" 	type="STRING" option="M"/>
+        	<query-argument id="sch_cont" 	type="STRING"/>
+        	<query-argument id="prcs_cont" 	type="STRING"/>
+        	<query-argument id="prcs_k_id" 	type="STRING"/>
+        	<query-argument id="cf_nm" 		type="STRING"/>
+        	<query-argument id="pgm_nm" 		type="STRING" />
+        	<query-argument id="req_nm" 		type="STRING"/>
+        	<query-argument id="req_date" 		type="STRING" option="M"/>
+        	<query-argument id="req_tel" 		type="STRING" option="M"/>
+        	<query-argument id="rnm_comp_date" 	type="STRING" option="M"/>
+        	<query-argument id="proc_time" 		type="STRING"/>
+        	<query-argument id="rsn_cont" 		type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+          	<query-argument id="end_yn" 	type="STRING"/>
+        	<query-argument id="sch_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>유지보수 수정 (prjMtncMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ020D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM UC_COM_SCH
+	  		WHERE sch_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="sch_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>유지보수 삭제 (prjMtncMng.js)</query-descript>
+    </queryinfo>
+
+    <!-- Q&A Start -->
+	<queryinfo>
+        <query-id>UCPRJ217S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				PRJ_SEQ
+				, PRJ_NM
+			FROM UC_PRJ
+			WHERE CONVERT(VARCHAR(8),GETDATE(),112) BETWEEN RL_ST_DT AND RL_END_DT
+			ORDER BY PRJ_SEQ
+		]]>
+        </query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript>현재(진행중인)프로젝트 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCPRJ218S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				  a.QST_SEQ
+				, b.PRJ_SEQ
+				, b.PRJ_NM
+				, dbo.FN_CODEBOOK('COM010', a.QST_TP_CD) AS QST_TP
+				, a.QST_TP_CD
+				, a.QST_CONT
+				, a.RG_DT+' '+a.RG_TM AS Q_RG_DTM
+				, dbo.FN_USER(a.RG_ID, '') AS Q_RG_NM
+				, a.MDF_DT+' '+a.MDF_TM AS Q_MDF_DTM
+				, dbo.FN_USER(a.MDF_ID, '') AS Q_MDF_NM
+			FROM UC_COM_QST a, UC_PRJ b
+			WHERE a.prj_seq = b.prj_seq
+			AND   TYPE_TC='PRJ'
+				@prj_seq
+				@qst_tp_cd
+				@qst_cont
+			ORDER BY QST_SEQ DESC
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="prj_seq"		type="INTEGER"	condition="AND b.prj_seq = ? "/>
+			<query-argument id="qst_tp_cd"		type="STRING"	condition="AND a.qst_tp_cd = ? "/>
+			<query-argument id="qst_cont"		type="STRING"	condition="AND a.qst_cont LIKE '%'+?+'%' "/>
+        </query-arguments>
+        <query-descript>질문 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCPRJ219S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				ANW_SEQ
+				, ANW_CONT
+				, RG_DT+' '+RG_TM AS A_RG_DTM
+				, dbo.FN_USER(RG_ID, '') AS A_RG_NM
+				, MDF_DT+' '+MDF_TM AS A_MDF_DTM
+				, dbo.FN_USER(MDF_ID, '') AS A_MDF_NM
+			FROM UC_COM_ANW
+			WHERE QST_SEQ = ?
+			ORDER BY ANW_SEQ DESC
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="qst_seq"		type="INTEGER"	condition="AND qst_seq = ? "/>
+        </query-arguments>
+        <query-descript>답변 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCPRJ123I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-statement><![CDATA[
+			INSERT INTO UC_COM_QST
+			(
+				PRJ_SEQ
+				, QST_TP_CD
+				, QST_CONT
+				, USE_F
+				, RG_DT
+				, RG_TM
+				, RG_ID
+				, MDF_DT
+				, MDF_TM
+				, MDF_ID
+				, TYPE_TC
+			)VALUES(
+				?
+				, ?
+				, ?
+				, 'Y'
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, 'PRJ'
+			)
+        ]]>
+		</query-statement>
+		<query-arguments>
+            <query-argument id="prj_seq"		type="INTEGER"/>
+          	<query-argument id="qst_tp_cd"		type="STRING"/>
+          	<query-argument id="qst_cont"		type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+		</query-arguments>
+		<query-descript> 프로젝트 관리 등록 (prjQAMng.js)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+        <query-id>UCPRJ123U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement>
+        <![CDATA[
+            UPDATE UC_COM_QST SET
+				PRJ_SEQ		= ?
+				, QST_TP_CD	= ?
+				, QST_CONT	= ?
+				, MDF_DT		= CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM		= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID		= ?
+        	WHERE QST_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+            <query-argument id="prj_seq"		type="INTEGER"/>
+          	<query-argument id="qst_tp_cd"		type="STRING"/>
+          	<query-argument id="qst_cont"		type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="qst_seq"		type="INTEGER"/>
+        </query-arguments>
+        <query-descript>질문 수정</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCPRJ123D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-statement><![CDATA[
+  			DELETE UC_COM_QST
+        	WHERE QST_SEQ = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="qst_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript>질문 삭제</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCPRJ124D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-statement><![CDATA[
+  			DELETE UC_COM_ANW
+        	WHERE QST_SEQ = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="qst_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript>질문-답변 삭제</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCPRJ124I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-statement><![CDATA[
+			INSERT INTO UC_COM_ANW
+			(
+				QST_SEQ
+				, ANW_CONT
+				, USE_F
+				, RG_DT
+				, RG_TM
+				, RG_ID
+				, MDF_DT
+				, MDF_TM
+				, MDF_ID
+			)VALUES(
+				?
+				, ?
+				, 'Y'
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+			)
+        ]]>
+		</query-statement>
+		<query-arguments>
+            <query-argument id="qst_seq"		type="INTEGER"/>
+          	<query-argument id="anw_cont"		type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+		</query-arguments>
+		<query-descript>답변 등록</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+        <query-id>UCPRJ124U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement>
+        <![CDATA[
+            UPDATE UC_COM_ANW SET
+				ANW_CONT	= ?
+				, MDF_DT		= CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM		= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID		= ?
+        	WHERE ANW_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+          	<query-argument id="anw_cont"		type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="anw_seq"		type="INTEGER"/>
+        </query-arguments>
+        <query-descript>답변 수정</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCPRJ125D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-statement><![CDATA[
+  			DELETE UC_COM_ANW
+        	WHERE ANW_SEQ = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="anw_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript>답변 삭제</query-descript>
+	</queryinfo>
+
+    <queryinfo>
+	    <query-id>UCPRJ126S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+		SELECT
+			file_seq
+			, file_nm
+			, new_file_nm
+			, rg_dt
+			, rg_tm
+			, rg_id
+			, dbo.FN_USER(rg_id, '') AS rg_nm
+		FROM UC_COM_FILE
+		WHERE prg_id = ?
+			AND up_seq = ?
+		ORDER BY file_seq ASC
+        ]]>
+        </query-statement>
+        <query-arguments>
+            <query-argument id="prg_id"      type="STRING"/>
+            <query-argument id="up_seq"      type="INTEGER"/>
+        </query-arguments>
+        <query-descript>업로드 파일 조회 공통</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ126I</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+        INSERT INTO UC_COM_FILE
+        (
+			up_seq, prg_id, file_nm, new_file_nm
+			, rg_dt, rg_tm, rg_id, mdf_dt, mdf_tm, mdf_id
+		)
+        VALUES
+        (
+        	?, ?, ?, ?
+			, CONVERT(VARCHAR(8),GETDATE(),112)
+			, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			, ?
+			, CONVERT(VARCHAR(8),GETDATE(),112)
+			, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			, ?
+        )
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="up_seq"			type="INTEGER"/>
+        	<query-argument id="prg_id"     	type="STRING"/>
+        	<query-argument id="file_nm"     	type="STRING"/>
+        	<query-argument id="new_file_nm"	type="STRING"/>
+        	<query-argument id="userid"    	 	type="STRING"/>
+        	<query-argument id="userid"    	 	type="STRING"/>
+        </query-arguments>
+        <query-descript>업로드 파일 최초 저장 공통</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ126D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+        DELETE FROM UC_COM_FILE
+		WHERE prg_id = ?
+			AND up_seq = ?
+			@file_seq
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="prg_id"     		type="STRING"/>
+        	<query-argument id="up_seq"     		type="INTEGER"/>
+        	<query-argument id="file_seq"     		type="INTEGER" condition=" AND file_seq = ?"/>
+        </query-arguments>
+        <query-descript>업로드 파일 삭제 공통</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+	    <query-id>UCPRJ127S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>FREE</query-view-type>
+        <query-statement><![CDATA[
+			SELECT IDENT_CURRENT('UC_COM_QST') AS seq
+        ]]>
+        </query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript>마지막 질문 순번 가져오기</query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCPRJ128I</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+        INSERT INTO UC_COM_FILE
+        (
+			up_seq, prg_id, file_nm, new_file_nm
+			, rg_dt, rg_tm, rg_id, mdf_dt, mdf_tm, mdf_id
+		)
+        (SELECT
+        	 IDENT_CURRENT('UC_COM_SCH'), ?, ?, ?
+			, CONVERT(VARCHAR(8),GETDATE(),112)
+			, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			, ?
+			, CONVERT(VARCHAR(8),GETDATE(),112)
+			, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			, ?
+        )
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="prg_id"     	type="STRING"/>
+        	<query-argument id="file_nm"     	type="STRING"/>
+        	<query-argument id="new_file_nm"	type="STRING"/>
+        	<query-argument id="userid"    	 	type="STRING"/>
+        	<query-argument id="userid"    	 	type="STRING"/>
+        </query-arguments>
+        <query-descript>업로드 파일 최초 저장 공통</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCPRJ200S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+        SELECT	prj_nm, rl_st_dt, rl_end_dt, b.etrn_dt, b.ot_dt, a.clnt_co, a.coper_co
+				, dbo.fn_codebook('PRJ007', dvlp_tool) dvlp_tool
+				, dbo.fn_codebook('PRJ008', dbms) dbms
+		FROM   uc_prj a, uc_prj_mbr b
+		WHERE  a.prj_seq = b.prj_seq
+		AND    b.user_id = ?
+		ORDER BY rl_st_dt desc
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="user_id"    	 	type="STRING"/>
+        </query-arguments>
+        <query-descript>개인별이력조회</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCPRJ031S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+            SELECT mtnc_seq  , mtnc_nm   , clnt_corp_seq , mtnc_system , mtnc_type
+                 , mtnc_cost , strt_date , end_date      , regular_chk , coop_corp_seq
+                 , dvlp_frwk , a.rmk       , prj_seq
+                 --, SUBSTRING(CONVERT(VARCHAR(10), CAST(strt_date AS DATETIME), 102),1,7) +' ~ '+
+                 --  SUBSTRING(CONVERT(VARCHAR(10), CAST(end_date  AS DATETIME), 102),1,7) mtnc_period
+                 , (CASE WHEN strt_date IS NULL THEN ' ' ELSE SUBSTRING(CONVERT(VARCHAR(10), CAST(strt_date AS DATETIME), 102),1,7) END)
+                 + (CASE WHEN strt_date IS NULL AND end_date IS NULL THEN ' ' ELSE ' ~ ' END)
+                 + (CASE WHEN end_date  IS NULL THEN ' ' ELSE SUBSTRING(CONVERT(VARCHAR(10), CAST(end_date  AS DATETIME), 102),1,7) END) mtnc_period
+                 , (SELECT prj_nm FROM uc_prj WHERE prj_seq=a.prj_seq) prj_nm
+                 , corp_nm clnt_corp_nm
+                 , corp_nm coop_corp_nm
+                 , mtnc_cd, mtd_cd, corp_chrg_nm
+                 , chrg_user_id, dbo.fn_user(chrg_user_id,'') chrg_user_id_nm
+                 , cs_user_id, dbo.fn_user(cs_user_id,'') cs_user_id_nm
+                 , bsn_user_id, dbo.fn_user(bsn_user_id,'') bsn_user_id_nm
+                 , rmt_tool, rmt_rmk
+                 , a.mdf_dt
+                 , dbo.fn_user(a.mdf_id, '') as mdf_nm
+            FROM   uc_mtnc a
+            left join uc_prj_corp b on a.clnt_corp_seq = b.corp_seq
+            WHERE 1=1
+            @clnt_corp_nm
+            @useyn
+            @mtnc_cd
+            @mtnc_cost
+            @regular_chk
+            @mtd_cd
+            @user_chrg
+            @user_cs
+            @user_bsn
+            ORDER  BY clnt_corp_nm, strt_date DESC, mtnc_nm
+      	]]></query-statement>
+        <query-arguments>
+        	 <query-argument id="clnt_corp_nm" 		type="STRING" condition="AND corp_nm LIKE '%'+?+'%' "/>
+        	 <query-argument id="useyn"			type="STRING" condition="AND use_yn = ? "/>
+        	 <query-argument id="mtnc_cd"		type="STRING" condition="AND mtnc_cd = ? "/>
+        	 <query-argument id="mtnc_cost"		type="STRING" condition="AND mtnc_cost = ? "/>
+        	 <query-argument id="regular_chk"	type="STRING" condition="AND regular_chk = ? "/>
+        	 <query-argument id="mtd_cd"		type="STRING" condition="AND mtd_cd = ? "/>
+        	 <query-argument id="user_chrg"		type="QUERY"  condition="AND chrg_user_id = ? "/>
+        	 <query-argument id="chrg_user_id"	type="STRING" condition=" "/>
+        	 <query-argument id="user_cs"		type="QUERY"  condition="AND cs_user_id = ? "/>
+        	 <query-argument id="cs_user_id"	type="STRING" condition=" "/>
+        	 <query-argument id="user_bsn"		type="QUERY"  condition="AND bsn_user_id = ? "/>
+        	 <query-argument id="bsn_user_id"	type="STRING" condition=" "/>
+        </query-arguments>
+        <query-descript> 유지보수 조회 (prjMtncMng.js) </query-descript>
+    </queryinfo>
+	<queryinfo>
+		<query-id>UCPRJ032S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            SELECT COUNT(sch_seq) cnt
+            FROM   uc_com_sch
+            WHERE  mtnc_seq = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="mtnc_seq" type="INTEGER"/>
+		</query-arguments>
+		<query-descript> 유지보수 사용요청사항 사용건수 조회(prjMtncMng.js)</query-descript>
+	</queryinfo>
+    <queryinfo>
+        <query-id>UCPRJ031U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+            UPDATE uc_mtnc
+            SET    mtnc_nm       = ?
+                 , clnt_corp_seq = ?
+                 , mtnc_system   = ?
+                 , mtnc_type     = ?
+                 , mtnc_cost     = ?
+                 , strt_date     = ?
+                 , end_date      = ?
+                 , regular_chk   = ?
+                 , coop_corp_seq = ?
+                 , dvlp_frwk     = ?
+                 , rmk           = ?
+                 , prj_seq       = ?
+                 , corp_chrg_nm  = ?
+                 , chrg_user_id  = ?
+                 , cs_user_id    = ?
+                 , bsn_user_id    = ?
+                 , rmt_tool      = ?
+                 , rmt_rmk       = ?
+				 , mtnc_cd       = ?
+				 , mtd_cd        = ?
+                 , mdf_dt        = CONVERT(VARCHAR(8),GETDATE(),112)
+                 , mdf_tm        = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+                 , mdf_id        = ?
+                 
+            WHERE  mtnc_seq      = ?
+		]]></query-statement>
+        <query-arguments>
+			<query-argument id="mtnc_nm"       type="STRING" />
+			<query-argument id="clnt_corp_seq" type="INTEGER"/>
+			<query-argument id="mtnc_system"   type="STRING" />
+			<query-argument id="mtnc_type"     type="STRING" />
+			<query-argument id="mtnc_cost"     type="STRING" />
+			<query-argument id="strt_date"     type="STRING" option="M"/>
+			<query-argument id="end_date"      type="STRING" option="M"/>
+			<query-argument id="regular_chk"   type="STRING" />
+			<query-argument id="coop_corp_seq" type="INTEGER"/>
+			<query-argument id="dvlp_frwk"     type="STRING" />
+			<query-argument id="rmk"           type="STRING" />
+			<query-argument id="prj_seq"       type="INTEGER"/>
+			<query-argument id="corp_chrg_nm"       type="STRING" />
+			<query-argument id="chrg_user_id"       type="STRING" />
+			<query-argument id="cs_user_id"       type="STRING" />
+			<query-argument id="bsn_user_id"       type="STRING" />
+			<query-argument id="rmt_tool"       type="STRING" />
+			<query-argument id="rmt_rmk"       type="STRING" />
+			<query-argument id="mtnc_cd"       type="STRING" />
+			<query-argument id="mtd_cd"       type="STRING" />
+			<query-argument id="user_id"       type="STRING" />
+			<query-argument id="mtnc_seq"      type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 수정(prjMtncMng.js) </query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCPRJ031I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+            INSERT INTO uc_mtnc
+            (
+                mtnc_nm   , clnt_corp_seq , mtnc_system , mtnc_type     , mtnc_cost
+              , strt_date , end_date      , regular_chk , coop_corp_seq , dvlp_frwk
+              , rmk       , prj_seq
+              , corp_chrg_nm  , chrg_user_id, cs_user_id, bsn_user_id, rmt_tool, rmt_rmk, mtnc_cd, mtd_cd
+			  , rg_dt     , rg_tm         , rg_id
+              , mdf_dt    , mdf_tm        , mdf_id
+
+            )VALUES(
+                ?, ?, ?, ?, ?
+              , ?, ?, ?, ?, ?
+              , ?, ?, ?, ?, ?, ?, ?, ?
+              , ?, ?
+              , CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', ''), ?
+              , CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', ''), ?
+            )
+      	]]></query-statement>
+        <query-arguments>
+			<query-argument id="mtnc_nm"       type="STRING" />
+			<query-argument id="clnt_corp_seq" type="INTEGER"/>
+			<query-argument id="mtnc_system"   type="STRING" />
+			<query-argument id="mtnc_type"     type="STRING" />
+			<query-argument id="mtnc_cost"     type="STRING" />
+			<query-argument id="strt_date"     type="STRING" option="M"/>
+			<query-argument id="end_date"      type="STRING" option="M"/>
+			<query-argument id="regular_chk"   type="STRING" />
+			<query-argument id="coop_corp_seq" type="INTEGER"/>
+			<query-argument id="dvlp_frwk"     type="STRING" />
+			<query-argument id="rmk"           type="STRING" />
+			<query-argument id="prj_seq"       type="INTEGER"/>
+			
+			<query-argument id="corp_chrg_nm"       type="STRING" />
+			<query-argument id="chrg_user_id"       type="STRING" />
+			<query-argument id="cs_user_id"       type="STRING" />
+			<query-argument id="bsn_user_id"       type="STRING" />
+			<query-argument id="rmt_tool"       type="STRING" />
+			<query-argument id="rmt_rmk"       type="STRING" />
+			<query-argument id="mtnc_cd"       type="STRING" />
+			<query-argument id="mtd_cd"       type="STRING" />
+			
+			<query-argument id="user_id"       type="STRING" />
+			<query-argument id="user_id"       type="STRING" />
+        </query-arguments>
+        <query-descript> 유지보수 등록 (prjMtncMng.js) </query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCPRJ033S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+            SELECT TOP 40
+                   mtnc_seq  , mtnc_nm   , clnt_corp_seq , mtnc_system , mtnc_type
+                 , mtnc_cost , strt_date , end_date      , regular_chk , coop_corp_seq
+                 , dvlp_frwk , rmk       , prj_seq       , rg_dt       , rg_tm
+                 --, SUBSTRING(CONVERT(VARCHAR(10), CAST(strt_date AS DATETIME), 102),1,7) +' ~ '+
+                 --  SUBSTRING(CONVERT(VARCHAR(10), CAST(end_date  AS DATETIME), 102),1,7) mtnc_period
+                 , (CASE WHEN strt_date IS NULL THEN ' ' ELSE SUBSTRING(CONVERT(VARCHAR(10), CAST(strt_date AS DATETIME), 102),1,7) END)
+                 + (CASE WHEN strt_date IS NULL AND end_date IS NULL THEN ' ' ELSE ' ~ ' END)
+                 + (CASE WHEN end_date  IS NULL THEN ' ' ELSE SUBSTRING(CONVERT(VARCHAR(10), CAST(end_date  AS DATETIME), 102),1,7) END) mtnc_period
+                 , (SELECT prj_nm FROM uc_prj WHERE prj_seq=a.prj_seq) prj_nm
+                 , (SELECT corp_nm FROM uc_prj_corp WHERE corp_seq=a.clnt_corp_seq) clnt_corp_nm
+                 , (SELECT corp_nm FROM uc_prj_corp WHERE corp_seq=a.coop_corp_seq) coop_corp_nm
+            FROM   uc_mtnc a
+            ORDER  BY rg_dt DESC, rg_tm DESC
+      	]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript> 유지보수 신규 40건 조회 (prjMtncMng.js) </query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCPRJ031D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM uc_mtnc WHERE mtnc_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="mtnc_seq" type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 삭제(prjMtncMng.js) </query-descript>
+    </queryinfo>
+	    
+    <queryinfo>
+        <query-id>UCPRJ034S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>FREE</query-view-type>
+        <query-statement><![CDATA[
+SELECT
+	  b.mtnc_system
+	, b.regular_chk
+	, dbo.fn_codebook('PRJ015', b.regular_chk) AS regular_chk_excel
+	, b.mtnc_cost
+	, dbo.fn_codebook('PRJ014', b.mtnc_cost) AS mtnc_cost_excel
+	, b.mtnc_type
+	, dbo.fn_codebook('PRJ017', b.mtnc_type) AS mtnc_type_excel
+	, (CASE WHEN b.strt_date IS NULL THEN ' ' ELSE SUBSTRING(CONVERT(VARCHAR(10), CAST(b.strt_date AS DATETIME), 102),1,7) END)
+		+ (CASE WHEN b.strt_date IS NULL AND b.end_date IS NULL THEN ' ' ELSE ' ~ ' END)
+		+ (CASE WHEN b.end_date  IS NULL THEN ' ' ELSE SUBSTRING(CONVERT(VARCHAR(10), CAST(b.end_date  AS DATETIME), 102),1,7) END) AS mtnc_date
+	, b.clnt_corp_seq
+	, (SELECT corp_nm FROM uc_prj_corp WHERE corp_seq=b.clnt_corp_seq) AS clnt_corp_nm
+	, a.mtnc_dtl_seq
+	, a.clnt_corp_loc
+	, a.consl_offc
+	, a.consl_offc_loc
+	, a.ptnr_offc
+	, a.rmt_pgm
+	, a.cnet_inf
+	, a.rmt_id
+	, a.rmt_pwd
+	, a.rmt_rmk
+	, a.ucare_url
+	, a.ucare_id
+	, a.ucare_pwd
+	, a.ucare_rmk
+	, a.rg_id
+	, a.rg_dt
+	, a.rg_tm
+	, a.mdf_id
+	, a.mdf_dt
+	, a.mdf_tm
+FROM uc_mtnc_dtl a
+RIGHT OUTER JOIN uc_mtnc b ON a.mtnc_seq = b.mtnc_seq
+WHERE b.mtnc_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="mtnc_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역 (dasMtncStatP.js) </query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCPRJ034U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+UPDATE uc_mtnc_dtl SET    
+	  clnt_corp_loc = ?
+	, consl_offc = ?
+	, consl_offc_loc = ?
+	, ptnr_offc = ?
+	, rmt_pgm = ?
+	, cnet_inf = ?
+	, rmt_id = ?
+	, rmt_pwd = ?
+	, rmt_rmk = ?
+	, ucare_url = ?
+	, ucare_id = ?
+	, ucare_pwd = ?
+	, ucare_rmk = ?
+	, mdf_id = ?
+	, mdf_dt = CONVERT(VARCHAR(8),GETDATE(),112)
+	, mdf_tm = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+WHERE mtnc_seq = ?
+IF @@ROWCOUNT=0
+INSERT INTO uc_mtnc_dtl
+(
+	  mtnc_seq, clnt_corp_loc, consl_offc, consl_offc_loc, ptnr_offc
+	, rmt_pgm, cnet_inf, rmt_id, rmt_pwd, rmt_rmk
+	, ucare_url, ucare_id, ucare_pwd, ucare_rmk
+	, rg_id, rg_dt, rg_tm, mdf_id, mdf_dt, mdf_tm
+)
+VALUES
+(
+	  ?, ?, ?, ?, ?
+	, ?, ?, ?, ?, ?
+	, ?, ?, ?, ?
+	, ?, CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', ''), ?, CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+)
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="clnt_corp_loc" 		type="STRING"/>
+        	<query-argument id="consl_offc" 		type="STRING"/>
+        	<query-argument id="consl_offc_loc" 	type="STRING"/>
+        	<query-argument id="ptnr_offc" 			type="STRING"/>
+        	<query-argument id="rmt_pgm" 			type="STRING"/>
+        	<query-argument id="cnet_inf" 			type="STRING"/>
+        	<query-argument id="rmt_id" 			type="STRING"/>
+        	<query-argument id="rmt_pwd" 			type="STRING"/>
+        	<query-argument id="rmt_rmk" 			type="STRING"/>
+        	<query-argument id="ucare_url" 			type="STRING"/>
+        	<query-argument id="ucare_id" 			type="STRING"/>
+        	<query-argument id="ucare_pwd" 			type="STRING"/>
+        	<query-argument id="ucare_rmk" 			type="STRING"/>
+        	<query-argument id="user_id" 			type="STRING"/>
+        	<query-argument id="mtnc_seq"			type="INTEGER"/>
+        	
+        	<query-argument id="mtnc_seq"			type="INTEGER"/>
+        	<query-argument id="clnt_corp_loc" 		type="STRING"/>
+        	<query-argument id="consl_offc" 		type="STRING"/>
+        	<query-argument id="consl_offc_loc" 	type="STRING"/>
+        	<query-argument id="ptnr_offc" 			type="STRING"/>
+        	<query-argument id="rmt_pgm" 			type="STRING"/>
+        	<query-argument id="cnet_inf" 			type="STRING"/>
+        	<query-argument id="rmt_id" 			type="STRING"/>
+        	<query-argument id="rmt_pwd" 			type="STRING"/>
+        	<query-argument id="rmt_rmk" 			type="STRING"/>
+        	<query-argument id="ucare_url" 			type="STRING"/>
+        	<query-argument id="ucare_id" 			type="STRING"/>
+        	<query-argument id="ucare_pwd" 			type="STRING"/>
+        	<query-argument id="ucare_rmk" 			type="STRING"/>
+        	<query-argument id="user_id" 			type="STRING"/>
+        	<query-argument id="user_id" 			type="STRING"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역 (dasMtncStatP.js) </query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCPRJ035S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				  a.srvr_inf_seq
+				, a.mtnc_seq
+				, a.prm_kind
+				, a.prm_kind AS prm_kind_cd
+				, a.prm_nm
+				, a.srvr_ip
+				, a.srvr_os
+				, a.os_cnet_inf
+				, a.prm_cnet_inf
+				, 1 AS add_del_index
+			FROM uc_mtnc_srvr_inf a
+			WHERE a.mtnc_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="mtnc_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역  - 서버정보(dasMtncStatP.js) </query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCPRJ035I</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO uc_mtnc_srvr_inf
+			(
+				  mtnc_seq
+				, prm_kind, prm_nm
+				, srvr_ip, srvr_os
+				, os_cnet_inf, prm_cnet_inf
+				, rg_id, rg_dt, rg_tm
+				, mdf_id, mdf_dt, mdf_tm
+			)
+			VALUES
+			(
+				  ?
+				, ?, ?
+				, ?, ?
+				, ?, ?
+				, ?, CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?, CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			)
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="mtnc_seq"				type="INTEGER"/>
+        	<query-argument	id="grid1_i_prm_kind"		type="STRING"/>
+        	<query-argument	id="grid1_i_prm_nm"		type="STRING"/>
+        	<query-argument	id="grid1_i_srvr_ip"			type="STRING"/>
+        	<query-argument	id="grid1_i_srvr_os"			type="STRING"/>
+        	<query-argument	id="grid1_i_os_cnet_inf"	type="STRING"/>
+        	<query-argument	id="grid1_i_prm_cnet_inf"	type="STRING"/>
+        	<query-argument	id="grid1_i_user_id"			type="STRING"/>
+        	<query-argument	id="grid1_i_user_id"			type="STRING"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역  - 서버정보(dasMtncStatP.js) </query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCPRJ035U</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			UPDATE uc_mtnc_srvr_inf SET
+				  prm_kind = ?
+				, prm_nm = ?
+				, srvr_ip = ?
+				, srvr_os = ?
+				, os_cnet_inf = ?
+				, prm_cnet_inf = ?
+				, mdf_id = ?
+				, mdf_dt = CONVERT(VARCHAR(8),GETDATE(),112)
+				, mdf_tm = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			WHERE mtnc_seq = ?
+			  AND srvr_inf_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="grid1_u_prm_kind"		type="STRING"/>
+        	<query-argument	id="grid1_u_prm_nm"		type="STRING"/>
+        	<query-argument	id="grid1_u_srvr_ip"		type="STRING"/>
+        	<query-argument	id="grid1_u_srvr_os"		type="STRING"/>
+        	<query-argument	id="grid1_u_os_cnet_inf"	type="STRING"/>
+        	<query-argument	id="grid1_u_prm_cnet_inf"	type="STRING"/>
+        	<query-argument	id="grid1_u_user_id"		type="STRING"/>
+        	<query-argument	id="mtnc_seq"				type="INTEGER"/>
+        	<query-argument	id="grid1_u_srvr_inf_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역  - 서버정보(dasMtncStatP.js) </query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCPRJ035D</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM uc_mtnc_srvr_inf
+			WHERE mtnc_seq = ?
+			  AND srvr_inf_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="mtnc_seq"				type="INTEGER"/>
+        	<query-argument	id="grid1_d_srvr_inf_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역  - 서버정보(dasMtncStatP.js) </query-descript>
+    </queryinfo>            
+
+    <queryinfo>
+        <query-id>UCPRJ036S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				  a.work_inf_seq
+				, a.mtnc_seq
+				, a.pgm_lrg
+				, a.pgm_mrg
+				, a.pgm_nm
+				, 1 AS add_del_index
+			FROM uc_mtnc_work_inf a
+			WHERE a.mtnc_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="mtnc_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역 - 작업정보(dasMtncStatP.js) </query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCPRJ036I</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO uc_mtnc_work_inf
+			(
+				mtnc_seq, pgm_lrg, pgm_mrg, pgm_nm,
+				rg_id, rg_dt, rg_tm,
+				mdf_id, mdf_dt, mdf_tm
+			)
+			VALUES
+			(
+				?, ?, ?, ?,
+				?, CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', ''),
+				?, CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			)
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="mtnc_seq"				type="INTEGER"/>
+        	<query-argument	id="grid2_i_pgm_lrg"		type="STRING"/>
+        	<query-argument	id="grid2_i_pgm_mrg"		type="STRING"/>
+        	<query-argument	id="grid2_i_pgm_nm"		type="STRING"/>
+        	<query-argument	id="grid2_i_user_id"			type="STRING"/>
+        	<query-argument	id="grid2_i_user_id"			type="STRING"/>
+        	
+        </query-arguments>
+        <query-descript> 유지보수 상세내역 - 작업정보(dasMtncStatP.js) </query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCPRJ036U</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			UPDATE uc_mtnc_work_inf SET
+				  pgm_lrg = ?
+				, pgm_mrg = ?
+				, pgm_nm = ?
+				, mdf_id = ?
+				, mdf_dt = CONVERT(VARCHAR(8),GETDATE(),112)
+				, mdf_tm = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			WHERE mtnc_seq = ?
+			  AND work_inf_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="grid2_u_pgm_lrg"			type="STRING"/>
+        	<query-argument	id="grid2_u_pgm_mrg"			type="STRING"/>
+        	<query-argument	id="grid2_u_pgm_nm"			type="STRING"/>
+        	<query-argument	id="grid2_u_user_id"			type="STRING"/>
+        	<query-argument	id="mtnc_seq"					type="INTEGER"/>
+        	<query-argument	id="grid2_u_work_inf_seq"		type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역 - 작업정보(dasMtncStatP.js) </query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCPRJ036D</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM uc_mtnc_work_inf
+			WHERE mtnc_seq = ?
+			  AND work_inf_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="mtnc_seq"					type="INTEGER"/>
+        	<query-argument	id="grid2_u_work_inf_seq"		type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역 - 작업정보(dasMtncStatP.js) </query-descript>
+    </queryinfo>            
+
+    <queryinfo>
+        <query-id>UCPRJ037S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				  a.chrg_usr_seq
+				, a.mtnc_seq
+				, a.chrg_usr_nm
+				, a.chrg_duty
+				, a.chrg_corp
+				, a.chrg_job
+				, a.mobl_no
+				, dbo.uf_telmask(a.mobl_no) AS mobl_no_excel
+				, a.tel_no
+				, dbo.uf_telmask(a.tel_no) AS tel_no_excel
+				, a.email
+				, 1 AS add_del_index
+			FROM uc_mtnc_chrg_usr a
+			WHERE a.mtnc_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="mtnc_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역 - 업무담당자 (dasMtncStatP.js) </query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCPRJ037I</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO uc_mtnc_chrg_usr
+			(
+				 mtnc_seq, chrg_usr_nm, chrg_duty, chrg_corp, chrg_job,
+				 mobl_no, tel_no, email,
+				 rg_id, rg_dt, rg_tm,
+				 mdf_id, mdf_dt, mdf_tm
+			)
+			VALUES
+			(
+				?, ?, ?, ?, ?, 
+				?, ?, ?,
+				?, CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', ''),
+				?, CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			)
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="mtnc_seq"					type="INTEGER"/>
+        	<query-argument	id="grid3_i_chrg_usr_nm"		type="STRING"/>
+        	<query-argument	id="grid3_i_chrg_duty"		type="STRING"/>
+        	<query-argument	id="grid3_i_chrg_corp"		type="STRING"/>
+        	<query-argument	id="grid3_i_chrg_job"			type="STRING"/>
+        	
+        	<query-argument	id="grid3_i_mobl_no"			type="STRING"		option="M"/>
+        	<query-argument	id="grid3_i_tel_no"				type="STRING"		option="M"/>
+        	<query-argument	id="grid3_i_email"				type="STRING"/>
+        	<query-argument	id="grid3_i_user_id"			type="STRING"/>
+        	<query-argument	id="grid3_i_user_id"			type="STRING"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역 - 업무담당자 (dasMtncStatP.js) </query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCPRJ037U</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			UPDATE uc_mtnc_chrg_usr SET
+				  chrg_usr_nm = ?
+				, chrg_duty = ?
+				, chrg_corp = ?
+				, chrg_job = ?
+				, mobl_no = ?
+				, tel_no = ?
+				, email = ?
+				, mdf_id = ?
+				, mdf_dt = CONVERT(VARCHAR(8),GETDATE(),112)
+				, mdf_tm = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			WHERE mtnc_seq = ?
+			  AND chrg_usr_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="grid3_u_chrg_usr_nm"		type="STRING"/>
+        	<query-argument	id="grid3_u_chrg_duty"		type="STRING"/>
+        	<query-argument	id="grid3_u_chrg_corp"		type="STRING"/>
+        	<query-argument	id="grid3_u_chrg_job"			type="STRING"/>
+        	<query-argument	id="grid3_u_mobl_no"			type="STRING"		option="M"/>
+        	<query-argument	id="grid3_u_tel_no"				type="STRING"		option="M"/>
+        	<query-argument	id="grid3_u_email"				type="STRING"/>
+        	<query-argument	id="grid3_u_user_id"			type="STRING"/>
+        	
+        	<query-argument	id="mtnc_seq"					type="INTEGER"/>
+        	<query-argument	id="grid3_u_chrg_usr_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역 - 업무담당자 (dasMtncStatP.js) </query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>UCPRJ037D</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM uc_mtnc_chrg_usr
+			WHERE mtnc_seq = ?
+			  AND chrg_usr_seq = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument	id="mtnc_seq"					type="INTEGER"/>
+        	<query-argument	id="grid3_d_chrg_usr_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 유지보수 상세내역 - 업무담당자 (dasMtncStatP.js) </query-descript>
+    </queryinfo>            
+                
+    <queryinfo>
+        <query-id>UCPRJ041S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+            SELECT corp_seq, corp_nm, rmk
+            FROM   uc_prj_corp a
+            WHERE  1=1
+            @corp_nm
+            ORDER  BY corp_nm ASC
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="corp_nm"	type="STRING"	condition="AND    a.corp_nm LIKE '%'+?+'%' "/>
+        </query-arguments>
+        <query-descript> 업체관리 조회 ( prjCorpMng.js ) </query-descript>
+    </queryinfo>
+	<queryinfo>
+		<query-id>UCPRJ042S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            SELECT (a.cnt+b.cnt) cnt, a.cnt AS mtnc_cnt, b.cnt AS prj_cnt
+            FROM
+            (
+                   SELECT COUNT(mtnc_seq) cnt
+                   FROM   uc_mtnc
+                   WHERE  (clnt_corp_seq = ? OR coop_corp_seq = ?)
+            ) a ,
+            (
+                   SELECT COUNT(prj_seq) cnt
+                   FROM   uc_prj
+                   WHERE  (coper_co = ? OR clnt_co = ?)
+            ) b
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="corp_seq" type="INTEGER"/>
+			<query-argument id="corp_seq" type="INTEGER"/>
+			<query-argument id="corp_seq" type="STRING"/>
+			<query-argument id="corp_seq" type="STRING"/>
+		</query-arguments>
+		<query-descript> 업체 사용건수 조회( prjCorpMng.js ) </query-descript>
+	</queryinfo>
+    <queryinfo>
+        <query-id>UCPRJ041I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+            INSERT INTO uc_prj_corp
+            (
+                corp_nm   , rmk
+              , rg_dt     , rg_tm         , rg_id
+              , mdf_dt    , mdf_tm        , mdf_id
+
+            )VALUES(
+                ?, ?
+              , CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', ''), ?
+              , CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', ''), ?
+            )
+      	]]></query-statement>
+        <query-arguments>
+			<query-argument id="corp_nm"       type="STRING" />
+			<query-argument id="rmk"           type="STRING" />
+			<query-argument id="user_id"       type="STRING" />
+			<query-argument id="user_id"       type="STRING" />
+        </query-arguments>
+        <query-descript> 업체관리 등록 ( prjCorpMng.js ) </query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCPRJ041U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+            UPDATE uc_prj_corp
+            SET    corp_nm       = ?
+                 , rmk           = ?
+                 , mdf_dt        = CONVERT(VARCHAR(8),GETDATE(),112)
+                 , mdf_tm        = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+                 , mdf_id        = ?
+            WHERE  corp_seq      = ?
+		]]></query-statement>
+        <query-arguments>
+			<query-argument id="corp_nm"       type="STRING" />
+			<query-argument id="rmk"           type="STRING" />
+			<query-argument id="user_id"       type="STRING" />
+			<query-argument id="corp_seq"      type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 업체관리 수정( prjCorpMng.js ) </query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCPRJ041D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM uc_prj_corp WHERE corp_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="corp_seq" type="INTEGER"/>
+        </query-arguments>
+        <query-descript> 업체관리 삭제( prjCorpMng.js ) </query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCPRJ043S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+            SELECT TOP 40
+                   corp_seq, corp_nm, rmk, rg_dt, rg_tm
+            FROM   uc_prj_corp a
+            WHERE  1=1
+            ORDER  BY rg_dt DESC, rg_tm DESC
+      	]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript> 업체관리 신규 40건 조회 ( prjCorpMng.js ) </query-descript>
+    </queryinfo>
+</query>

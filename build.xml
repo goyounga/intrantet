@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="euc-kr"?>
+<project name="uCare" default="all" basedir=".">
+	<description>uCare</description>
+	<property environment="env" />
+	<property 	name="build" 			value="dev/classes" />
+	<property	name="dist" 			value="view/WEB-INF/lib" />
+	<property	name="dist2" 			value="view/cab" />
+	<property 	name="file2" 			value="biz2.3" />
+	<property 	name="jarclasses" 		value="dev/jar-classes" />
+	<property 	name="bizbuild" 		value="dev/jar-classes/ucare/biz" />
+	
+	<target 	name="all" depends="clean, init, compile, archive ,copy " />
+	
+	<!-- 컴파일된 파일삭제 및 기존 jar 파일 백업 -->
+	<target name="clean" description="Removes the temporary directories used">
+		<delete dir="${build}/ucare/biz" />
+	</target>
+	
+	<!-- 폴더생성 -->
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${dist2}" />
+		<mkdir dir="${build}" />
+		<mkdir dir="${bizbuild}" />
+	</target>
+
+	<!-- classpath-->
+	<target name="compile" depends="init" description="ucare compile">
+		<path id="compile.classpath">
+			<pathelement location="view/WEB-INF/lib/struts-core-1.3.5.jar" />
+			<pathelement location="view/WEB-INF/lib/struts-taglib-1.3.5.jar" />
+			<pathelement location="view/WEB-INF/lib/commons-beanutils-1.7.0.jar" />
+			<pathelement location="view/WEB-INF/lib/commons-digester-1.6.jar" />
+			<pathelement location="view/WEB-INF/lib/commons-fileupload-1.1.1.jar" />
+			<pathelement location="view/WEB-INF/lib/commons-logging-1.1.jar" />
+			<pathelement location="view/WEB-INF/lib/commons.validator-1.3.0.jar" />
+			<pathelement location="view/WEB-INF/lib/commons-chain-1.1.jar" />
+			<pathelement location="view/WEB-INF/lib/commons-io-1.1.jar" />
+			<pathelement location="view/WEB-INF/lib/commons-collections.jar" />
+			<pathelement location="view/WEB-INF/lib/commons-logging-1.0.4.jar" />
+			<pathelement location="view/WEB-INF/lib/commons-validator-1.3.0.jar" />
+			<pathelement location="view/WEB-INF/lib/jwupload.jar" />
+			<pathelement location="view/WEB-INF/lib/log4j-1.2.12.jar" />
+			<pathelement location="view/WEB-INF/lib/mail.jar" />
+			<pathelement location="view/WEB-INF/lib/activation.jar" />
+			<pathelement location="view/WEB-INF/lib/mailapi.jar" />
+			<pathelement location="view/WEB-INF/lib/jxl.jar" />
+			<pathelement location="view/WEB-INF/lib/cos.jar" />
+			<pathelement location="view/WEB-INF/lib/jdom.jar" />
+			<pathelement location="view/WEB-INF/lib/xercesImpl.jar" />
+			<pathelement location="view/WEB-INF/lib/ibatis-sqlmap-2.jar" />
+			<pathelement location="view/WEB-INF/lib/ibatis-dao-2.jar" />
+			<pathelement location="view/WEB-INF/lib/ibatis-common-2.jar" />
+			<pathelement location="view/WEB-INF/lib/commons-dbcp-1.2.1.jar" />
+			<pathelement location="view/WEB-INF/lib/commons-pool-1.3.jar" />
+			<pathelement location="view/WEB-INF/lib/ojdbc14.jar" />
+			<pathelement location="view/WEB-INF/lib/jaf2.23.6.jar" />
+			<pathelement location="view/WEB-INF/lib/jpattern2.23.6.jar" />
+			<pathelement location="view/WEB-INF/lib/javax.servlet.jar" />
+			<pathelement location="view/WEB-INF/lib/j2ee.jar" />
+			<pathelement location="view/WEB-INF/lib/xml-apis.jar" />
+			<pathelement location="view/WEB-INF/lib/spring.jar" />
+			<pathelement location="view/WEB-INF/lib/green_client.jar" />
+			<pathelement location="view/WEB-INF/lib/green_xapi.jar" />
+			<pathelement location="view/WEB-INF/lib/netscape.jar" />
+		</path>
+		<javac srcdir="dev/src" destdir="${build}" includeAntRuntime="yes">
+			<classpath refid="compile.classpath" />
+			<include name="**/*.java" />
+		</javac>
+	</target>
+	
+	<!-- package 디렉토리 형식 class 파일 카피 -->
+	<target name="copy" depends="compile" description="Copy file">
+		<copy todir="${jarclasses}/ucare/biz">
+			<fileset dir="${build}">
+				<patternset>
+					<include name="ucare/biz/**" />
+				</patternset>
+			</fileset>
+		</copy>
+	</target>
+
+		
+			
+	<!-- jar (biz) -->
+	<target name="archive" depends="copy" description="Creates the JAR file">
+		<jar destfile="${dist}/${file2}.jar" basedir="${bizbuild}" />
+	</target>
+	
+
+</project>

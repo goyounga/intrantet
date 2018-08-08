@@ -1,0 +1,1526 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<query>
+
+	<queryinfo>
+		<query-id>COM000001</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-statement><![CDATA[
+			]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>코드북 캐시</query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>codebookcache</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-statement><![CDATA[
+		SELECT up_cd as uppercd, code, code_nm as codenm, etc1, etc2, etc3, use_f as useyn, lup_ord as sortseq
+		FROM uc_com_codebook
+		WHERE code NOT IN('000') and use_f='Y'
+		ORDER BY up_cd, lup_ord, code
+			]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>코드북 캐시</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMTABLE</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+		SELECT
+			B.TABLE_NAME||' ['||B.COMMENTS||']' as codev,
+			0 as codev_image,
+			'*,'||B.TABLE_NAME||'000' as codev_hidden,
+            B.TABLE_NAME as uppercd,
+			B.TABLE_NAME as orguppercd,
+            '000' as code,
+			'000' as orgcode,
+			'1' as step,
+			B.TABLE_NAME as TNAME,
+			B.COMMENTS as TCMT,
+			null as COL_NM,
+			null as COL_CMT,
+			0  as ID,
+			null as PK,
+			null as TYPE_CD,
+			null as LENGTH,
+			null as NULL_YN,
+			null as D_DEFAULT
+		FROM USER_TABLES A, USER_TAB_COMMENTS B
+		WHERE A.TABLE_NAME = B.TABLE_NAME
+		@table
+		@commment
+		UNION ALL
+		SELECT
+			COL.COLUMN_NAME||' ['||CCOM.COMMENTS||']' as codev,
+			2 as codev_image,
+			COL.TABLE_NAME||'000,'||COL.TABLE_NAME||COL.COLUMN_ID as codev_hidden,
+            COL.TABLE_NAME as uppercd,
+			COL.TABLE_NAME as orguppercd,
+            ''||COL.COLUMN_ID as code,
+			''||COL.COLUMN_ID as orgcode,
+			'3' as step,
+			COL.TABLE_NAME as TNAME,
+			'' as TCMT,
+			COL.COLUMN_NAME as COL_NM,
+			CCOM.COMMENTS as COL_CMT,
+			COL.COLUMN_ID ID,
+			PKCOL.constraint_type AS PK,
+			COL.DATA_TYPE as TYPE_CD,
+			DECODE(COL.DATA_TYPE, 'NUMBER',COL.DATA_PRECISION ||'.'||COL.DATA_SCALE,    COL.DATA_LENGTH) as LENGTH,
+			COL.NULLABLE as NULL_YN,
+			COL.DATA_DEFAULT as D_DEFAULT
+		FROM USER_TABLES UTAB,
+			USER_TAB_COLUMNS COL,
+			USER_COL_COMMENTS CCOM,
+			( SELECT b.table_name, b.column_name,
+						  DECODE (a.constraint_type,
+								  'R', 'FK',
+								  'P', 'PK',
+								  ''
+								 ) constraint_type
+					 FROM user_constraints a, user_cons_columns b
+					WHERE a.constraint_name = b.constraint_name
+					  AND a.constraint_type IN ('R', 'P')
+			) PKCOL
+		WHERE COL.TABLE_NAME = UTAB.TABLE_NAME
+			AND COL.TABLE_NAME  = CCOM.TABLE_NAME
+			AND COL.COLUMN_NAME = CCOM.COLUMN_NAME
+			AND COL.COLUMN_NAME = PKCOL.COLUMN_NAME(+)
+			AND COL.TABLE_NAME  = PKCOL.TABLE_NAME(+)
+			@table
+			@commment
+
+		ORDER BY TNAME ,ID
+			]]></query-statement>
+		<query-arguments>
+			<query-argument id="table" type="STRING"
+				condition="AND B.TABLE_NAME like '%'||UPPER(?)||'%'" />
+			<query-argument id="commment" type="STRING"
+				condition="AND B.COMMENTS like '%'||?||'%'" />
+			<query-argument id="table" type="STRING"
+				condition="AND CCOM.TABLE_NAME like '%'||UPPER(?)||'%'" />
+			<query-argument id="commment" type="STRING"
+				condition="AND COL.TABLE_NAME IN
+																					(SELECT B.TABLE_NAME FROM USER_TABLES A, USER_TAB_COMMENTS B
+																						WHERE A.TABLE_NAME = B.TABLE_NAME
+																						AND B.COMMENTS like '%'||?||'%')" />
+		</query-arguments>
+		<query-descript>admin DB 테이블 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMTABLE_DETAIL1</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+		SELECT
+			COL.TABLE_NAME as TNAME,
+			COL.COLUMN_NAME as COL_NM,
+			CCOM.COMMENTS as COL_CMT,
+			COL.COLUMN_ID ID,
+			PKCOL.constraint_type AS PK,
+			COL.DATA_TYPE as TYPE_CD,
+			DECODE(COL.DATA_TYPE, 'NUMBER', DECODE(COL.DATA_PRECISION, null, null, COL.DATA_PRECISION ||'.'||COL.DATA_SCALE), COL.DATA_LENGTH) as LENGTH,
+			COL.NULLABLE as NULL_YN,
+			COL.DATA_DEFAULT as D_DEFAULT
+		FROM USER_TABLES UTAB,
+			USER_TAB_COLUMNS COL,
+			USER_COL_COMMENTS CCOM,
+			( SELECT b.table_name, b.column_name,
+						  DECODE (a.constraint_type,
+								  'R', 'FK',
+								  'P', 'PK',
+								  ''
+								 ) constraint_type
+					 FROM user_constraints a, user_cons_columns b
+					WHERE a.constraint_name = b.constraint_name
+					  AND a.constraint_type IN ('R', 'P')
+			) PKCOL
+		WHERE COL.TABLE_NAME = UTAB.TABLE_NAME
+			AND COL.TABLE_NAME  = CCOM.TABLE_NAME
+			AND COL.COLUMN_NAME = CCOM.COLUMN_NAME
+			AND COL.COLUMN_NAME = PKCOL.COLUMN_NAME(+)
+			AND COL.TABLE_NAME  = PKCOL.TABLE_NAME(+)
+			AND COL.TABLE_NAME  = ?
+		ORDER BY TNAME ,ID
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="tname" type="STRING" />
+		</query-arguments>
+		<query-descript>admin DB 테이블 컬럼 상세조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMCODE</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT up_cd, code, code_nm, etc1, etc2, etc3, use_f, lup_ord
+			FROM   uc_com_codebook
+			WHERE code NOT IN('000') and use_f = 'Y' and up_cd = ?
+			ORDER BY up_cd, lup_ord
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="up_cd" type="STRING" />
+		</query-arguments>
+		<query-descript>코드북(NHN)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMMENU</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-statement><![CDATA[
+			SELECT   a.mnu_id as menu_id
+				   , SUBSTRING(a.MNU_ID,1,2)+'00' up_menu_id
+				   , a.MNU_NM as menu_nm
+				   , CASE WHEN SUBSTRING(a.MNU_ID,3,2) = '00' THEN  1 ELSE 2 END as menu_lvl
+				   , a.SR_URL as menu_url
+				   , 'Y' as use_yn
+				   , CASE WHEN SUBSTRING(a.MNU_ID,3,2) = '00' THEN  0 ELSE LUP_ORD END as ord
+				   , (SELECT LUP_ORD FROM UC_COM_MNU d WHERE d.mnu_id = SUBSTRING(a.MNU_ID,1,2) + '00' ) as up_menu_ord
+				   , a.MNU_DESC as menu_desc
+				   , isnull(a.SR_FRM_CD, '01') as pop_type_tc
+				   , '1111' as menu_auth_func
+				   , (SELECT MNU_NM FROM UC_COM_MNU d WHERE d.mnu_id = SUBSTRING(a.MNU_ID,1,2) + '00' ) as up_menu_nm
+				   , new_flag
+			FROM    UC_COM_MNU a , uc_com_mnu_grp_list b, uc_com_mnu_grp c
+			WHERE a.MNU_ID = b.mnu_id
+			and    b.mnu_grp_id = c.mnu_grp_id
+			and   c.mnu_grp_id = (select MNU_GRP_ID from UC_COM_USER where USER_ID = ?)
+			ORDER BY up_menu_ord, menu_lvl, ord, menu_id
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="user_id" type="STRING" />
+		</query-arguments>
+		<query-descript>메뉴그룹</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMBOARD</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-statement><![CDATA[
+		SELECT A.BOARD_ID, A.BOARD_NM
+		FROM UC_COM_BOARD A, UC_COM_BOARD_INSP_OBJ B
+		WHERE A.BOARD_ID = B.BOARD_ID
+			AND B.USER_ID = ?
+			AND A.USE_F='Y'
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="user_id" type="STRING" />
+		</query-arguments>
+		<query-descript>게시판</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMCTIINFO</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>FREE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+				A.cti_id
+				, A.ext_no
+			FROM UC_COM_USER A
+			WHERE A.user_id = ?
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="userid" type="STRING" />
+		</query-arguments>
+		<query-descript>상담원 CTI 정보</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMLOGINCHECK</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+				user_id
+				, user_nm
+				, use_f
+			FROM UC_COM_USER
+			WHERE user_id = ?
+			AND user_pwd = ?
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="user_id" type="STRING" />
+			<query-argument id="user_pwd" type="STRING" />
+		</query-arguments>
+		<query-descript>로그인 체크(NHN)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMLOGINCHECKCERT</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+		SELECT
+			A.user_id
+			, nvl2(A.cti_id, 'Y', 'N') AS ctiuseyn
+			, A.cti_id
+			, A.loi_ip
+			, nvl(A.loi_f, 'N') AS loginyn
+		FROM UC_COM_USER
+		WHERE user_id = ?
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="citizen_no" type="STRING" />
+		</query-arguments>
+		<query-descript>로그인 체크(인증)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMLOGIN</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			UPDATE UC_COM_USER SET
+				loi_ip = ?
+				, loi_f = 'Y'
+				, ext_no = ?
+			WHERE user_id = ?
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="ipno" type="STRING" />
+			<query-argument id="user_extno" type="STRING" />
+			<query-argument id="user_id" type="STRING" />
+		</query-arguments>
+		<query-descript>로그인(NHN)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMWORKIN</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type>none</query-view-type>
+		<query-statement><![CDATA[
+			MERGE INTO UC_COM_WORK_INFO a
+			USING (
+						SELECT x.user_id, TO_CHAR(SYSDATE,'YYYYMMDD') AS work_dt, ? AS ipno
+						FROM UC_COM_USER x, UC_COM_WORK_INFO y
+						WHERE x.user_id = ?
+						AND y.user_id(+) = x.user_id
+						AND y.work_dt(+) = TO_CHAR(SYSDATE,'YYYYMMDD')
+						AND NVL(x.loi_ip,'x') IN ('x',?)
+					) b
+			ON (a.user_id = b.user_id AND a.work_dt = b.work_dt)
+			WHEN matched THEN
+				UPDATE SET
+					a.work_cd = '01'
+					, a.loi_tm = DECODE(a.loi_tm,NULL,TO_CHAR(SYSDATE,'HH24MISS'),a.loi_tm)
+					, a.lot_tm = ''
+					, a.mdf_dt = TO_CHAR(SYSDATE,'YYYYMMDD')
+					, a.mdf_tm = TO_CHAR(SYSDATE,'HH24MISS')
+					, a.mdf_id = ?
+			WHEN NOT matched THEN
+				INSERT (work_dt, work_cd, user_id, loi_tm, rg_dt, rg_tm, rg_id)
+				VALUES (b.work_dt, '01', b.user_id, TO_CHAR(SYSDATE,'HH24MISS'), TO_CHAR(SYSDATE,'YYYYMMDD'), TO_CHAR(SYSDATE,'HH24MISS'), ?)
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="ipno" type="STRING" />
+			<query-argument id="user_id" type="STRING" />
+			<query-argument id="ipno" type="STRING" />
+			<query-argument id="user_id" type="STRING" />
+			<query-argument id="user_id" type="STRING" />
+		</query-arguments>
+		<query-descript>출근 등록(NHN)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMLOGOUT</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+		UPDATE UC_COM_USER SET
+			loi_ip = ?
+			, loi_f = 'N'
+		WHERE user_id = ?
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="loi_ip" type="STRING" />
+			<query-argument id="user_id" type="STRING" />
+		</query-arguments>
+		<query-descript>로그아웃</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMWORKOUT</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+    	UPDATE UC_COM_WORK_INFO SET
+			lot_tm = to_char(sysdate,'hh24miss')
+			, mdf_dt = TO_CHAR(SYSDATE,'YYYYMMDD')
+			, mdf_tm = TO_CHAR(SYSDATE,'HH24MISS')
+			, mdf_id = ?
+    	WHERE  user_id = ?
+		AND    work_dt = to_char(sysdate,'yyyymmdd')
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="user_id" type="STRING" />
+			<query-argument id="user_id" type="STRING" />
+		</query-arguments>
+		<query-descript>퇴근 등록(NHN)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>getdate</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+     	SELECT
+			CONVERT(varchar(8),GETDATE(), 112) AS dbdate
+      	]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>db시간</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMCALENDAR</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+		SELECT week_gb,
+			RTRIM(LTRIM(MIN(CASE dt WHEN 1 THEN no END))) AS sun,
+			RTRIM(LTRIM(MIN(CASE dt WHEN 2 THEN no END))) AS mon,
+			RTRIM(LTRIM(MIN(CASE dt WHEN 3 THEN no END))) AS tue,
+			RTRIM(LTRIM(MIN(CASE dt WHEN 4 THEN no END))) AS wed,
+			RTRIM(LTRIM(MIN(CASE dt WHEN 5 THEN no END))) AS thu,
+			RTRIM(LTRIM(MIN(CASE dt WHEN 6 THEN no END))) AS fri,
+			RTRIM(LTRIM(MIN(CASE dt WHEN 7 THEN no END))) AS sat,
+			MIN(REPLACE(CONVERT(VARCHAR(8),GETDATE(),112),'-','')) AS curday
+		FROM (
+			SELECT no, DATEPART(dw, dt) AS dt, DATEPART(WW , dt)  AS week_gb
+			FROM (
+				SELECT no, convert(VARCHAR(8),DATEADD(day, no -1 ,DATEADD(MONTH, 0,DATENAME(YEAR,?)  + DATENAME(month,?) +'01')),112) AS dt
+				FROM UC_COM_DUMMY
+				WHERE no BETWEEN 1 AND DATENAME(day, DATEADD(day, -1,DATEADD(MONTH, 1,DATENAME(YEAR,?)  + DATENAME(month,?) +'01')))
+			) A
+		) A
+		GROUP BY week_gb
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="yyyymmdd" type="STRING" />
+			<query-argument id="yyyymmdd" type="STRING" />
+			<query-argument id="yyyymmdd" type="STRING" />
+			<query-argument id="yyyymmdd" type="STRING" />
+		</query-arguments>
+		<query-descript>달력</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM001S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+            SELECT user_id , ext_no , mnu_grp_id, user_nm
+                 , grd_cd , dept_cd , pos_cd    , em_addr
+                 , hdp_no , nex_dept_cd
+                 , view_org_1, view_org_2, view_org_3
+               --, cti_id  , loi_ip , corp_cd corp_id
+               --, (select corp_nm from uc_com_corp_info where corp_cd = a.corp_cd) corp_nm, clnt_mdf_able_f
+               --, isnull((select top 1 prj_seq from uc_prj_mbr where user_id = A.user_id), '') AS prj_id
+            FROM   UC_COM_USER A
+            WHERE  user_id = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="user_id" type="STRING" />
+		</query-arguments>
+		<query-descript>사용자 정보 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM002S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>CODE</query-view-type>
+		<query-statement><![CDATA[
+		SELECT code, codenm
+		  FROM uc_com_constypecodebook
+		 WHERE 1=1
+		   AND useyn='Y'
+		   AND up_cd='ROOT'
+		 ORDER BY sortseq
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>상담유형(대)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM003S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>CODE</query-view-type>
+		<query-statement><![CDATA[
+		SELECT '2' step, '' cnsl_tp_cd, '== 선택 ==' cnsl_tp_nm, 0 lup_ord FROM DUAL
+		UNION ALL
+		SELECT '2' step, cnsl_tp_cd, cnsl_tp_nm, lup_ord
+		FROM UC_COM_CNSL_TP
+		WHERE 1=1
+			AND use_f='Y'
+			AND length(cnsl_tp_cd)=7
+			@constypel
+		ORDER BY lup_ord
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="constypel" type="QUERY"
+				condition="AND up_tp_cd = ? " />
+			<query-argument id="constypel" type="STRING"
+				condition="" />
+		</query-arguments>
+		<query-descript>상담유형(중)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM004S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>CODE</query-view-type>
+		<query-statement><![CDATA[
+		SELECT '2' step, '' cnsl_tp_cd, '== 선택 ==' cnsl_tp_nm, 0 lup_ord FROM DUAL
+		UNION ALL
+		SELECT '2' step, cnsl_tp_cd, cnsl_tp_nm, lup_ord
+		FROM UC_COM_CNSL_TP
+		WHERE 1=1
+			AND use_f='Y'
+			AND length(cnsl_tp_cd)=10
+			@constypem
+		ORDER BY lup_ord
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="constypem" type="QUERY"
+				condition="AND up_tp_cd = ? " />
+			<query-argument id="constypem" type="STRING"
+				condition="" />
+		</query-arguments>
+		<query-descript>상담유형(소)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM005S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+				A.cnsl_tp_cd AS lcode
+				, A.cnsl_tp_nm AS lcodenm
+				, A.lup_ord AS lsortseq
+				, B.muppercd AS muppercd
+				, B.mcode AS mcode
+				, B.mcodenm AS mcodenm
+				, B.msortseq AS msortseq
+				, B.suppercd AS suppercd
+				, B.scode AS scode
+				, B.scodenm AS scodenm
+				, B.ssortseq AS ssortseq
+			FROM UC_COM_CNSL_TP A,
+			(
+				SELECT
+					A.up_tp_cd AS muppercd
+					, A.cnsl_tp_cd AS mcode
+					, A.cnsl_tp_nm AS mcodenm
+					, A.lup_ord AS msortseq
+					, B.up_tp_cd AS suppercd
+					, B.cnsl_tp_cd AS scode
+					, B.cnsl_tp_nm AS scodenm
+					, B.lup_ord AS ssortseq
+				FROM UC_COM_CNSL_TP a, UC_COM_CNSL_TP b
+				WHERE
+				A.cnsl_tp_cd = B.up_tp_cd
+				AND A.use_f = 'Y'
+				AND B.use_f = 'Y'
+			) B
+			WHERE A.cnsl_tp_cd = B.muppercd
+			AND A.use_f='Y'
+			AND A.CORP_CD = ?
+			@constype
+			@constype
+			@constype
+			ORDER BY lsortseq, lcode, msortseq, mcode, ssortseq, scode
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="corp_cd" type="STRING" />
+			<query-argument id="constype" type="STRING"
+				condition=" AND (UPPER(A.cnsl_tp_nm) LIKE '%' || ? ||'%'" />
+			<query-argument id="constype" type="STRING"
+				condition=" OR UPPER(B.mcodenm) LIKE '%' || ? ||'%'" />
+			<query-argument id="constype" type="STRING"
+				condition=" OR UPPER(B.scodenm) LIKE '%' || ? ||'%')" />
+		</query-arguments>
+		<query-descript>상담유형</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM006S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>tree</query-view-type>
+		<query-statement><![CDATA[
+		SELECT
+			DECODE(SUBSTR(code, 2,4), '000', '1', '2') step
+			, code
+			, nm_code
+		FROM ib_code
+		WHERE cl_code = '0066' AND cl_use = '1'
+		ORDER BY code
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>조직도 부서 정보</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM007S</query-id>
+		<query-exec-type>PAGE</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+		SELECT
+			TRIM(A.user_id)			AS user_id
+			, TRIM(A.agent_code)		AS agent_code
+			, TRIM(A.user_nm)		AS user_nm
+			, DECODE(LENGTH(TRIM(A.citizen_no)), NULL, '', 0, '', RPAD(SUBSTR(TRIM(A.citizen_no),1, 6) || '-', 14, '*')) AS citizen_no
+			, TRIM(A.phone_no)		AS phone_no
+			, TRIM(A.handphone_no)	AS handphone_no
+			, TRIM(A.email)			AS email
+			, TRIM(A.job_grade)		AS job_grade
+			, TRIM(A.department)		AS department
+			, (SELECT
+					nm_code
+				FROM ib_code
+				WHERE code = A.department AND ROWNUM = 1) AS departmentnm
+			, TRIM(A.user_status)		AS user_status
+		FROM user_inf_mst A
+		WHERE A.user_status = '1'
+			AND A.department IN
+			(
+				SELECT
+					code
+				FROM ib_code
+				WHERE cl_code = '0066'
+				AND cl_use = '1'
+				@departmentl
+			)
+			@departments
+			@search
+		ORDER BY user_nm
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="departmentl" type="STRING"
+				condition=" AND code LIKE SUBSTR(?, 1, 2) || '%'" />
+			<query-argument id="departments" type="STRING"
+				condition=" AND A.department = ?" />
+			<query-argument id="search" type="STRING" option="R" />
+		</query-arguments>
+		<query-descript>조직도 상담원 정보</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM008S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>CODE</query-view-type>
+		<query-statement><![CDATA[
+		select
+			'1' as step
+			, ORG_CD as code
+			, ORG_NM as codenm
+		from uc_com_org_info
+		where up_org_cd = 'ROOT'
+			and corp_cd = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="corp_cd" type="STRING" condition="" />
+		</query-arguments>
+		<query-descript>조직도 상위 부서(콤보용)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM009S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+		select
+			'1' as step
+			, ORG_CD as code
+			, ORG_NM as codenm
+		from uc_com_org_info
+		where corp_cd = ?
+			and up_org_cd = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="corp_cd" type="STRING" />
+			<query-argument id="org_cd" type="STRING" />
+		</query-arguments>
+		<query-descript>조직도 하위 부서(콤보용)</query-descript>
+	</queryinfo>
+
+
+	<!-- 채널 발송 시작 (이창욱)-->
+	<!-- FAX START -->
+	<queryinfo>
+		<query-id>UCCOM010S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>FREE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT SEQ_UC_COM_CHANNELHSTINFO.NEXTVAL AS seq FROM dual
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript></query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM011I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			INSERT ALL
+			INTO uc_com_channelhstinfo(	seq, custgb, custkey, templatecd, channeltypeuniqueno, channeltype, senddt, sendtm, regid)
+			VALUES(	int_seq
+					, custgb
+					, custkey
+					, templatecd
+					, seq_no
+					, channeltype
+					, TO_CHAR(SYSDATE, 'YYYYMMDD')
+					, TO_CHAR(SYSDATE, 'HH24MISS')
+					, userid)
+			INTO fax_send_lst(seq_no, recv_seqno, send_type, fms_ch_id, fax_no, cust_name, subject, enter_user, enter_date)
+			VALUES( seq_no
+					, char_seq
+					, send_type
+					, fms_ch_id
+					, fax_no
+					, shop_name
+					, subject
+					, userid
+					, TO_CHAR(SYSDATE, 'YYMMDDHH24MISS') )
+			SELECT	? AS int_seq
+				  	, ? AS char_seq
+				  	, ? AS custgb
+				  	, ? AS custkey
+				  	, ? AS templatecd
+				  	, DECODE(LPAD(MAX(seq_no) + 1, 15, '0'), null, LPAD('1',15,'0'), LPAD(MAX(seq_no) + 1, 15, '0')) AS seq_no
+				  	, ? AS channeltype
+				  	, ? AS userid
+				  	, ? AS send_type
+				  	, ? AS fms_ch_id
+				  	, ? AS fax_no
+				  	, ? AS shop_name
+				  	, ? AS subject
+			FROM fax_send_lst
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="seq" type="INTEGER" condition="?" />
+			<query-argument id="seq" type="STRING" condition="?" />
+			<query-argument id="custgb" type="STRING" />
+			<query-argument id="custkey" type="STRING" />
+			<query-argument id="templatecd" type="STRING" />
+			<query-argument id="channeltype" type="STRING" />
+			<query-argument id="userid" type="STRING" />
+			<query-argument id="send_type" type="STRING" />
+			<query-argument id="fms_ch_id" type="STRING" />
+			<query-argument id="fax_no" type="STRING" option="M" />
+			<query-argument id="shop_name" type="STRING" />
+			<query-argument id="subject" type="STRING" />
+		</query-arguments>
+		<query-descript>EIS 팩스 테이블, 채널 이력 테이블 INSERT</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM012S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>FREE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT channeltypeuniqueno AS eis_seq_no FROM uc_com_channelhstinfo WHERE seq = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="seq" type="STRING" />
+		</query-arguments>
+		<query-descript>채널이력(UCCOM011I) 인서트 후 EIS테이블에 tif 이미지 업데이트 하기 위해 시퀀스
+			조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM013U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+		UPDATE fax_send_lst
+		   SET tif_message 	= ?
+		 WHERE seq_no 		= ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="tif_message" type="STRING" />
+			<query-argument id="eis_seq_no" type="STRING" />
+		</query-arguments>
+		<query-descript>EIS 팩스 테이블 이미지명 UPDATE</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM014U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			UPDATE fax_send_lst
+			SET	   send_result = '90'
+			WHERE  seq_no = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="eis_seq_no" type="STRING" />
+		</query-arguments>
+		<query-descript>EIS 팩스 테이블 UPDATE(발송 에러)</query-descript>
+	</queryinfo>
+	<!-- FAX END -->
+
+	<!-- SMS START -->
+	<queryinfo>
+		<query-id>UCCOM015I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+			INSERT ALL
+			INTO uc_com_channelHstInfo(	seq, custgb, custkey, templatecd, channeltypeuniqueno, channeltype, senddt, sendtm, regid)
+			VALUES(	SEQ_UC_COM_CHANNELHSTINFO.NEXTVAL
+					, custgb
+					, custkey
+					, templatecd
+					, 'INB'|| send_job_code || send_key_code ||LPAD(SMS_SEND_ID_SEQ.NEXTVAL, 12, '0')
+					, '02'
+					, TO_CHAR(SYSDATE, 'YYYYMMDD')
+					, TO_CHAR(SYSDATE, 'HH24MISS')
+					, userid)
+			INTO sms_message_mst(sms_send_id, asp_code, send_job_code, send_key_code, dest_column,
+			                     	   dest_code_value, receivernum, callback, message, reserved_time, send_user)
+			VALUES( 'INB'|| send_job_code || send_key_code ||LPAD(SMS_SEND_ID_SEQ.NEXTVAL, 12, '0')
+					, 'INB'
+					, send_job_code
+					, send_key_code
+					, 'CUST_NO'
+					, custkey
+					, receivernum
+					, callback
+					, msg1
+					, TO_CHAR(SYSDATE,'YYMMDDHH24MISS')
+					, 'online')
+			SELECT  ? AS custgb, ? AS custkey, ? AS templatecd, ? AS send_job_code, ? AS send_key_code,
+					? AS receivernum, ? AS callback, ? AS msg1, ? AS userid
+			FROM dual
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="custgb" type="STRING" />
+			<query-argument id="custkey" type="STRING" />
+			<query-argument id="templatecd" type="STRING" />
+			<query-argument id="send_job_code" type="STRING" />
+			<query-argument id="send_key_code" type="STRING" />
+			<query-argument id="receivernum" type="STRING" option="M" />
+			<query-argument id="callback" type="STRING" option="M" />
+			<query-argument id="message1" type="STRING" />
+			<query-argument id="userid" type="STRING" />
+		</query-arguments>
+		<query-descript>SMS 발송 요청</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM016I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+			INSERT ALL
+			INTO uc_com_channelHstInfo(	seq, custgb, custkey, templatecd, channeltypeuniqueno, channeltype, senddt, sendtm, regid)
+			VALUES(	SEQ_UC_COM_CHANNELHSTINFO.NEXTVAL
+					, custgb
+					, custkey
+					, templatecd
+					, 'INB'|| send_job_code || send_key_code ||LPAD(SMS_SEND_ID_SEQ.NEXTVAL, 12, '0')
+					, '02'
+					, TO_CHAR(SYSDATE, 'YYYYMMDD')
+					, TO_CHAR(SYSDATE, 'HH24MISS')
+					, userid)
+			INTO sms_message_mst(sms_send_id, asp_code, send_job_code, send_key_code, dest_column,
+			                     dest_code_value, receivernum, callback, message, reserved_time, send_flag_yn, send_user)
+			VALUES( 'INB'|| send_job_code || send_key_code ||LPAD(SMS_SEND_ID_SEQ.NEXTVAL, 12, '0')
+					, 'INB'
+					, send_job_code
+					, send_key_code
+					, 'CUST_NO'
+					, custkey
+					, receivernum
+					, callback
+					, msg2
+					, TO_CHAR(SYSDATE,'YYMMDDHH24MISS')
+					, 'N'
+					, 'online')
+			SELECT  ? AS custgb, ? AS custkey, ? AS templatecd, ? AS send_job_code, ? AS send_key_code,
+					? AS receivernum, ? AS callback, ? AS msg2, ? AS userid
+			FROM dual
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="custgb" type="STRING" />
+			<query-argument id="custkey" type="STRING" />
+			<query-argument id="templatecd" type="STRING" />
+			<query-argument id="send_job_code" type="STRING" />
+			<query-argument id="send_key_code" type="STRING" />
+			<query-argument id="receivernum" type="STRING" option="M" />
+			<query-argument id="callback" type="STRING" option="M" />
+			<query-argument id="message2" type="STRING" />
+			<query-argument id="userid" type="STRING" />
+		</query-arguments>
+		<query-descript>SMS 발송 요청(문자 메시지 80Byte이상)</query-descript>
+	</queryinfo>
+	<!-- SMS END -->
+
+	<!-- Email START -->
+	<queryinfo>
+		<query-id>UCCOM017I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			INSERT ALL
+			INTO uc_com_channelHstInfo(	seq, custgb, custkey, templatecd, channeltypeuniqueno, channeltype, senddt, sendtm, regid)
+			VALUES(	mail_seq
+					, custgb
+					, custkey
+					, templatecd
+					, mail_seq
+					, '03'
+					, TO_CHAR(SYSDATE, 'YYYYMMDD')
+					, TO_CHAR(SYSDATE, 'HH24MISS')
+					, userid)
+			INTO mail_send_log( mail_send_no, user_id, agent_code, cat_id, registration_no, send_time, send_yn, rcv_yn, rcv_addr)
+			VALUES( mail_seq
+					, userid
+					, agent_code		-- 대리점 코드
+					, cat_id 			-- 단말기 번호
+					, registration_no 	-- 사업자번호
+					, TO_NUMBER(TO_CHAR(SYSDATE,'YYMMDDHH24MISS'))
+					, 'Y'
+					, 'N'
+					, mail_to)
+			SELECT  ( SELECT (MAX(TO_NUMBER(mail_send_no)) + 1) FROM mail_send_log ) AS mail_seq,
+					? AS custgb, ? AS custkey, ? AS templatecd, ? AS userid, ? AS agent_code, ? AS cat_id, ? AS registration_no, ? AS mail_to
+			FROM dual
+
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="custgb" type="STRING" />
+			<query-argument id="custkey" type="STRING" />
+			<query-argument id="templatecd" type="STRING" />
+			<query-argument id="userid" type="STRING" />
+			<query-argument id="agent_code" type="STRING" />
+			<query-argument id="cat_id" type="STRING" />
+			<query-argument id="registration_no" type="STRING" />
+			<query-argument id="mail_to" type="STRING" />
+		</query-arguments>
+		<query-descript>Email 발송 요청</query-descript>
+	</queryinfo>
+	<!-- Email END -->
+
+	<queryinfo>
+		<query-id>UCCOM018S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>FREE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT EMAIL_SEND_ID_SEQ.NEXTVAL AS mail_seq FROM dual
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>EIS - Email 이력테이블의 시퀀스조회</query-descript>
+	</queryinfo>
+
+	<!-- 채널 발송 끝 -->
+
+
+	<!-- query-id 번호 오류를 대비해서 101번부터 시작한다 (김정균) -->
+	<queryinfo>
+		<query-id>UCCOM101S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>FREE</query-view-type>
+		<query-statement><![CDATA[
+		SELECT
+				SUM(status_cnt1) AS status_cnt1
+				, DECODE(MAX(res_yn),'','N') AS res_yn
+				, SUM(status_cnt2) AS status_cnt2
+				, SUM(status_cnt3) AS status_cnt3
+				, SUM(status_cnt4) AS status_cnt4
+		FROM
+		(
+				--예약콜
+				SELECT
+					COUNT(tel_res_no) AS status_cnt1
+					, MAX(
+								CASE WHEN RES_TM BETWEEN TO_CHAR(TRUNC(SYSDATE, 'HH24'), 'HH24')||'00'
+															  AND TO_CHAR(TRUNC(SYSDATE, 'HH24')+(1/24), 'HH24')||'00'
+								THEN 'Y' ELSE 'N' END
+							) AS res_yn
+					, 0 AS status_cnt2
+					, 0 AS status_cnt3
+					, 0 AS status_cnt4
+				FROM UC_TEL_SCH
+				WHERE user_id = ?
+				AND tel_f_cd = 'N'
+				AND res_dt = TO_CHAR(SYSDATE, 'YYYYMMDD')
+
+				UNION ALL
+
+				-- 진성검증
+				SELECT
+					0 AS status_cnt1
+					, '' AS res_yn
+					, COUNT(atcl_no) AS status_cnt2
+					, 0 AS status_cnt3
+					, 0 AS status_cnt4
+				FROM UC_ATCL_VRFY_INFO
+				WHERE vrfy_asg_id = ?
+				AND vrfy_asg_dt BETWEEN TO_CHAR(SYSDATE - 30, 'YYYYMMDD') AND TO_CHAR(SYSDATE, 'YYYYMMDD')
+				AND atcl_stts_cd = '20'
+
+				UNION ALL
+
+				-- 개인정보동의
+				SELECT
+					0 AS status_cnt1
+					, '' AS res_yn
+					, 0 AS status_cnt2
+					, COUNT(atcl_no) AS status_cnt3
+					, 0 AS status_cnt4
+				FROM UC_ATCL_VRFY_INFO
+				WHERE info_agm_asg_id = ?
+				AND info_agm_asg_dt BETWEEN TO_CHAR(SYSDATE - 30, 'YYYYMMDD') AND TO_CHAR(SYSDATE, 'YYYYMMDD')
+				AND info_agm_f IS NULL
+				AND atcl_stts_cd = '10'
+
+				UNION ALL
+
+				SELECT
+					0 AS status_cnt1
+					, '' AS res_yn
+					, 0 AS status_cnt2
+					, 0 AS status_cnt3
+					, COUNT(atcl_no) AS status_cnt4
+				FROM UC_ATCL_VRFY_INFO
+				WHERE rgn_doc_asg_id = ?
+				AND rgn_doc_asg_dt BETWEEN TO_CHAR(SYSDATE - 30, 'YYYYMMDD') AND TO_CHAR(SYSDATE, 'YYYYMMDD')
+				AND atcl_stts_cd = '40'
+		)
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="userid" type="STRING" />
+			<query-argument id="userid" type="STRING" />
+			<query-argument id="userid" type="STRING" />
+			<query-argument id="userid" type="STRING" />
+		</query-arguments>
+		<query-descript>예약 / 캠페인</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM102S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+		SELECT
+			TRIM(B.user_id) AS userid
+			,TRIM(B.user_nm) AS user_nm
+			,A.grd_cd
+			,DECODE(B.agent_code, '0000', 'N', 'Y') AS agentyn
+			,B.agent_code
+		FROM uc_com_user A, user_inf_mst B
+		WHERE A.userid(+) = B.user_id
+			AND trim(B.user_id) = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="userid" type="STRING" />
+		</query-arguments>
+		<query-descript>OuterMain 사용자 정보 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM103S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+				u.user_id
+				, u.user_nm
+				, u.ext_no
+				, u.cti_id
+				, c.code_nm
+			FROM UC_COM_USER u, UC_COM_CODEBOOK c
+			WHERE u.org_cd(+) = c.code
+			AND c.code NOT IN('000') AND c.use_f = 'Y' AND c.up_cd = ?
+			AND u.use_f='Y' AND cti_id IS NOT NULL
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="up_cd" type="STRING" />
+		</query-arguments>
+		<query-descript>상담원 CTI 정보</query-descript>
+	</queryinfo>
+
+	<!-- sms 유형선택 시작 -->
+	<queryinfo>
+		<query-id>UCCOM0010S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>CODE</query-view-type>
+		<query-statement><![CDATA[
+		select
+			'1' as step
+			, up_sms_tp_cd as code
+			, sms_code_nm as codenm
+		from uc_com_sms_tp
+		where sms_tp_cd = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="brcode" type="STRING" condition="" />
+		</query-arguments>
+		<query-descript>sms 유형 상위(콤보용)</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM0011S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+		select
+			'1' as step
+			, sms_tp_cd as code
+			, sms_code_nm as codenm
+			, sms_code_txt
+		from uc_com_sms_tp
+		where up_sms_tp_cd = ?
+		and sms_tp_cd != '000'
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="sms_cd" type="STRING" />
+		</query-arguments>
+		<query-descript>sms 유형 하위(콤보용)</query-descript>
+	</queryinfo>
+	<!-- sms 유형선택 끝 -->
+
+	<!-- 우편번호 시작 -->
+	<queryinfo>
+		<query-id>UCCOM011S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+				POST
+				, FN_POST(POST) as POST
+				, ADDRESS
+				, AREA_CD
+				, RG_ID
+				, FN_USER(RG_ID, 'Y') as RGNM
+				, RG_DT
+				, RG_TM
+				, RG_DT || ',' || RG_TM as RG_DTM
+				, MDF_ID
+				, FN_USER(MDF_ID, 'Y') as MDFNM
+				, MDF_DT
+				, MDF_TM
+				, MDF_DT || ',' || MDF_TM as MDF_DTM
+			FROM UC_COM_POST
+			WHERE 1=1
+				@address_s
+		]]>
+		</query-statement>
+		<query-arguments>
+			<query-argument id="address_s" type="STRING"
+				condition="AND address like '%' || ? || '%'" />
+		</query-arguments>
+		<query-descript>우편번호 조회</query-descript>
+	</queryinfo>
+	<!-- 우편번호 끝 -->
+
+	<queryinfo>
+		<query-id>UCCOM028S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT   user_id
+			       , user_pwd
+			FROM   uc_com_user
+			WHERE  user_id = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="userid" type="STRING" />
+		</query-arguments>
+		<query-descript>비밀번호변경 (comChangePwd.jsp)</query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCCOM028U</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+			UPDATE UC_COM_USER
+			SET	  user_pwd     = ?
+			WHERE user_id = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="newpwd" type="STRING" />
+			<query-argument id="userid" type="STRING" />
+		</query-arguments>
+		<query-descript>비밀번호변경 (comChangePwd.jsp)</query-descript>
+	</queryinfo>
+
+
+	<queryinfo>
+		<query-id>UCCOM030S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+		SELECT
+			file_seq
+			, file_nm
+			, new_file_nm
+			, rg_dt
+			, rg_tm
+			, rg_id
+			, dbo.FN_USER(rg_id, '') AS rg_nm
+		FROM UC_COM_FILE
+		WHERE prg_id = ?
+			AND up_seq = ?
+		ORDER BY file_seq ASC
+        ]]>
+		</query-statement>
+		<query-arguments>
+			<query-argument id="prg_id" type="STRING" />
+			<query-argument id="up_seq" type="INTEGER" />
+		</query-arguments>
+		<query-descript>업로드 파일 조회 공통</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM030I</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+        INSERT INTO UC_COM_FILE
+        (
+			up_seq, prg_id, file_nm, new_file_nm
+			, rg_dt, rg_tm, rg_id, mdf_dt, mdf_tm, mdf_id
+		)
+        VALUES
+        (
+        	?, ?, ?, ?
+			, CONVERT(VARCHAR(8),GETDATE(),112)
+			, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			, ?
+			, CONVERT(VARCHAR(8),GETDATE(),112)
+			, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			, ?
+        )
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="up_seq" type="INTEGER" />
+			<query-argument id="prg_id" type="STRING" />
+			<query-argument id="file_nm" type="STRING" />
+			<query-argument id="new_file_nm" type="STRING" />
+			<query-argument id="userid" type="STRING" />
+			<query-argument id="userid" type="STRING" />
+		</query-arguments>
+		<query-descript>업로드 파일 최초 저장 공통</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM030D</query-id>
+		<query-exec-type>DELETE</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+        DELETE FROM UC_COM_FILE
+		WHERE prg_id = ?
+			AND up_seq = ?
+			@file_seq
+      	]]></query-statement>
+		<query-arguments>
+			<query-argument id="prg_id" type="STRING" />
+			<query-argument id="up_seq" type="INTEGER" />
+			<query-argument id="file_seq" type="INTEGER"
+				condition=" AND file_seq = ?" />
+		</query-arguments>
+		<query-descript>업로드 파일 삭제 공통</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOM031S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+		SELECT	user_id	, user_nm, em_addr
+		FROM 	UC_COM_USER A
+		WHERE 	use_f = 'Y'
+		AND 	em_addr IS NOT NULL
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>사용자 정보 조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCCOMTEST</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+		SELECT
+			COL.TABLE_NAME as TNAME,
+			COL.COLUMN_NAME as COL_NM,
+			CCOM.COMMENTS as COL_CMT,
+			COL.COLUMN_ID ID,
+			PKCOL.constraint_type AS PK,
+			COL.DATA_TYPE as TYPE_CD,
+			DECODE(COL.DATA_TYPE, 'NUMBER', DECODE(COL.DATA_PRECISION, null, null, COL.DATA_PRECISION ||'.'||COL.DATA_SCALE), COL.DATA_LENGTH) as LENGTH,
+			COL.NULLABLE as NULL_YN,
+			COL.DATA_DEFAULT as D_DEFAULT
+		FROM USER_TABLES UTAB,
+			USER_TAB_COLUMNS COL,
+			USER_COL_COMMENTS CCOM,
+			( SELECT b.table_name, b.column_name,
+						  DECODE (a.constraint_type,
+								  'R', 'FK',
+								  'P', 'PK',
+								  ''
+								 ) constraint_type
+					 FROM user_constraints a, user_cons_columns b
+					WHERE a.constraint_name = b.constraint_name
+					  AND a.constraint_type IN ('R', 'P')
+			) PKCOL
+		WHERE COL.TABLE_NAME = UTAB.TABLE_NAME
+			AND COL.TABLE_NAME  = CCOM.TABLE_NAME
+			AND COL.COLUMN_NAME = CCOM.COLUMN_NAME
+			AND COL.COLUMN_NAME = PKCOL.COLUMN_NAME(+)
+			AND COL.TABLE_NAME  = PKCOL.TABLE_NAME(+)
+			AND COL.TABLE_NAME  = ?
+		ORDER BY TNAME ,ID
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="tname" type="STRING" />
+		</query-arguments>
+		<query-descript>admin DB 테이블 컬럼 상세조회</query-descript>
+	</queryinfo>
+
+	<!-- 조직도 S-->
+    <queryinfo>
+		<query-id>UCCOM041S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+            SELECT A.FULL_ORGNM + ISNULL( ' ('+B.CNT+')','') FULL_ORGNM
+                 , A.FULL_ORGNM_HIDDEN
+                 , A.FULL_ORGNM_INDEX --image
+                 , A.EM_ADDR
+                 , A.GUBUN
+                 , A.ORGNM
+                 , '0' CHK
+                 , A.SORT
+               --, A.SORT_ORG
+               --, A.PARENT_CD -- parent
+                 , A.ORGCD     -- self unique
+               --, A.ORGCD_ORG -- self original
+               --, A.DEPTH
+                 , A.HDP_NO
+            FROM   (
+                   -- LEVEL 1
+                   SELECT '넥스프론' AS FULL_ORGNM
+                        , '*,ROOT'   AS FULL_ORGNM_HIDDEN
+                        , '0'        AS FULL_ORGNM_INDEX
+                        , 'E-MAIL'   AS EM_ADDR
+                        , 'DEPT'     AS GUBUN
+                        , '넥스프론' AS ORGNM
+                        , 0          AS SORT
+                      --, 0          AS SORT_ORG
+                      --, '*'        AS PARENT_CD
+                        , 'ROOT'     AS ORGCD
+                      --, 'ROOT'     AS ORGCD_ORG
+                      --, 1          AS DEPTH
+                        , ''         AS HDP_NO
+                   UNION  ALL -- LEVEL 2
+                   SELECT CODE_NM            AS FULL_ORGNM
+                        , 'ROOT,'+UP_CD+CODE AS FULL_ORGNM_HIDDEN
+                        , '1'                AS FULL_ORGNM_INDEX
+                        , ''                 AS EM_ADDR
+                        , 'DEPT'             AS GUBUN
+                        , CODE_NM            AS ORGNM
+                        , (LUP_ORD*100)      AS SORT
+                      --, LUP_ORD            AS SORT_ORG
+                      --, 'ROOT'             AS PARENT_CD
+                        , UP_CD+CODE         AS ORGCD
+                      --, CODE               AS ORGCD_ORG
+                      --, 2                  AS DEPTH
+                        , ''                 AS HDP_NO
+                   FROM   UC_COM_CODEBOOK
+                   WHERE  UP_CD = 'SYS025'
+                   AND    CODE <> '000'
+                   AND    USE_F = 'Y'
+                   UNION  ALL -- LEVEL 3
+                   SELECT CODE_NM    AS FULL_ORGNM
+                        , (CASE WHEN (A.ETC1 IS NULL OR A.ETC1='') THEN 'ROOT' ELSE ('SYS025'+A.ETC1) END)+','+(UP_CD+CODE) AS FULL_ORGNM_HIDDEN
+                        , '1'        AS FULL_ORGNM_INDEX
+                        , ''         AS EM_ADDR
+                        , 'DEPT'     AS GUBUN
+                        , CODE_NM    AS ORGNM
+                        , (CASE WHEN (A.ETC1 IS NULL OR A.ETC1='') THEN 1 ELSE (SELECT LUP_ORD*100 FROM UC_COM_CODEBOOK WHERE UP_CD='SYS025' AND CODE=A.ETC1)+LUP_ORD END) AS SORT
+                      --, LUP_ORD    AS SORT_ORG
+                      --, (CASE WHEN (A.ETC1 IS NULL OR A.ETC1='') THEN 'ROOT' ELSE ('SYS025'+A.ETC1) END) AS PARENT_CD
+                        , UP_CD+CODE AS ORGCD
+                      --, CODE       AS ORGCD_ORG
+                      --, 3          AS DEPTH
+                        , ''         AS HDP_NO
+                   FROM   UC_COM_CODEBOOK A
+                   WHERE  UP_CD = 'SYS012'
+                   AND    CODE <> '000'
+                   AND    USE_F = 'Y'
+                   UNION  ALL -- LEVEL 4
+                   SELECT USER_NM +ISNULL(' ['+B.CODE_NM+']','') AS FULL_USER_NM
+                        , 'SYS012'+DEPT_CD +','+ USER_ID         AS FULL_USER_NM_HIDDEN
+                        , '2'                                    AS FULL_USER_NM_INDEX
+                        , EM_ADDR                                AS EM_ADDR
+                        , 'MAN'                                  AS GUBUN
+                        , USER_NM                                AS USER_NM
+                        , ROW_NUMBER() OVER(ORDER BY USER_NM)    AS SORT
+                      --, ROW_NUMBER() OVER(ORDER BY USER_NM)    AS SORT_ORG
+                      --, 'SYS012'+DEPT_CD                       AS PARENT_CD
+                        , USER_ID                                AS USER_ID
+                      --, USER_ID                                AS USER_ID_ORG
+                      --, 4                                      AS DEPTH
+                        , HDP_NO                                 AS HDP_NO
+                   FROM   UC_COM_USER A
+                   LEFT   OUTER JOIN (SELECT CODE_NM, CODE FROM UC_COM_CODEBOOK WHERE UP_CD='SYS013') B ON B.CODE=A.POS_CD
+                   WHERE  USE_F='Y'
+                   ) AS A
+            LEFT OUTER JOIN
+            (
+                SELECT CASE WHEN GROUPING(A.ETC1   )=1 THEN 'ROOT'
+                            WHEN GROUPING(A.DEPT_CD)=1 THEN ('SYS025'+A.ETC1)
+                            ELSE A.DEPT_CD
+                       END DEPT_CD
+                     , CAST(COUNT(USER_ID) AS VARCHAR) CNT --, A.ETC1, A.DEPT_CD --, GROUPING(A.ETC1) --, GROUPING(A.DEPT_CD)
+                FROM   (
+                       SELECT (SELECT ISNULL(ETC1,'ROOT') FROM UC_COM_CODEBOOK WHERE UP_CD='SYS012' AND CODE=A.DEPT_CD) ETC1
+                            , ('SYS012'+DEPT_CD) DEPT_CD, USER_ID
+                       FROM   UC_COM_USER A
+                       WHERE  USE_F='Y'
+                       ) A
+                GROUP  BY A.ETC1, A.DEPT_CD WITH ROLLUP
+            ) B
+            ON     A.ORGCD=B.DEPT_CD
+            ORDER  BY SORT
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript> 조직도 조회 (구) (comMailSendAddressP.js) </query-descript>
+	</queryinfo>
+
+    <queryinfo>
+		<query-id>UCCOM041S_1</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+            SELECT A.FULL_ORGNM + ISNULL( ' ('+B.CNT+')','') FULL_ORGNM
+                 , A.FULL_ORGNM_HIDDEN
+                 , A.FULL_ORGNM_INDEX --image
+                 , A.EM_ADDR
+                 , A.GUBUN
+                 , A.ORGNM
+                 , '0' CHK
+                 , A.SORT
+                 , A.ORGCD     -- self unique
+                 , A.HDP_NO
+            FROM   (
+                   SELECT '0'         AS CHK
+                        , '넥스프론'  AS FULL_ORGNM
+                        , 'E-MAIL'    AS EM_ADDR
+                        , '휴대전화'  AS HDP_NO
+                        , 'DEPT'      AS GUBUN
+                        , '넥스프론'  AS ORGNM
+                        , '*ROOT'     AS ORGCD
+                        , '*,*ROOT'   AS FULL_ORGNM_HIDDEN
+                        , '0'         AS FULL_ORGNM_INDEX
+                        , 0           AS SORT
+                   UNION  ALL
+                   SELECT '0'         AS CHK
+                        , CODE_NM     AS FULL_ORGNM
+                        , ''          AS EM_ADDR
+                        , ''          AS HDP_NO
+                        , 'DEPT'      AS GUBUN
+                        , CODE_NM     AS ORGNM
+                        , UP_CD+CODE  AS ORGCD
+                        , ETC2+ETC1+','+UP_CD+CODE AS FULL_ORGNM_HIDDEN
+                        , '1'         AS FULL_ORGNM_INDEX
+                        , LUP_ORD*100 AS SORT
+                   FROM   UC_COM_CODEBOOK A
+                   WHERE  (UP_CD IN ('SYS031','SYS032','SYS033') AND CODE<>'000')
+                   AND    use_f = 'Y'
+                   UNION  ALL
+                   SELECT '0'                                    AS CHK
+                        , USER_NM +ISNULL(' ['+B.CODE_NM+']','') AS FULL_ORGNM
+                        , EM_ADDR                                AS EM_ADDR
+                        , HDP_NO                                 AS HDP_NO
+                        , 'MAN'                                  AS GUBUN
+                        , USER_NM                                AS ORGNM
+                        , USER_ID                                AS ORGCD
+                        , (CASE WHEN VIEW_ORG_3 IS NOT NULL THEN 'SYS033'+VIEW_ORG_3
+                                WHEN VIEW_ORG_2 IS NOT NULL THEN 'SYS032'+VIEW_ORG_2
+                                WHEN VIEW_ORG_1 IS NOT NULL THEN 'SYS031'+VIEW_ORG_1
+                                ELSE '*ROOT'
+                          END)+','+USER_ID                       AS FULL_ORGNM_HIDDEN
+                        , '2'                                    AS FULL_USER_NM_INDEX
+                        , ROW_NUMBER() OVER(ORDER BY USER_NM)    AS SORT
+                   FROM   UC_COM_USER A
+                   LEFT   OUTER JOIN (SELECT CODE_NM, CODE FROM UC_COM_CODEBOOK WHERE UP_CD='SYS013') B ON B.CODE=A.POS_CD
+                   WHERE  USE_F = 'Y'
+                   ) AS A
+            LEFT OUTER JOIN
+            (
+                SELECT (CASE WHEN GROUPING(C.ORGCD)=1 THEN '*ROOT' ELSE C.ORGCD END) ORGCD
+                     , CAST((CASE WHEN GROUPING(C.ORGCD)=1 THEN MAX(TOT)
+                                  ELSE SUM(CASE C.UP_CD WHEN 'SYS031' THEN CNT1
+                                                        WHEN 'SYS032' THEN CNT2
+                                                        WHEN 'SYS033' THEN CNT3
+                       END) END) AS VARCHAR) CNT
+                FROM   (
+                       SELECT B.ORGCD
+                            , MAX(B.UP_CD) AS UP_CD
+                            , COUNT(DISTINCT USER_ID) AS TOT
+                            , SUM(CASE WHEN A.VIEW_ORG_1=B.ORGCD THEN 1 ELSE 0 END) AS CNT1
+                            , SUM(CASE WHEN A.VIEW_ORG_2=B.ORGCD THEN 1 ELSE 0 END) AS CNT2
+                            , SUM(CASE WHEN A.VIEW_ORG_3=B.ORGCD THEN 1 ELSE 0 END) AS CNT3
+                       FROM   (
+                              SELECT USER_ID
+                                   , 'SYS031'+VIEW_ORG_1 AS VIEW_ORG_1
+                                   , 'SYS032'+VIEW_ORG_2 AS VIEW_ORG_2
+                                   , 'SYS033'+VIEW_ORG_3 AS VIEW_ORG_3
+                              FROM   UC_COM_USER A
+                              WHERE  USE_F = 'Y'
+                              ) A ,
+                              (
+                              SELECT UP_CD+CODE AS ORGCD
+                                   , UP_CD
+                              FROM   UC_COM_CODEBOOK A
+                              WHERE  (UP_CD IN ('SYS031','SYS032','SYS033') AND CODE<>'000')
+                              AND    use_f = 'Y'
+                              ) B
+                       GROUP  BY B.ORGCD
+                       ) C
+                GROUP  BY C.ORGCD WITH ROLLUP
+            ) B
+            ON     A.ORGCD=B.ORGCD
+            ORDER  BY SORT
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript> 조직도 조회2 (신) (comMailSendAddressP.js) </query-descript>
+	</queryinfo>
+
+    <queryinfo>
+		<query-id>UCCOM042S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            SELECT 'SYS025'+ETC1 HQ
+            FROM   UC_COM_CODEBOOK
+            WHERE  UP_CD = 'SYS012'
+            AND    CODE=?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="dept_cd" type="STRING" />
+		</query-arguments>
+		<query-descript> 자신의 본부코드 조회 (구) (comMailSendAddressP.js) </query-descript>
+	</queryinfo>
+	<!-- 조직도 E-->
+</query>

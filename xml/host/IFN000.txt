@@ -1,0 +1,47 @@
+#************NHN과 패킷 정의************
+#packetID=데이타_타이틀
+
+#매물의 상세정보를 요청한다.
+INCAT06_IN=atcl_no
+INCAT06_OUT=atcl_no,atcl_tp,cust_nm,law_addr1,law_addr2,adm_addr1,adm_addr2,atcl_spc,atcl_rg_prc,atcl_min_prc,atcl_max_prc,atcl_rg_dttm,result,message
+INCAT06_URL=icnat06.nhn
+#고객의 개인정보 동의 여부를 NHN으로 전송한다.
+ICNAT01_IN=atcl_no,consent_f,comment,user_id,user_nm,rslt_cd
+ICNAT01_OUT=result,message
+ICNAT01_URL=icnat01.nhn
+#상담원이 등록한 매도자확인(진성검증) 정보를 NHN으로 전송한다
+#INF004_IN=atcl_no,addr_cf_f,addr_cf_rmk,spc_cf_f,spc_cf_rmk,prc_cf_f,prc_cf_rmk,ins_prc,pss_k_cf_f,pss_k_nm,pss_k_cf_rmk,user_id,user_nm,cnsl_no,tel_dttm,call_id
+#INF004_OUT=result,message
+#ICNAT01_URL=icnat01.nhn
+ICNAT02_IN=atcl_no,atcl_cf_f,prc_cf_f,atcl_cf_cmnt,prc_cf_cmnt,pss_k_nm,user_id,user_nm,consent_f,rslt_cd,pss_cf_f,pss_cf_cmnt
+ICNAT02_OUT=result,message
+ICNAT02_URL=icnat02.nhn
+#ACS에서 발송된 발신 이력 및 결과를 전송한다.
+ICNAT03_IN=atcl_no,snd_dttm,snd_rslt_cd,info_agm_f
+ICNAT03_OUT=result,message
+ICNAT03_URL=icnat03.nhn
+#매물번호를 키 값으로 등기부 등본 확인 결과 정보를 등록한다.
+ICNAT04_IN=atcl_no,atcl_cf_f,pss_k_cf_f,atcl_cf_cmnt,pss_k_cf_cmnt,user_id,user_nm
+ICNAT04_OUT=result,message
+ICNAT04_URL=icnat04.nhn
+#매물번호를 키 값으로 등기부 등본 확인 TM 결과 정보를 등록한다.(1차확인(ICNAT04 실패 후 처리)
+ICNAT05_IN=atcl_no,atcl_cf_f,pss_k_cf_f,atcl_cf_cmnt,pss_k_cf_cmnt,user_id,user_nm,cnsl_no,tel_dttm,call_id,rslt_cd,pss_cf_f,pss_cf_cmnt
+ICNAT05_OUT=result,message
+ICNAT05_URL=icnat05.nhn
+#회원ID를 키 값으로 회원정보를 조회한다.
+INCMB01_IN=rltr_mbr_id
+INCMB01_OUT=rtrl_mbr_id,mbr_nm,rtrl_mbr_nm,tel_no,addr1,addr2,result,message
+INCMB01_URL=incmb01.nhn
+#매물번호를 키 값으로 매물 상태정보를 조회한다.
+ICNAT08_IN=atcl_no,rltr_mbr_id
+ICNAT08_OUT=atcl_no,rltr_mbr_id,atcl_stts_cd,result,message
+ICNAT08_URL=icnat08.nhn
+#******************************************************
+#**************************수신************************
+#******************************************************
+#개인매물등록 후 처리 시간이 경과되여 O/B할 데이터를 수신한다.
+INCAT07_IN=atcl_no,atcl_tp_cd,atcl_nm,rltr_mbr_id,rltr_mbr_nm,rltr_mbr_tel_no,atcl_ins_dttm,atcl_tmnt_du_dttm
+INCAT07_OUT=result,message
+#매물 진성여부 확인 해야할 데이터를 수신한다.
+INCAT01_OUT=atcl_no,atcl_vrfc_stp_cd,atcl_tp_cd,cust_tel_no,rltr_mbr_nm,rltr_mbr_tel_no,snd_ymd,snd_tm,rgn_doc_cf_f            
+INCAT01_IN=result,message

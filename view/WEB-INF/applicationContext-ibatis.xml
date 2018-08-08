@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+  <bean id="sqlMap" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+    <property name="configLocation"><value>sqlmap-config.xml</value></property>
+    <property name="dataSource" ref="myDataSource" />
+  </bean>
+
+	<bean id="myDataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> 
+	    <property name="jndiName" value="jdbc/ucareDataSource" />
+	
+	</bean>
+  <bean id="myTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+      <property name="dataSource"><ref local="myDataSource"/></property>
+  </bean>  
+  
+
+  <bean id="ucareService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">  
+    <property name="transactionManager"><ref local="myTransactionManager"/></property>
+    <property name="target"><ref local="ucareTarget"/></property>
+    <property name="transactionAttributes">
+      <props>
+        <prop key="get*">PROPAGATION_REQUIRED,readOnly,-OrderException</prop>
+        <prop key="add*">PROPAGATION_REQUIRED,-OrderException,-OrderMinimumAmountException</prop>
+        <prop key="update*">PROPAGATION_REQUIRED,-OrderException,-OrderMinimumAmountException</prop>
+        <prop key="del*">PROPAGATION_REQUIRED,-OrderException,-OrderMinimumAmountException</prop>
+      </props>
+    </property>
+  </bean>  
+
+  <bean id="ucareTarget" class="ucare.jaf.database.ibatis.UCareSpringImpl">
+    <property name="UCareDAO"><ref local="ucareDAO"/></property>
+  </bean>  
+  
+  <bean id="ucareDAO" class="ucare.jaf.database.ibatis.dao.IbatisUCareDAOImpl">
+    <property name="dataSource"><ref local="myDataSource"/></property>
+    <property name="sqlMapClient"><ref local="sqlMap"/></property>
+  </bean>
+  
+</beans>

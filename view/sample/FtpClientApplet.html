@@ -1,0 +1,33 @@
+ 
+
+<HTML>
+
+<HEAD><TITLE>Applet Test</TITLE></HEAD>
+
+<SCRIPT LANGUAGE='javascript'>
+	function ftpConnect()
+	{
+		FTPClientApplet.connect("192.168.100.159", "21", "C:\\OZExport");
+	}
+	
+ 	function ftpLogin()
+ 	{
+ 		FTPClientApplet.login("ftp", "ftp");
+ 	}
+</SCRIPT>
+
+<BODY>
+
+<input type="button" style="width:70" name="btn1" value="connect" onClick="ftpConnect();">	
+<input type="button" style="width:70" name="btn2" value="login" onClick="ftpLogin();">
+
+<applet codebase="." code="FTPClientApplet.class" width=300 height=300 name="FTPClientApplet">
+<param name=cabbase value="FTPClientApplet.cab">
+<param name=id value="FTPClientApplet">
+<param name=name value="FTPClientApplet">
+</applet>
+
+</BODY>
+
+</HTML>
+ 

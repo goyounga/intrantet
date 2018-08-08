@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<query>
+	<queryinfo>
+        <query-id>UCAST010S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+	      	SELECT
+	      		 book_seq
+	      		,book_sbjt
+	      		,book_co
+	      		,book_writ
+	      		,buy_dt
+	      		,buy_amt
+	      		,rnt_c_cd
+	      		,dnat_id
+	      		,dbo.fn_user(dnat_id, '') dnat_nm
+	      		,book_rmk
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,dbo.fn_user(rg_id, '') rg_nm
+	      		,mdf_dt
+	      		,mdf_tm
+	      		,mdf_id
+	      		,dbo.fn_user(mdf_id, '') mdf_nm
+			FROM UC_BOOK
+			WHERE 1=1
+				@book_sbjt
+				@book_co
+				@book_writ
+				@rnt_c_cd
+			ORDER BY book_sbjt
+      	]]></query-statement>
+        <query-arguments>
+        	 <query-argument id="book_sbjt" 	type="STRING" condition=" AND book_sbjt like '%'+?+'%' "/>
+        	 <query-argument id="book_co" 		type="STRING" condition=" AND book_co like '%'+?+'%' "/>
+        	 <query-argument id="book_writ" 	type="STRING" condition=" AND book_writ like '%'+?+'%' "/>
+        	 <query-argument id="rnt_c_cd" 		type="STRING" condition=" AND rnt_c_cd = ? "/>
+        </query-arguments>
+        <query-descript>도서 관리 조회 (astBookMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST010I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO UC_BOOK
+			(
+	      		 book_sbjt
+	      		,book_co
+	      		,book_writ
+	      		,buy_dt
+	      		,buy_amt
+	      		,dnat_id
+	      		,book_rmk
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,mdf_dt
+	      		,mdf_tm
+	      		,mdf_id
+
+	        )VALUES
+	        (
+	      		 ?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	        )
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="book_sbjt" 	type="STRING"/>
+        	<query-argument id="book_co" 	type="STRING"/>
+        	<query-argument id="book_writ" 	type="STRING"/>
+        	<query-argument id="buy_dt" 	type="STRING" option="M"/>
+        	<query-argument id="buy_amt" 	type="INTEGER" option="M"/>
+        	<query-argument id="dnat_id" 	type="STRING"/>
+        	<query-argument id="book_rmk" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        </query-arguments>
+        <query-descript>도서 관리 등록 (astBookMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST010U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			UPDATE UC_BOOK SET
+	      		 book_sbjt	= ?
+	      		,book_co		= ?
+	      		,book_writ	= ?
+	      		,buy_dt	= ?
+	      		,buy_amt	= ?
+	      		,dnat_id	= ?
+	      		,book_rmk	= ?
+	      		,mdf_dt		= CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,mdf_tm		= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,mdf_id		= ?
+	  		WHERE book_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="book_sbjt" 	type="STRING"/>
+        	<query-argument id="book_co" 	type="STRING"/>
+        	<query-argument id="book_writ" 	type="STRING"/>
+        	<query-argument id="buy_dt" 	type="STRING" option="M"/>
+        	<query-argument id="buy_amt" 	type="INTEGER" option="M"/>
+        	<query-argument id="dnat_id" 	type="STRING"/>
+        	<query-argument id="book_rmk" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        	<query-argument id="book_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>도서 관리 수정 (astBookMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST010D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type>none</query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM UC_BOOK
+	  		WHERE book_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="book_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>도서 관리 삭제 (astBookMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST011D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM UC_BOOK_RNT_HST
+	  		WHERE book_seq = ?
+	  			@book_rnt_hst_seq
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="book_seq" 	type="INTEGER"/>
+        	<query-argument id="book_rnt_hst_seq" 	type="INTEGER"  condition=" and book_rnt_hst_seq=? "/>
+        </query-arguments>
+        <query-descript>도서 관리 대여자 삭제 (astBookMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST011S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+	      	SELECT
+	      		 book_rnt_hst_seq
+	      		,book_seq
+	      		,rnt_id
+	      		,dbo.fn_user(rnt_id, '') rnt_nm
+	      		,rnt_dt
+	      		,rtn_dt
+	      		,rnt_rmk
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,dbo.fn_user(rg_id, '') rg_nm
+			FROM UC_BOOK_RNT_HST
+			WHERE book_seq = ?
+			ORDER BY rnt_dt DESC
+      	]]></query-statement>
+        <query-arguments>
+        	 <query-argument id="book_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>도서 관리 대여자 조회 (astBookMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST011I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO UC_BOOK_RNT_HST
+			(
+	      		 book_seq
+	      		,rnt_id
+	      		,rnt_dt
+	      		,rtn_dt
+	      		,rnt_rmk
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+
+	        )VALUES
+	        (
+	      		 ?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	        )
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="book_seq" 	type="INTEGER"/>
+        	<query-argument id="rnt_id" 	type="STRING"/>
+        	<query-argument id="rnt_dt" 	type="STRING" option="M"/>
+        	<query-argument id="rtn_dt" 	type="STRING" option="M"/>
+        	<query-argument id="rnt_rmk" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        </query-arguments>
+        <query-descript>도서 관리 대여자 등록(astBookMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST011U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			UPDATE UC_BOOK_RNT_HST SET
+	      		 rnt_id 	= ?
+	      		,rnt_dt		= ?
+	      		,rtn_dt		= ?
+	      		,rnt_rmk	= ?
+	  		WHERE book_rnt_hst_seq = ?
+				AND book_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="rnt_id" 	type="STRING"/>
+        	<query-argument id="rnt_dt" 	type="STRING" option="M"/>
+        	<query-argument id="rtn_dt" 	type="STRING" option="M"/>
+        	<query-argument id="rnt_rmk" 	type="STRING"/>
+        	<query-argument id="book_rnt_hst_seq" 	type="INTEGER"/>
+        	<query-argument id="book_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>도서 관리 대여자 수정(astBookMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST012U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>none</query-view-type>
+        <query-statement><![CDATA[
+			UPDATE UC_BOOK SET
+	      		 rnt_c_cd 	= ?
+	  		WHERE book_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="rnt_c_cd" 	type="STRING"/>
+        	<query-argument id="book_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>도서 관리 대여여부 수정(astBookMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST020S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+	      	SELECT
+	      		 a.mtrl_seq
+	      		,mtrl_c_cd
+	      		,dbo.fn_codebook('AST001', mtrl_c_cd) mtrl_c_nm
+	      		,mco
+	      		,prdt_nm
+	      		,prdt_no
+	      		,buy_dt
+	      		,buy_amt
+	      		,mtrl_rmk
+	      		,rnt_id
+	      		,dbo.fn_user(rnt_id, '') rnt_nm
+	      		,rnt_dt
+	      		,rnt_c_cd
+	      		,rtn_dt
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,dbo.fn_user(rg_id, '') rg_nm
+	      		,mdf_dt
+	      		,mdf_tm
+	      		,mdf_id
+	      		,dbo.fn_user(mdf_id, '') mdf_nm
+	      		,b.cnt
+			FROM UC_MTRL a
+			LEFT OUTER JOIN
+                 (
+                 SELECT mtrl_seq, COUNT(mtrl_seq) cnt
+                 FROM   uc_sub_mtrl
+                 GROUP  BY mtrl_seq
+                 ) b
+            ON   a.mtrl_seq=b.mtrl_seq
+			WHERE 1=1
+				@prdt_nm
+				@mtrl_c_cd
+				@rnt_c_cd
+			--ORDER BY mtrl_c_cd, prdt_nm
+			ORDER BY @orderby
+      	]]></query-statement>
+        <query-arguments>
+        	 <query-argument id="prdt_nm" 		type="STRING" condition=" AND prdt_nm like '%'+?+'%' "/>
+        	 <query-argument id="mtrl_c_cd" 	type="STRING" condition=" AND mtrl_c_cd = ? "/>
+        	 <query-argument id="rnt_c_cd" 		type="STRING" condition=" AND rnt_c_cd = ? "/>
+        	 <query-argument id="orderby" 		type="QUERY" condition=" @orderby "/>
+        </query-arguments>
+        <query-descript>자재 관리 조회 (astMtrlMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST020I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO UC_MTRL
+			(
+	      		 mtrl_c_cd
+	      		,mco
+	      		,prdt_nm
+	      		,prdt_no
+	      		,buy_dt
+	      		,buy_amt
+	      		,mtrl_rmk
+	      		,rnt_id
+	      		,rnt_dt
+	      		,rnt_c_cd
+	      		,rtn_dt
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,mdf_dt
+	      		,mdf_tm
+	      		,mdf_id
+
+	        )VALUES
+	        (
+	      		 ?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	        )
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="mtrl_c_cd" 	type="STRING"/>
+        	<query-argument id="mco" 		type="STRING"/>
+        	<query-argument id="prdt_nm" 	type="STRING"/>
+        	<query-argument id="prdt_no" 	type="STRING"/>
+        	<query-argument id="buy_dt" 	type="STRING"  option="M"/>
+        	<query-argument id="buy_amt" 	type="INTEGER" option="M"/>
+        	<query-argument id="mtrl_rmk" 	type="STRING"/>
+        	<query-argument id="rnt_id" 	type="STRING"/>
+        	<query-argument id="rnt_dt" 	type="STRING" option="M"/>
+        	<query-argument id="rnt_c_cd" 	type="STRING"/>
+        	<query-argument id="rtn_dt" 	type="STRING" option="M"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        </query-arguments>
+        <query-descript>자재 관리 등록 (astMtrlMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST020U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			UPDATE UC_MTRL SET
+	      		 mtrl_c_cd	= ?
+	      		,mco		= ?
+	      		,prdt_nm	= ?
+	      		,prdt_no	= ?
+	      		,buy_dt		= ?
+	      		,buy_amt	= ?
+	      		,mtrl_rmk	= ?
+	      		,rnt_id		= ?
+	      		,rnt_dt		= ?
+	      		,rnt_c_cd	= ?
+	      		,rtn_dt		= ?
+	      		,mdf_dt		= CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,mdf_tm		= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,mdf_id		= ?
+	  		WHERE mtrl_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="mtrl_c_cd" 	type="STRING"/>
+        	<query-argument id="mco" 		type="STRING"/>
+        	<query-argument id="prdt_nm" 	type="STRING"/>
+        	<query-argument id="prdt_no" 	type="STRING"/>
+        	<query-argument id="buy_dt" 	type="STRING"  option="M"/>
+        	<query-argument id="buy_amt" 	type="INTEGER" option="M"/>
+        	<query-argument id="mtrl_rmk" 	type="STRING"/>
+        	<query-argument id="rnt_id" 	type="STRING"/>
+        	<query-argument id="rnt_dt" 	type="STRING" option="M"/>
+        	<query-argument id="rnt_c_cd" 	type="STRING"/>
+        	<query-argument id="rtn_dt" 	type="STRING" option="M"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        	<query-argument id="mtrl_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>자재 관리 수정 (astMtrlMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST020D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type>none</query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM UC_MTRL
+	  		WHERE mtrl_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="mtrl_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>자재 관리 삭제 (astMtrlMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST021D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			DELETE FROM UC_SUB_MTRL
+	  		WHERE mtrl_seq = ?
+	  			@sub_mtrl_seq
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="mtrl_seq" 	type="INTEGER"/>
+        	<query-argument id="sub_mtrl_seq" 	type="INTEGER"  condition=" and sub_mtrl_seq=? "/>
+        </query-arguments>
+        <query-descript>자재 관리 부품 삭제 (astMtrlMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST021S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+	      	SELECT
+	      		 sub_mtrl_seq
+	      		,mtrl_seq
+	      		,mtrl_c_cd
+	      		,dbo.fn_codebook('AST001', mtrl_c_cd) mtrl_c_nm
+	      		,mtrl_mco
+	      		,prdt_nm
+	      		,prdt_no
+	      		,buy_dt
+	      		,buy_amt
+	      		,sub_mtrl_rmk
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,dbo.fn_user(rg_id, '') rg_nm
+	      		,mdf_dt
+	      		,mdf_tm
+	      		,mdf_id
+	      		,dbo.fn_user(mdf_id, '') mdf_nm
+			FROM UC_SUB_MTRL
+			WHERE mtrl_seq = ?
+			ORDER BY mtrl_c_cd
+      	]]></query-statement>
+        <query-arguments>
+        	 <query-argument id="mtrl_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>자재 관리 부품 조회 (astMtrlMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST021I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			INSERT INTO UC_SUB_MTRL
+			(
+	      		 mtrl_seq
+	      		,mtrl_c_cd
+	      		,mtrl_mco
+	      		,prdt_nm
+	      		,prdt_no
+	      		,buy_dt
+	      		,buy_amt
+	      		,sub_mtrl_rmk
+	      		,rg_dt
+	      		,rg_tm
+	      		,rg_id
+	      		,mdf_dt
+	      		,mdf_tm
+	      		,mdf_id
+
+	        )VALUES
+	        (
+	      		 ?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	      		,CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,?
+	        )
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="mtrl_seq" 	type="INTEGER"/>
+        	<query-argument id="mtrl_c_cd" 	type="STRING"/>
+        	<query-argument id="mtrl_mco" 	type="STRING"/>
+        	<query-argument id="prdt_nm" 	type="STRING"/>
+        	<query-argument id="prdt_no" 	type="STRING"/>
+        	<query-argument id="buy_dt" 	type="STRING" option="M"/>
+        	<query-argument id="buy_amt" 	type="STRING" option="M"/>
+        	<query-argument id="sub_mtrl_rmk" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        </query-arguments>
+        <query-descript>자재 관리 부품 등록(astMtrlMng.js)</query-descript>
+    </queryinfo>
+
+    <queryinfo>
+        <query-id>UCAST021U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+			UPDATE UC_SUB_MTRL SET
+	      		 mtrl_c_cd	= ?
+	      		,mtrl_mco	= ?
+	      		,prdt_nm	= ?
+	      		,prdt_no	= ?
+	      		,buy_dt		= ?
+	      		,buy_amt	= ?
+	      		,sub_mtrl_rmk	= ?
+	      		,mdf_dt		= CONVERT(VARCHAR(8),GETDATE(),112)
+	      		,mdf_tm		= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+	      		,mdf_id	= ?
+	  		WHERE sub_mtrl_seq = ?
+				AND mtrl_seq = ?
+		]]></query-statement>
+        <query-arguments>
+        	<query-argument id="mtrl_c_cd" 	type="STRING"/>
+        	<query-argument id="mtrl_mco" 	type="STRING"/>
+        	<query-argument id="prdt_nm" 	type="STRING"/>
+        	<query-argument id="prdt_no" 	type="STRING"/>
+        	<query-argument id="buy_dt" 	type="STRING" option="M"/>
+        	<query-argument id="buy_amt" 	type="STRING" option="M"/>
+        	<query-argument id="sub_mtrl_rmk" 	type="STRING"/>
+        	<query-argument id="userid" 	type="STRING"/>
+        	<query-argument id="sub_mtrl_seq" 	type="INTEGER"/>
+        	<query-argument id="mtrl_seq" 	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>자재 관리 부품 수정(astMtrlMng.js)</query-descript>
+    </queryinfo>
+</query>

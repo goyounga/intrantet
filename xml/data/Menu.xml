@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="EUC-KR"?><menus>
+	<menu0100 name="주간보고" id="0100" src="/jsp/common/blank.jsp">
+		<menu0102 src="/jsp/management/mngWeeklyRptMng.jsp" target="" width="" height="" top="" left="">주간보고결재</menu0102>
+		<menu0103 src="/jsp/management/mngWeeklyRptSta.jsp" target="" width="" height="" top="" left="">주간보고현황</menu0103>
+		<menu0101 src="/jsp/management/mngWeeklyRpt.jsp" target="" width="" height="" top="" left="">주간보고</menu0101>
+	</menu0100>
+	<menu0200 name="휴가" id="0200" src="/jsp/common/blank.jsp">
+		<menu0204 src="/jsp/holiday/hldHolidayUseList.jsp" target="" width="" height="" top="" left="">휴가사용내역조회</menu0204>
+		<menu0201 src="/jsp/holiday/hldHolidayList.jsp" target="" width="" height="" top="" left="">휴가신청/조회</menu0201>
+		<menu0202 src="/jsp/holiday/hldHolidaySnc.jsp" target="" width="" height="" top="" left="">휴가결재</menu0202>
+		<menu0203 src="/jsp/holiday/hldHolidayMng.jsp" target="" width="" height="" top="" left="">휴가관리</menu0203>
+	</menu0200>
+	<menu0300 name="경비" id="0300" src="/jsp/common/blank.jsp">
+		<menu0303 src="/jsp/expense/expHoliday.jsp" target="" width="" height="" top="" left="">휴일근무신청</menu0303>
+		<menu0301 src="/jsp/expense/expExpenseList.jsp" target="" width="" height="" top="" left="">경비신청/조회</menu0301>
+		<menu0302 src="/jsp/expense/expExpenseMng.jsp" target="" width="" height="" top="" left="">경비결재</menu0302>
+	</menu0300>
+	<menu0400 name="프로젝트" id="0400" src="/jsp/common/blank.jsp">
+		<menu0405 src="/jsp/project/prjUserProject.jsp" target="" width="" height="" top="" left="">개인별 이력관리</menu0405>
+		<menu0401 src="/jsp/project/prjExeMng.jsp" target="" width="" height="" top="" left="">프로젝트관리</menu0401>
+		<menu0403 src="/jsp/project/prjMtncReqMng.jsp" target="" width="" height="" top="" left="">유지보수 요청관리</menu0403>
+		<menu0404 src="/jsp/project/prjQAMng.jsp" target="" width="" height="" top="" left="">프로젝트 자료관리</menu0404>
+		<menu0406 src="/jsp/project/prjMtncMng.jsp" target="" width="" height="" top="" left="">유지보수관리</menu0406>
+	</menu0400>
+	<menu0500 name="자산" id="0500" src="/jsp/common/blank.jsp">
+		<menu0501 src="/jsp/asset/astBookMng.jsp" target="" width="" height="" top="" left="">도서관리</menu0501>
+		<menu0502 src="/jsp/asset/astMtrlMng.jsp" target="" width="" height="" top="" left="">자재관리</menu0502>
+	</menu0500>
+	<menu0800 name="자료공유" id="0800" src="/jsp/common/blank.jsp">
+		<menu0805 src="/jsp/information/infNotice.jsp" target="" width="" height="" top="" left="">공지사항</menu0805>
+		<menu0806 src="/jsp/information/infNoticeHomePage.jsp" target="" width="" height="" top="" left="">홈페이지공지</menu0806>
+		<menu0807 src="/jsp/information/infBoardHtml5.jsp" target="" width="" height="" top="" left="">HTML5</menu0807>
+		<menu0804 src="/jsp/information/infBoardList.jsp" target="" width="" height="" top="" left="">게시판</menu0804>
+		<menu0802 src="/jsp/information/infQnA.jsp" target="" width="" height="" top="" left="">Q＆A</menu0802>
+		<menu0803 src="/jsp/information/infDataList.jsp" target="" width="" height="" top="" left="">자료실</menu0803>
+		<menu0801 src="/jsp/information/infBoardMng.jsp" target="" width="" height="" top="" left="">게시판관리</menu0801>
+	</menu0800>
+	<menu1200 name="현황판" id="1200" src="/jsp/common/blank.jsp">
+		<menu1201 src="/jsp/dashboard/dasProjectStatTab.jsp" target="" width="" height="" top="" left="">프로젝트현황</menu1201>
+		<menu1202 src="/jsp/dashboard/dasMtncStat.jsp" target="" width="" height="" top="" left="">유지보수현황</menu1202>
+		<menu1203 src="/jsp/dashboard/dasOfficeStat.jsp" target="" width="" height="" top="" left="">본사인력현황</menu1203>
+	</menu1200>
+	<menu1100 name="UCare" id="1100" src="/jsp/common/blank.jsp">
+		<menu1104 src="/jsp/ucareprogram/ucrWordDic.jsp" target="" width="" height="" top="" left="">워드사전</menu1104>
+		<menu1105 src="/jsp/sample/smpImageButton.jsp" target="" width="" height="" top="" left="">ImageButton</menu1105>
+		<menu1106 src="/jsp/sample/smpCSS.jsp" target="" width="" height="" top="" left="">CSS</menu1106>
+		<menu1107 src="/jsp/sample/smpInput.jsp" target="" width="" height="" top="" left="">Input</menu1107>
+		<menu1108 src="/jsp/sample/smpSelect.jsp" target="" width="" height="" top="" left="">Combobox</menu1108>
+		<menu1109 src="/jsp/sample/smpWiseGrid.jsp" target="" width="" height="" top="" left="">WiseGrid</menu1109>
+		<menu1110 src="/jsp/sample/smpTab.jsp" target="" width="" height="" top="" left="">Tab</menu1110>
+		<menu1111 src="/jsp/ucareprogram/ucrUpgradeMng.jsp" target="OPEN" width="" height="" top="" left="">프레임웍 업그레이 정보</menu1111>
+		<menu1102 src="/jsp/ucareprogram/ucrUcareHelpFunc.jsp" target="" width="" height="" top="" left="">Function</menu1102>
+		<menu1103 src="/jsp/ucareprogram/ucrUcareEx.jsp" target="" width="" height="" top="" left="">예제</menu1103>
+		<menu1113 src="/jsp/ucareprogram/ucrUcareJavaApi.jsp" target="" width="" height="" top="" left="">UCareJavaApi</menu1113>
+		<menu1101 src="/jsp/ucareprogram/ucrUcareHelpCtgr.jsp" target="" width="" height="" top="" left="">카테고리관리</menu1101>
+		<menu1112 src="/jsp/ucareprogram/ucrLicense.jsp" target="" width="" height="" top="" left="">라이센스키발급</menu1112>
+	</menu1100>
+	<menu0700 name="시스템" id="0700" src="/jsp/common/blank.jsp">
+		<menu0701 src="/jsp/system/sysCodebookMng.jsp" target="" width="" height="" top="" left="">코드집관리</menu0701>
+		<menu0703 src="/jsp/system/sysUserMng.jsp" target="" width="" height="" top="" left="">사용자 관리</menu0703>
+		<menu0704 src="/jsp/system/sysMenuMng.jsp" target="" width="" height="" top="" left="">메뉴관리</menu0704>
+		<menu0705 src="/jsp/system/sysMenuGrpMng.jsp" target="" width="" height="" top="" left="">메뉴그룹 관리</menu0705>
+		<menu0706 src="/jsp/system/sysHolidayMng.jsp" target="" width="" height="" top="" left="">휴무일관리</menu0706>
+		<menu0707 src="/jsp/common/comChangePwd.jsp" target="OPEN" width="280" height="170" top="" left="">비밀번호번경</menu0707>
+		<menu0708 src="/jsp/system/sysScheduleMng.jsp" target="" width="" height="" top="" left="">주요일정관리</menu0708>
+		<menu0709 src="/jsp/system/sysApprovalMng.jsp" target="" width="" height="" top="" left="">결재자관리</menu0709>
+		<menu0710 src="/jsp/system/sysUserWorkMng.jsp" target="" width="" height="" top="" left="">근무관리</menu0710>
+	</menu0700>
+</menus>

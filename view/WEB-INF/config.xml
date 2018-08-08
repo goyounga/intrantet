@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Domain Name="workshop" ConfigurationVersion="8.1.2.0">
+    <Server Name="cgServer" AcceptBacklog="50" AdministrationPort="1"
+        HttpdEnabled="true" ListenAddress="" ListenPort="7001"
+        ReliableDeliveryPolicy="RMDefaultPolicy"
+        TransactionLogFilePrefix="./logs/" TunnelingClientPingSecs="45"
+        TunnelingClientTimeoutSecs="40" DefaultProtocol="t3"
+        DefaultSecureProtocol="t3s" NativeIOEnabled="true"
+        StdoutDebugEnabled="false" StdoutSeverityLevel="32">
+        <WebServer Name="cgServer" AuthCookieEnabled="true"
+            LogFileName="./logs/access.log" LoggingEnabled="true"/>
+        <COM Name="cgServer"/>
+        <ServerStart Name="cgServer"/>
+        <SSL Name="cgServer" Enabled="true"
+            IdentityAndTrustLocations="KeyStores" ListenPort="7002"/>
+        <Log Name="cgServer" FileMinSize="20000" RotationType="bySize"/>
+        <KernelDebug Name="cgServer"/>
+        <KernelDebug Name="cgServer"/>
+        <ServerDebug Name="cgServer"/>
+        <ExecuteQueue Name="weblogic.kernel.Default" ThreadCount="15"/>
+        <JTAMigratableTarget Name="cgServer" UserPreferredServer="cgServer"/>
+    </Server>
+    <ApplicationManager Name="workshop"/>
+    <Application Name="JWSQueueTransport" Deployed="true"
+        LoadOrder="1000" Path="d:\bea\weblogic81/server/lib/" TwoPhase="true">
+        <EJBComponent Name="QueueTransportEJB" Targets="cgServer" URI="QueueTransportEJB.jar"/>
+    </Application>
+    <Application Name="certificate" Deployed="true" Path="./" TwoPhase="false">
+        <WebAppComponent Name="certificate" Targets="cgServer" URI="certificate.war"/>
+    </Application>
+    <Application Name="CreditScoreTopicBean"
+        Path="d:\bea\weblogic81\samples/platform" StagingMode="stage" TwoPhase="true">
+        <EJBComponent Name="CreditScoreTopicBean" Targets="cgServer" URI="CreditScoreTopicBean.jar"/>
+    </Application>
+    <Application Name="ValidateCreditBean"
+        Path="d:\bea\weblogic81\samples/platform" StagingMode="stage" TwoPhase="true">
+        <EJBComponent Name="ValidateCreditBean" Targets="cgServer" URI="ValidateCreditBean.jar"/>
+    </Application>
+    <SNMPAgent Name="workshop"/>
+    <Log Name="workshop" FileMinSize="20000" FileName="./wl-domain.log" RotationType="bySize"/>
+    <JMSConnectionFactory Name="cgQueue"
+        Notes="User transactions must be enabled to ensure transaction coordination for persistence and asynchronous operations"
+        Targets="cgServer"
+        JNDIName="weblogic.jws.jms.QueueConnectionFactory" UserTransactionsEnabled="true"/>
+    <JMSFileStore Name="FileStore" Directory="rmfilestore"/>
+    <JMSJDBCStore Name="cgJMSStore" ConnectionPool="cgPool" PrefixName="weblogic"/>
+    <JMSServer Name="cgJMSServer" Targets="cgServer" Store="cgJMSStore">
+        <JMSQueue Name="jms.CustomJmsCtlQ" RedeliveryLimit="2"
+            JNDIName="jms.CustomJmsCtlQ" StoreEnabled="default"/>
+        <JMSQueue Name="jms.SimpleJmsQ" RedeliveryLimit="2"
+            JNDIName="jms.SimpleJmsQ" StoreEnabled="default"/>
+        <JMSQueue Name="cgJWSQueue" RedeliveryLimit="2"
+            JNDIName="jws.queue" StoreEnabled="default"/>
+        <JMSTopic Name="tutorial.credit.response.topic"
+            RedeliveryLimit="2"
+            JNDIName="tutorial.credit.response.topic" StoreEnabled="default"/>
+        <JMSTopic Name="jms.AccountUpdate" RedeliveryLimit="2"
+            JNDIName="jms.AccountUpdate" StoreEnabled="default"/>
+        <JMSTopic Name="tutorial.credit.request.topic"
+            RedeliveryLimit="2" JNDIName="tutorial.credit.request.topic" StoreEnabled="default"/>
+    </JMSServer>
+    <WSReliableDeliveryPolicy Name="RMDefaultPolicy" Store="FileStore"
+        DefaultRetryCount="10" DefaultTimeToLive="60000"/>
+    <JDBCConnectionPool Name="cgPool" Targets="cgServer"
+        CapacityIncrement="1"
+        DriverName="com.pointbase.jdbc.jdbcUniversalDriver"
+        InitialCapacity="5" MaxCapacity="20" Password="weblogic"
+        Properties="user=weblogic;" RefreshMinutes="0"
+        ShrinkPeriodMinutes="15" ShrinkingEnabled="true"
+        SupportsLocalTransaction="true" TestConnectionsOnRelease="false"
+        TestConnectionsOnReserve="false" URL="jdbc:pointbase:server://localhost:9093/workshop"/>
+    <JDBCTxDataSource Name="cgDataSource" Targets="cgServer"
+        EnableTwoPhaseCommit="true" JNDIName="cgDataSource" PoolName="cgPool"/>
+    <JDBCTxDataSource Name="cgSampleDataSource" Targets="cgServer"
+        EnableTwoPhaseCommit="true" JNDIName="cgSampleDataSource" PoolName="cgPool"/>
+    <JTA Name="workshop" TimeoutSeconds="500"/>
+</Domain>

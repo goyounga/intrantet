@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<query>
+	<!-- Ucare Help Start -->
+	<queryinfo>
+        <query-id>UCUCR300S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				HELP_CTGR_SEQ
+				, LANG_TP_CD
+				, CTGR_NM
+				, CTGR_DESC
+				, RG_DT+' '+RG_TM AS RG_DTM
+				, dbo.FN_USER(RG_ID, '') AS RG_NM
+				, MDF_DT+' '+MDF_TM AS MDF_DTM
+				, dbo.FN_USER(MDF_ID, '') AS MDF_NM
+			FROM UC_COM_UCARE_HELP_CTGR
+			WHERE LANG_TP_CD = ?
+				@searchType @searchText
+			ORDER BY HELP_CTGR_SEQ
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="lang_tp_cd"		type="STRING"/>
+			<query-argument id="searchType"		type="QUERY"	condition="AND @searchType "/>
+			<query-argument id="searchText"		type="QUERY"	condition="LIKE '%@searchText%' "/>
+        </query-arguments>
+        <query-descript>Ucare Help 카테고리 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCUCR300I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-statement><![CDATA[
+			INSERT INTO UC_COM_UCARE_HELP_CTGR
+			(
+				LANG_TP_CD
+				, CTGR_NM
+				, CTGR_DESC
+				, USE_F
+				, RG_DT
+				, RG_TM
+				, RG_ID
+				, MDF_DT
+				, MDF_TM
+				, MDF_ID
+			)VALUES(
+				?
+				, ?
+				, ?
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+			)
+        ]]>
+		</query-statement>
+		<query-arguments>
+            <query-argument id="lang_tp_cd"		type="STRING"/>
+          	<query-argument id="ctgr_nm"		type="STRING"/>
+          	<query-argument id="ctgr_desc"		type="STRING"/>
+          	<query-argument id="use_f"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+		</query-arguments>
+		<query-descript>Ucare Help 카테고리 등록</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+        <query-id>UCUCR300U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement>
+        <![CDATA[
+            UPDATE UC_COM_UCARE_HELP_CTGR SET
+				LANG_TP_CD	= ?
+				, CTGR_NM	= ?
+				, CTGR_DESC	= ?
+				, USE_F		= ?
+				, MDF_DT		= CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM		= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID		= ?
+        	WHERE HELP_CTGR_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+            <query-argument id="lang_tp_cd"		type="STRING"/>
+          	<query-argument id="ctgr_nm"		type="STRING"/>
+          	<query-argument id="ctgr_desc"		type="STRING"/>
+          	<query-argument id="use_f"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="help_ctgr_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>Ucare Help 카테고리 수정</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCUCR300D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-statement><![CDATA[
+  			DELETE UC_COM_UCARE_HELP_CTGR
+        	WHERE HELP_CTGR_SEQ = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="help_ctgr_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript>Ucare Help 카테고리 삭제</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+        <query-id>UCUCR301S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				HELP_CTGR_SEQ
+				, CTGR_NM
+			FROM UC_COM_UCARE_HELP_CTGR
+			WHERE USE_F = 'Y' AND LANG_TP_CD = ?
+			ORDER BY HELP_CTGR_SEQ
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="lang_tp_cd"		type="STRING"/>
+        </query-arguments>
+        <query-descript>언어유형별 카테고리 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+        <query-id>UCUCR302S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				A.FUNC_SEQ
+				, B.LANG_TP_CD
+				, A.HELP_CTGR_SEQ
+				, B.CTGR_NM
+				, A.FUNC_NM
+				, A.FUNC_PAR
+				, A.FUNC_DESC
+				, A.FUNC_EX
+				, A.FUNC_SRC
+				, ISNULL(dbo.FN_CODEBOOK('UCR006', A.FUNC_SRC), A.FUNC_SRC) AS func_src_nm
+				, A.FUNC_RMK
+				, A.RG_DT+' '+A.RG_TM AS RG_DTM
+				, dbo.FN_USER(A.RG_ID, '') AS RG_NM
+				, A.MDF_DT+' '+A.MDF_TM AS MDF_DTM
+				, dbo.FN_USER(A.MDF_ID, '') AS MDF_NM
+				, A.use_f
+			FROM UC_COM_UCARE_HELP_FUNC A, UC_COM_UCARE_HELP_CTGR B
+			WHERE A.HELP_CTGR_SEQ = B.HELP_CTGR_SEQ
+				AND B.USE_F = 'Y' 
+				AND LANG_TP_CD = ?
+				@func_seq
+				@help_ctgr_seq
+				@func_src
+				@searchType @searchText
+				@use_f
+			ORDER BY B.CTGR_NM, A.FUNC_NM
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="lang_tp_cd"		type="STRING"/>
+			<query-argument id="func_seq"		type="INTEGER"	condition="AND A.func_seq = ? "/>
+			<query-argument id="help_ctgr_seq"	type="INTEGER"	condition="AND A.HELP_CTGR_SEQ = ? "/>
+			<query-argument id="func_src"		type="STRING"	condition="AND A.func_src = ? "/>
+			<query-argument id="searchType"		type="QUERY"	condition="AND @searchType "/>
+			<query-argument id="searchText"		type="QUERY"	condition="LIKE '%@searchText%' "/>
+			<query-argument id="use_f"			type="STRING"	condition="AND A.USE_F = ? "/> 
+        </query-arguments>
+        <query-descript>Ucare Help Function 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCUCR301I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-statement><![CDATA[
+			INSERT INTO UC_COM_UCARE_HELP_FUNC
+			(
+				HELP_CTGR_SEQ
+				, FUNC_NM
+				, FUNC_PAR
+				, FUNC_DESC
+				, FUNC_EX
+				, FUNC_SRC
+				, FUNC_RMK
+				, USE_F
+				, RG_DT
+				, RG_TM
+				, RG_ID
+				, MDF_DT
+				, MDF_TM
+				, MDF_ID
+			)VALUES(
+				?
+				, ?
+				, ?
+				, ?
+				, ?
+				, ?
+				, ?
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+			)
+        ]]>
+		</query-statement>
+		<query-arguments>
+            <query-argument id="help_ctgr_seq"	type="INTEGER"/>
+          	<query-argument id="func_nm"		type="STRING"/>
+          	<query-argument id="func_par"		type="STRING"/>
+          	<query-argument id="func_desc"		type="STRING"/>
+          	<query-argument id="func_ex"		type="STRING"/>
+          	<query-argument id="func_src"		type="STRING"/>
+          	<query-argument id="func_rmk"		type="STRING"/>
+          	<query-argument id="use_f"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+		</query-arguments>
+		<query-descript>Ucare Help Function 등록</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+        <query-id>UCUCR301U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement>
+        <![CDATA[
+            UPDATE UC_COM_UCARE_HELP_FUNC SET
+				HELP_CTGR_SEQ	= ?
+				, FUNC_NM		= ?
+				, FUNC_PAR		= ?
+				, FUNC_DESC		= ?
+				, FUNC_EX		= ?
+				, FUNC_SRC		= ?
+				, FUNC_RMK		= ?
+				, USE_F			= ?
+				, MDF_DT		= CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM		= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID		= ?
+        	WHERE FUNC_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+            <query-argument id="help_ctgr_seq"	type="INTEGER"/>
+          	<query-argument id="func_nm"		type="STRING"/>
+          	<query-argument id="func_par"		type="STRING"/>
+          	<query-argument id="func_desc"		type="STRING"/>
+          	<query-argument id="func_ex"		type="STRING"/>
+          	<query-argument id="func_src"		type="STRING"/>
+          	<query-argument id="func_rmk"		type="STRING"/>
+          	<query-argument id="use_f"			type="STRING"/>
+          	<query-argument id="userid"			type="STRING"/>
+          	<query-argument id="func_seq"		type="INTEGER"/>
+        </query-arguments>
+        <query-descript>Ucare Help Function 수정</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCUCR301D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-statement><![CDATA[
+  			DELETE UC_COM_UCARE_HELP_FUNC
+        	WHERE FUNC_SEQ = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="func_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript>Ucare Help Function 삭제</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+        <query-id>UCUCR303S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+			SELECT
+				EX_SEQ
+				, EX_NM
+				, EX_CONT
+				, RG_DT+' '+RG_TM AS RG_DTM
+				, dbo.FN_USER(RG_ID, '') AS RG_NM
+				, MDF_DT+' '+MDF_TM AS MDF_DTM
+				, dbo.FN_USER(MDF_ID, '') AS MDF_NM
+			FROM UC_COM_UCARE_EX
+			WHERE 1=1
+				@searchType @searchText
+			ORDER BY EX_NM
+		]]>
+        </query-statement>
+        <query-arguments>
+			<query-argument id="searchType"		type="QUERY"	condition="AND @searchType "/>
+			<query-argument id="searchText"		type="QUERY"	condition="LIKE '%@searchText%' "/>
+        </query-arguments>
+        <query-descript>Ucare Example 조회</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCUCR302I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-statement><![CDATA[
+			INSERT INTO UC_COM_UCARE_EX
+			(
+				EX_NM
+				, EX_CONT
+				, USE_F
+				, RG_DT
+				, RG_TM
+				, RG_ID
+				, MDF_DT
+				, MDF_TM
+				, MDF_ID
+			)VALUES(
+				?
+				, ?
+				, 'Y'
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+				, CONVERT(VARCHAR(8),GETDATE(),112)
+				, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, ?
+			)
+        ]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="ex_nm"		type="STRING"/>
+          	<query-argument id="ex_cont"	type="STRING"/>
+          	<query-argument id="userid"		type="STRING"/>
+          	<query-argument id="userid"		type="STRING"/>
+		</query-arguments>
+		<query-descript>Ucare Example 등록</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+        <query-id>UCUCR302U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement>
+        <![CDATA[
+            UPDATE UC_COM_UCARE_EX SET
+				EX_NM		= ?
+				, EX_CONT	= ?
+				, MDF_DT	= CONVERT(VARCHAR(8),GETDATE(),112)
+				, MDF_TM	= REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+				, MDF_ID	= ?
+        	WHERE EX_SEQ = ?
+		]]>
+        </query-statement>
+        <query-arguments>
+          	<query-argument id="ex_nm"		type="STRING"/>
+          	<query-argument id="ex_cont"	type="STRING"/>
+          	<query-argument id="userid"		type="STRING"/>
+          	<query-argument id="ex_seq"		type="INTEGER"/>
+        </query-arguments>
+        <query-descript>Ucare Example 수정</query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCUCR302D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-statement><![CDATA[
+  			DELETE UC_COM_UCARE_EX
+        	WHERE EX_SEQ = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="ex_seq"		type="INTEGER"/>
+		</query-arguments>
+		<query-descript>Ucare Example 삭제</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCUCR305S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+  			SELECT '0' as CHK, COLM_NM, KOR_NM, WORD_TYPE, WORD_DESC, dbo.fn_user(rg_id, 'Y') as rg_nm, RG_DT, RG_TM, dbo.fn_user(mdf_id, 'Y') as mdf_nm, MDF_DT, MDF_TM
+			FROM   DBO.UC_UCR_WORD_DIC
+			WHERE 1=1
+			@word_type
+			@keycode
+			]]>
+		</query-statement>
+		<query-arguments>
+			<query-argument id="word_type"	type="QUERY"	condition="AND WORD_TYPE = ? "/>
+			<query-argument id="word_type"	type="STRING"	condition=""/>
+          	<query-argument id="keycode"	type="QUERY"	condition="AND (@keycode LIKE '%'+ ? + '%' OR word_desc LIKE '%'+ ? + '%')"/>
+			<query-argument id="keyword"	type="STRING"	condition=""/>
+			<query-argument id="keyword"	type="STRING"	condition=""/>
+		</query-arguments>
+		<query-descript>워드사전조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCUCR305I</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-statement><![CDATA[
+  			INSERT INTO UC_UCR_WORD_DIC(COLM_NM, KOR_NM, WORD_TYPE, WORD_DESC, RG_ID, RG_DT, RG_TM, MDF_ID, MDF_DT, MDF_TM)
+			VALUES (?, ?, ?, ?, ?, CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', ''), ? , CONVERT(VARCHAR(8),GETDATE(),112), REPLACE(CONVERT(char , GETDATE(), 108), ':', ''))
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="colm_nm"	type="STRING"/>
+			<query-argument id="kor_nm"		type="STRING"/>
+			<query-argument id="word_type"	type="STRING"/>
+			<query-argument id="word_desc"	type="STRING"/>
+			<query-argument id="user_id"	type="STRING"/>
+			<query-argument id="user_id"	type="STRING"/>
+		</query-arguments>
+		<query-descript>워드사전등록</query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCUCR305U</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-statement><![CDATA[
+  			UPDATE UC_UCR_WORD_DIC
+				SET  KOR_NM = ?
+					,WORD_TYPE = ?
+					,WORD_DESC = ?
+					,MDF_ID = ?
+					,MDF_DT = CONVERT(VARCHAR(8),GETDATE(),112)
+					,MDF_TM = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			WHERE  COLM_NM = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+			<query-argument id="kor_nm"		type="STRING"/>
+			<query-argument id="word_type"	type="STRING"/>
+			<query-argument id="word_desc"	type="STRING"/>
+			<query-argument id="user_id"	type="STRING"/>
+			<query-argument id="colm_nm"	type="STRING"/>
+		</query-arguments>
+		<query-descript>워드사전수정</query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCUCR305D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-statement><![CDATA[
+  			DELETE FROM  UC_UCR_WORD_DIC
+			WHERE  COLM_NM = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+			<query-argument id="colm_nm"	type="STRING"/>
+		</query-arguments>
+		<query-descript>워드사전삭제</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCUCR306S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+  			SELECT upg_seq, upg_src_cd, upg_type_cd, upg_title, upg_src, upg_cntn, upg_exps, notc_yn, dbo.fn_user(reg_user_id, 'N') as reg_user_id, REG_DT
+			FROM    UC_UCR_UPG_HST
+			WHERE  1=1
+			@upg_type_cd
+			@strt_dt
+			@end_dt
+			@keycode
+			ORDER BY upg_seq desc
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="upg_type_cd"	type="STRING"	condition="AND upg_type_cd =? "/>
+          	<query-argument id="strt_dt"		type="STRING"	condition="AND REG_DT BETWEEN ?+'000000' " option="M"/>
+			<query-argument id="end_dt"			type="STRING"	condition="AND ?+'235959'" option="M"/>
+          	<query-argument id="keycode"	type="QUERY"	condition="AND @keycode LIKE '%'+ ? + '%' "/>
+			<query-argument id="keyword"	type="STRING"	condition=""/>
+		</query-arguments>
+		<query-descript>업그레이드 정보조회</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCUCR306I</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-statement><![CDATA[
+  			INSERT INTO UC_UCR_UPG_HST(upg_src_cd, upg_type_cd, upg_title, upg_src, upg_cntn, upg_exps,notc_yn, reg_user_id, REG_DT)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, CONVERT(VARCHAR(8),GETDATE(),112)+ REPLACE(CONVERT(char , GETDATE(), 108), ':', ''))
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="upg_src_cd"		type="STRING"/>
+          	<query-argument id="upg_type_cd"	type="STRING"/>
+			<query-argument id="upg_title"		type="STRING"/>
+			<query-argument id="upg_src"		type="STRING"/>
+			<query-argument id="upg_cntn"	type="STRING"/>
+			<query-argument id="upg_exps"	type="STRING"/>
+			<query-argument id="notc_yn"	type="STRING"/>
+			<query-argument id="userid"	type="STRING"/>
+		</query-arguments>
+		<query-descript>업그레이드 정보등록</query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCUCR306U</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-statement><![CDATA[
+  			UPDATE UC_UCR_UPG_HST
+				SET  upg_src_cd  = ?
+					,upg_type_cd = ?
+					,upg_title   = ?
+					,upg_src     = ?
+					,upg_cntn    = ?
+					,upg_exps    = ?
+					,notc_yn     = ?
+					,reg_user_id = ?
+					,REG_DT = CONVERT(VARCHAR(8),GETDATE(),112)+REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			WHERE  upg_seq = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+          	<query-argument id="upg_src_cd"		type="STRING"/>
+          	<query-argument id="upg_type_cd"	type="STRING"/>
+			<query-argument id="upg_title"		type="STRING"/>
+			<query-argument id="upg_src"		type="STRING"/>
+			<query-argument id="upg_cntn"	type="STRING"/>
+			<query-argument id="upg_exps"	type="STRING"/>
+			<query-argument id="notc_yn"	type="STRING"/>
+			<query-argument id="userid"	type="STRING"/>
+			<query-argument id="upg_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript>업그레이드 정보수정</query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCUCR306D</query-id>
+		<query-exec-type>UPDATE</query-exec-type>
+		<query-statement><![CDATA[
+  			DELETE FROM  UC_UCR_UPG_HST
+			WHERE  upg_seq = ?
+			]]>
+		</query-statement>
+		<query-arguments>
+			<query-argument id="upg_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript>업그레이드 정보삭제</query-descript>
+	</queryinfo>
+</query>
+
+

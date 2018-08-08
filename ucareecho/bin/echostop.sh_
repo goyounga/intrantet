@@ -1,0 +1,11 @@
+export DEFAULT_PATH="${PATH}"
+export DEFAULT_CLASSPATH="${CLASSPATH}"
+
+export PATH="C:/jdk1.6.0_10/bin:${DEFAULT_PATH}"
+export BATCH_LIB="C:/project/ucareecho/lib"
+export CLASSPATH="${DEFAULT_CLASSPATH}:${BATCH_LIB}/commons-logging-1.0.4.jar:${BATCH_LIB}/echoserver.jar:${BATCH_LIB}/jdom.jar:${BATCH_LIB}/log4j-1.2.12.jar"
+
+java ucare.echo.server.ShutDownServer c:/project/ucareecho/lib/sys.properties 10.254.28.73 4200
+
+export PATH="${DEFAULT_PATH}"
+export CLASSPATH="${DEFAULT_CLASSPATH}"

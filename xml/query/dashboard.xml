@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<query>
+	<queryinfo>
+        <query-id>UCDAS011S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+            SELECT a.prj_seq, a.prj_nm, a.work_range, a.rmk, b.mbr_cnt
+                 , '~ '+CONVERT(VARCHAR(10), CAST(rl_end_dt AS DATETIME), 102) rl_end_dt
+                 , (SELECT code_nm FROM uc_com_codebook WHERE up_cd='PRJ011' AND code=a.pogr_stat) pogr_stat
+            FROM   uc_prj a
+            LEFT   OUTER JOIN
+            (
+                   SELECT a.prj_seq
+                        , (CASE WHEN COUNT(a.prj_seq)>1
+                                THEN (SUBSTRING(MIN(a.etrn_c_cd+b.pos_cd+b.user_nm),5,10)+'외 ') + CAST(COUNT(a.prj_seq)-1 AS VARCHAR) + '명'
+                                ELSE MAX(b.user_nm)
+                           END) mbr_cnt
+                   FROM   uc_prj_mbr a
+                   INNER  JOIN uc_com_user b ON a.user_id=b.user_id
+                   GROUP  BY a.prj_seq
+            )b     ON a.prj_seq=b.prj_seq
+            WHERE  pogr_stat !='04'
+            ORDER  BY rl_st_dt DESC, prj_nm
+      	]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript> 프로젝트현황-프로젝트별 ( dasProjectStat.js ) </query-descript>
+    </queryinfo>
+	<queryinfo>
+        <query-id>UCDAS012S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+            SELECT a.user_id  , b.etrn_c_cd , b.job_c_cd , b.etrn_du_dt , b.etrn_dt
+                 , b.ot_du_dt , b.ot_dt     , b.chrgjob  , c.user_nm    , c.dept_cd
+                 , d.code_nm pos_nm
+                 , c.user_nm+' [ '+d.code_nm+' ]' user_nm2
+                 , '  '+b.prj_nm prj_nm
+                 , (CASE WHEN (b.etrn_dt IS NULL)
+                         THEN REPLICATE(CHAR(32),16)
+                         ELSE CONVERT(VARCHAR(10), CAST(b.etrn_dt AS DATETIME),120)
+                    END)
+                 + (CASE WHEN (b.etrn_du_dt IS NULL)
+                         THEN REPLICATE(CHAR(32),22)
+                         ELSE '  [ '+CONVERT(VARCHAR(10), CAST(b.etrn_du_dt AS DATETIME),120)+' ]'
+                    END) AS etrn
+                 , (CASE WHEN (b.ot_dt IS NULL)
+                         THEN REPLICATE(CHAR(32),16)
+                         ELSE CONVERT(VARCHAR(10), CAST(b.ot_dt AS DATETIME),120)
+                    END)
+                 + (CASE WHEN (b.ot_du_dt IS NULL)
+                         THEN REPLICATE(CHAR(32),22)
+                         ELSE '  [ '+CONVERT(VARCHAR(10), CAST(b.ot_du_dt AS DATETIME),120)+' ]'
+                    END) AS ot
+            FROM   (SELECT user_id FROM UC_COM_USER WHERE use_f='Y' AND dept_cd='03') a
+            FULL   OUTER JOIN
+                   (
+                       SELECT a.prj_nm  , b.user_id  , b.etrn_c_cd , b.job_c_cd , b.etrn_du_dt
+                            , b.etrn_dt , b.ot_du_dt , b.ot_dt     , b.chrgjob
+                       FROM   UC_PRJ a
+                       INNER  JOIN UC_PRJ_MBR b ON a.prj_seq=b.prj_seq
+                       WHERE  a.pogr_stat!='04'
+                   ) b
+                   ON a.user_id=b.user_id
+            INNER  JOIN UC_COM_USER c ON (b.user_id=c.user_id OR a.user_id=c.user_id)
+            INNER  JOIN (SELECT code, code_nm, lup_ord FROM UC_COM_CODEBOOK WHERE  up_cd='SYS013') d ON c.pos_cd=d.code
+            ORDER  BY d.lup_ord desc, c.brth ASC, c.user_nm ASC
+      	]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript> 프로젝트현황-개발자별 ( dasProjectStat.js ) </query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCDAS021S</query-id>
+        <query-exec-type>PAGE</query-exec-type>
+        <query-view-type>grid</query-view-type>
+        <query-statement><![CDATA[
+            SELECT mtnc_seq  , mtnc_nm   , clnt_corp_seq , mtnc_system , mtnc_type
+                 , mtnc_cost , strt_date , end_date      , regular_chk , coop_corp_seq
+                 , dvlp_frwk , rmk
+               --, SUBSTRING(CONVERT(VARCHAR(10), CAST(strt_date AS DATETIME), 102),1,7) +' ~ '+
+               --  SUBSTRING(CONVERT(VARCHAR(10), CAST(end_date  AS DATETIME), 102),1,7) mtnc_period
+                 , (CASE WHEN strt_date IS NULL THEN ' ' ELSE SUBSTRING(CONVERT(VARCHAR(10), CAST(strt_date AS DATETIME), 102),1,7) END)
+                 + (CASE WHEN strt_date IS NULL AND end_date IS NULL THEN ' ' ELSE ' ~ ' END)
+                 + (CASE WHEN end_date  IS NULL THEN ' ' ELSE SUBSTRING(CONVERT(VARCHAR(10), CAST(end_date  AS DATETIME), 102),1,7) END) mtnc_period
+                 , (SELECT corp_nm FROM uc_prj_corp WHERE corp_seq=a.clnt_corp_seq) clnt_corp_nm
+                 , (SELECT corp_nm FROM uc_prj_corp WHERE corp_seq=a.coop_corp_seq) coop_corp_nm
+            FROM   uc_mtnc a
+          --WHERE  strt_date <= CONVERT(varchar(8),GETDATE(), 112)
+          --AND    end_date  >= CONVERT(varchar(8),GETDATE(), 112)
+	      --날짜데이터를 제대로 입력하지 않았으므로 조회가 되지 않아 일시적으로 조건절을 막아둔다.
+            ORDER BY strt_date DESC, mtnc_nm
+      	]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript> 유지보수현황 조회 (dasMtncStat.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+        <query-id>UCDAS031S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+            SELECT a.user_nm
+                 , (SELECT code_nm FROM uc_com_codebook WHERE up_cd='SYS012' AND code=a.dept_cd) dept_cd
+                 , (SELECT code_nm FROM uc_com_codebook WHERE up_cd='DAS001' AND code=
+                       (CASE WHEN (b.hldy_id IS NOT NULL)
+                             THEN '03'
+                             ELSE a.in_offc_stat
+                        END)
+                   ) in_offc_stat
+                 , (CASE WHEN (b.hldy_id IS NOT NULL)
+                         THEN (b.st_dt+' ~ '+b.end_dt)
+                         ELSE a.work_scdl
+                    END) work_scdl
+                 , a.rtn_scdl
+                 , (CASE WHEN (b.hldy_id IS NOT NULL)
+                         THEN (SELECT hldy_knd_nm FROM uc_hldy_knd WHERE hldy_knd_seq=b.hldy_knd_seq)
+                         ELSE a.work_rmk
+                    END) work_rmk
+            FROM   uc_com_user a
+            LEFT   OUTER JOIN
+                   (
+                   SELECT a.hldy_id, a.hldy_knd_seq
+                        , CONVERT(VARCHAR(10), CAST(a.st_dt  AS DATETIME), 102) st_dt
+                        , CONVERT(VARCHAR(10), CAST(a.end_dt AS DATETIME), 102) end_dt
+                   FROM   uc_hldy a ,uc_sign_hst b
+                   WHERE  a.hldy_seq=b.sign_hst_id
+                   AND    b.sign_tp_cd='01'
+                   AND    b.sign_prgs_stts_cd='04'
+                   AND    st_dt <=CONVERT(varchar(8),GETDATE(), 112)
+                   AND    end_dt>=CONVERT(varchar(8),GETDATE(), 112)
+                   ) b
+            ON     a.user_id=b.hldy_id
+            INNER  JOIN (SELECT code, code_nm, lup_ord FROM UC_COM_CODEBOOK WHERE  up_cd='SYS013') c ON a.pos_cd=c.code
+            WHERE  (work_type_cd='01' OR b.hldy_id IS NOT NULL)
+            --AND    a.dept_cd!='05'
+            ORDER  BY c.lup_ord DESC, a.brth ASC, a.user_nm ASC
+      	]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript>본사인력현황 (dasOfficeStat.js)</query-descript>
+    </queryinfo>
+	<queryinfo>
+        <query-id>UCDAS032S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>FREE</query-view-type>
+        <query-statement><![CDATA[
+            SELECT work_type_cd, in_offc_stat, work_scdl, rtn_scdl, work_rmk
+            FROM   UC_COM_USER
+            WHERE  user_id=?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="userid"	type="STRING"/>
+        </query-arguments>
+        <query-descript>개인-인력현황 (home.js)</query-descript>
+    </queryinfo>
+	<queryinfo>
+		<query-id>UCDAS041S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+            SELECT clnt_nm, system_nm, pgm_nm, req_nm
+                 , (SELECT code_nm FROM uc_com_codebook WHERE up_cd='PRJ004' AND code=a.mtnc_cd) mtnc_cd
+                 , CONVERT(VARCHAR(10), CAST(a.req_date  AS DATE), 102) req_date
+                 , (SELECT user_nm FROM uc_com_user WHERE user_id=a.prcs_k_id) prcs_k_nm
+                 , (CONVERT(VARCHAR(8),GETDATE(), 112) - CAST(req_date AS int)+1) wait_days
+                 , (CASE WHEN prcs_k_id IS NULL THEN '미배정' ELSE '배정' END) alloc_yn
+                 , (CASE WHEN (prcs_k_id     IS NOT NULL
+                          AND (rsn_cont      IS NOT NULL
+                           OR  prcs_cont     IS NOT NULL
+                           OR  rnm_strt_date IS NOT NULL
+                           OR  rnm_end_date  IS NOT NULL))
+                         THEN '처리중'
+                         ELSE ''
+                    END) pogr_stat
+            FROM   uc_com_sch a
+            WHERE  end_yn!='Y'
+            ORDER  BY req_date DESC
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>유지보수요청현황 (dasMtncReqStat.js)</query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCDAS061S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+            SELECT c.user_nm
+                 , (SELECT code_nm     FROM uc_com_codebook WHERE up_cd='SYS012' AND code=c.dept_cd) dept_cd
+                 , (SELECT hldy_knd_nm FROM uc_hldy_knd     WHERE hldy_knd_seq=a.hldy_knd_seq) hldy_knd_nm
+                 , CONVERT(VARCHAR(10), CAST(a.st_dt  AS DATE), 102) +' ~ '+
+                   CONVERT(VARCHAR(10), CAST(a.end_dt AS DATE), 102) hldy_period
+                 , a.hldy_dy , a.hldy_plc , a.cntc_tel_no , a.hldy_rsn , a.hldy_rmk
+            FROM   uc_hldy a ,uc_sign_hst b, uc_com_user c
+            WHERE  a.hldy_seq=b.sign_hst_id
+            AND    a.hldy_id=c.user_id
+            AND    b.sign_tp_cd='01'
+            AND    b.sign_prgs_stts_cd='04'
+            AND    st_dt <=CONVERT(varchar(8),GETDATE(), 112)
+            AND    end_dt>=CONVERT(varchar(8),GETDATE(), 112)
+            ORDER  BY c.pos_cd DESC, c.user_nm ASC
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>휴가자현황 (dasHolidayStat.js)</query-descript>
+	</queryinfo>
+    <queryinfo>
+	    <query-id>UCDAS071U</query-id>
+	    <query-exec-type>MULTI</query-exec-type>
+	    <query-view-type></query-view-type>
+	    <query-statement><![CDATA[
+            UPDATE uc_com_user
+            SET    work_type_cd = ?
+                 , work_scdl    = ?
+                 , rtn_scdl     = ?
+                 , work_rmk     = ?
+                 , in_offc_stat = ?
+                 , mdf_dt       = CONVERT(VARCHAR(8),GETDATE(),112)
+                 , mdf_tm       = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+                 , mdf_id       = ?
+            WHERE  user_id      = ?
+		]]></query-statement>
+     	<query-arguments>
+			<query-argument id="work_type_cd"	type="STRING"/>
+			<query-argument id="work_scdl"		type="STRING"/>
+			<query-argument id="rtn_scdl"		type="STRING"/>
+			<query-argument id="work_rmk"		type="STRING"/>
+			<query-argument id="in_offc_stat"	type="STRING"/>
+			<query-argument id="mdf_id"			type="STRING"/>
+			<query-argument	id="user_id"		type="STRING"/>
+      </query-arguments>
+      <query-descript>사용자정보 UPDATE</query-descript>
+    </queryinfo>
+	<queryinfo>
+        <query-id>UCDAS111S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+            SELECT a.prj_seq, a.prj_nm, a.work_range, a.rmk, b.mbr_cnt
+                 , '~ '+CONVERT(VARCHAR(10), CAST(rl_end_dt AS DATETIME), 102) rl_end_dt
+                 , (SELECT code_nm FROM uc_com_codebook WHERE up_cd='PRJ011' AND code=a.pogr_stat) pogr_stat
+            FROM   uc_prj a
+            LEFT   OUTER JOIN
+            (
+                   SELECT a.prj_seq
+                        , (CASE WHEN COUNT(a.prj_seq)>1
+                                THEN (SUBSTRING(MIN(a.etrn_c_cd+b.pos_cd+b.user_nm),5,10)+'외 ') + CAST(COUNT(a.prj_seq)-1 AS VARCHAR) + '명'
+                                ELSE MAX(b.user_nm)
+                           END) mbr_cnt
+                   FROM   uc_prj_mbr a
+                   INNER  JOIN uc_com_user b ON a.user_id=b.user_id
+                   GROUP  BY a.prj_seq
+            )b     ON a.prj_seq=b.prj_seq
+            WHERE  pogr_stat !='04'
+            ORDER  BY rl_st_dt DESC, prj_nm
+      	]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript> 전광판-프로젝트현황 조회 (dasMainProjectStat.js) </query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCDAS112S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+            SELECT mtnc_seq  , mtnc_nm   , clnt_corp_seq , mtnc_system
+               --, mtnc_type
+               --, mtnc_cost
+                 , strt_date , end_date
+               --, regular_chk
+                 , coop_corp_seq
+               --, dvlp_frwk
+                 , rmk
+               --, SUBSTRING(CONVERT(VARCHAR(10), CAST(strt_date AS DATETIME), 102),1,7) +' ~ '+
+               --  SUBSTRING(CONVERT(VARCHAR(10), CAST(end_date  AS DATETIME), 102),1,7) mtnc_period
+                 , (CASE WHEN strt_date IS NULL THEN ' ' ELSE SUBSTRING(CONVERT(VARCHAR(10), CAST(strt_date AS DATETIME), 102),1,7) END)
+                 + (CASE WHEN strt_date IS NULL AND end_date IS NULL THEN ' ' ELSE ' ~ ' END)
+                 + (CASE WHEN end_date  IS NULL THEN ' ' ELSE SUBSTRING(CONVERT(VARCHAR(10), CAST(end_date  AS DATETIME), 102),1,7) END) mtnc_period
+                 , (SELECT code_nm FROM uc_com_codebook WHERE up_cd='PRJ017' AND code=a.mtnc_type) mtnc_type
+                 , (SELECT code_nm FROM uc_com_codebook WHERE up_cd='PRJ014' AND code=a.mtnc_cost) mtnc_cost
+                 , (SELECT code_nm FROM uc_com_codebook WHERE up_cd='PRJ015' AND code=a.regular_chk) regular_chk
+                 , (SELECT code_nm FROM uc_com_codebook WHERE up_cd='PRJ016' AND code=a.dvlp_frwk) dvlp_frwk
+                 , (SELECT corp_nm FROM uc_prj_corp WHERE corp_seq=a.clnt_corp_seq) clnt_corp_nm
+                 , (SELECT corp_nm FROM uc_prj_corp WHERE corp_seq=a.coop_corp_seq) coop_corp_nm
+            FROM   uc_mtnc a
+          --WHERE  strt_date <= CONVERT(varchar(8),GETDATE(), 112)
+          --AND    end_date  >= CONVERT(varchar(8),GETDATE(), 112)
+            ORDER  BY strt_date DESC, mtnc_nm
+            --날짜데이터를 제대로 입력하지 않았으므로 조회가 되지 않아 일시적으로 조건절을 막아둔다.
+      	]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript> 전광판-유지보수현황 조회 (dasMainMtncStat.js) </query-descript>
+	</queryinfo>
+	<queryinfo>
+        <query-id>UCDAS113S</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type></query-view-type>
+        <query-statement><![CDATA[
+            SELECT a.user_nm
+                 , (SELECT code_nm FROM uc_com_codebook WHERE up_cd='SYS012' AND code=a.dept_cd) dept_cd
+                 , (SELECT code_nm FROM uc_com_codebook WHERE up_cd='DAS001' AND code=
+                       (CASE WHEN (b.hldy_id IS NOT NULL)
+                             THEN '03'
+                             ELSE a.in_offc_stat
+                        END)
+                   ) in_offc_stat
+                 , (CASE WHEN (b.hldy_id IS NOT NULL)
+                         THEN (b.st_dt+' ~ '+b.end_dt)
+                         ELSE a.work_scdl
+                    END) work_scdl
+                 , a.rtn_scdl
+                 , (CASE WHEN (b.hldy_id IS NOT NULL)
+                         THEN (SELECT hldy_knd_nm FROM uc_hldy_knd WHERE hldy_knd_seq=b.hldy_knd_seq)
+                         ELSE a.work_rmk
+                    END) work_rmk
+            FROM   uc_com_user a
+            LEFT   OUTER JOIN
+                   (
+                   SELECT a.hldy_id, a.hldy_knd_seq
+                        , CONVERT(VARCHAR(10), CAST(a.st_dt  AS DATETIME), 102) st_dt
+                        , CONVERT(VARCHAR(10), CAST(a.end_dt AS DATETIME), 102) end_dt
+                   FROM   uc_hldy a ,uc_sign_hst b
+                   WHERE  a.hldy_seq=b.sign_hst_id
+                   AND    b.sign_tp_cd='01'
+                   AND    b.sign_prgs_stts_cd='04'
+                   AND    st_dt <=CONVERT(varchar(8),GETDATE(), 112)
+                   AND    end_dt>=CONVERT(varchar(8),GETDATE(), 112)
+                   ) b
+            ON     a.user_id=b.hldy_id
+            INNER  JOIN (SELECT code, code_nm, lup_ord FROM UC_COM_CODEBOOK WHERE  up_cd='SYS013') c ON a.pos_cd=c.code
+            WHERE  (work_type_cd='01' OR b.hldy_id IS NOT NULL)
+            --AND    a.dept_cd!='05'
+            ORDER  BY c.lup_ord DESC, a.brth ASC, a.user_nm ASC
+      	]]></query-statement>
+        <query-arguments>
+        </query-arguments>
+        <query-descript> 전광판-본사인력현황 조회 (dasMainOfficeStat.js) </query-descript>
+    </queryinfo>
+  </query>

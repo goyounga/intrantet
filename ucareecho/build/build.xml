@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="euc-kr"?>
+<project name="UcareEcho" default="all" basedir=".">
+	<description>UcareEcho</description>
+	<property environment="env" />
+	<property 	name="build" 			value="../compiles/classes" />
+	<property	name="dist" 			value="../lib" />
+	<property	name="doc" 				value="../docs" />
+	<property 	name="file" 			value="echoserver" />
+	<property 	name="file1" 			value="echoclient" />
+	<property 	name="jarclasses" 		value="../compiles/jar-classes" />
+	<property 	name="server" 		value="../compiles/jar-classes" />
+	<property 	name="client" 		value="../compiles/jar-classes/ucare/echo/client" />
+	
+	<target 	name="all" depends="clean, init, compile, copy, archive,archive1,doc" />
+	
+	<!-- 컴파일된 파일삭제 및 기존 jar 파일 백업 -->
+	<target name="clean" description="Removes the temporary directories used">
+		<delete dir="${build}" />
+	</target>
+	
+	<!-- 폴더생성 -->
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${build}" />
+		<mkdir dir="${doc}" />
+		<mkdir dir="${jarclasses}" />
+		<mkdir dir="${server}" />
+		<mkdir dir="${client}" />
+	</target>
+
+	<!-- classpath-->
+	<target name="compile" depends="init" description="ucare compile">
+		<path id="compile.classpath">
+			<pathelement location="../lib/log4j-1.2.12.jar" />
+			<pathelement location="../lib/jdom.jar" />
+			<pathelement location="../lib/commons-logging-1.0.4.jar" />
+			<pathelement location="../lib/netscape.jar" />
+			<pathelement location="../lib/diaq-jpeek-1_0.jar" />
+		</path>
+		<javac srcdir="../src" destdir="${build}" includeAntRuntime="yes">
+			<classpath refid="compile.classpath" />
+			<include name="**/*.java" />
+		</javac>
+	</target>
+
+	<!-- package 디렉토리 형식 class 파일 카피 -->
+	<target name="copy" description="Copy file">
+		<copy todir="${jarclasses}/">
+			<fileset dir="${build}">
+				<patternset>
+					<include name="**" />
+				</patternset>
+			</fileset>
+		</copy>
+	<!--	<copy todir="${jarclasses}/ucare/echo/client">
+			<fileset dir="${build}">
+				<patternset>
+					<include name="ucare/echo/client/**" />
+				</patternset>
+			</fileset>
+		</copy>
+         -->
+	</target>
+	
+	<!-- jar (echoserver.jar) -->
+	<target name="archive" depends="copy" description="Creates the JAR file">
+		<jar destfile="${dist}/${file}.jar" basedir="${server}" />
+	</target>
+	
+	<!-- jar (echoclient.jar) -->
+	<target name="archive1" depends="copy" description="Creates the JAR file">
+		<jar destfile="${dist}/${file1}.jar" basedir="${client}" />
+	</target>
+	
+	<!-- api -->
+	<target name="doc" depends="archive" description="create api">
+		<javadoc destdir="${doc}"
+			author="true"
+			version="true"
+			use="true"
+			locale="ko_KR"
+			charset="euc-kr"
+			encoding="euc-kr"
+			docencoding="euc-kr"
+			windowtitle="Ucare-Echo-Server API">
+			
+			<classpath refid="compile.classpath" />
+			<packageset dir="../src">
+		<!--		<include name="ucare/echo/server/**"/>  -->
+				<include name="ucare/**"/>
+			</packageset>
+			<doctitle><![CDATA[
+				<h1>Ucare-Echo-Server API
+			]]></doctitle>
+			<bottom><![CDATA[<center><i>Copyright ⓒ nexfron Corp. All Rights Reserved.</i></center>]]></bottom>
+		</javadoc>
+	</target>
+	
+</project>

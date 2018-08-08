@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+	<resource-ref>
+		<description>Oracle Datasource example</description>
+		<res-ref-name>ucareDataPool</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+
+	<filter>
+        <filter-name>Set Character Encoding</filter-name>
+        <filter-class>filters.SetCharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+    </filter>
+	<filter-mapping>
+		<filter-name>Set Character Encoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+ 	<context-param>
+		<param-name>common-config</param-name>
+		<param-value>D:\project\workspace\intranet\conf\global.properties</param-value>
+      	<description>환경 파일 위치</description>
+    </context-param>
+
+	<!-- Listener : uCareIns Loader -->
+	<listener>
+		<listener-class>ucare.jaf.loader.uCareLoader</listener-class>
+	</listener>
+   	<servlet>
+    	<servlet-name>action</servlet-name>
+    	<servlet-class>ucare.jpattern.common.servlet.InitServlet</servlet-class>
+    	<init-param>
+        	<param-name>application</param-name>
+        	<param-value>MessageResources_ko</param-value>
+        </init-param>
+        <init-param>
+            <param-name>config</param-name>
+            <param-value>/WEB-INF/struts-config.xml</param-value>
+        </init-param>
+        <init-param>
+            <param-name>debug</param-name>
+            <param-value>3</param-value>
+        </init-param>
+        <init-param>
+            <param-name>detail</param-name>
+            <param-value>1</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+   	</servlet>
+
+    <servlet>
+    	<servlet-name>CommonResultServlet</servlet-name>
+    	<display-name>CommonResultServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.CommonResultServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+    	<servlet-name>ComboResultServlet</servlet-name>
+    	<display-name>ComboResultServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.ComboResultServlet</servlet-class>
+    </servlet>
+
+     <servlet>
+    	<servlet-name>CommonJspServlet</servlet-name>
+    	<display-name>CommonJspServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.CommonJspServlet</servlet-class>
+    </servlet>
+    <!--
+    <servlet>
+    	<servlet-name>XhtmlServlet</servlet-name>
+    	<display-name>XhtmlServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.XhtmlServlet</servlet-class>
+    </servlet>-->
+
+	<servlet>
+    	<servlet-name>PageServlet</servlet-name>
+    	<display-name>PageServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.PageServlet</servlet-class>
+	</servlet>
+
+    <servlet>
+    	<servlet-name>FstFactorServlet</servlet-name>
+    	<display-name>FstFactorServlet</display-name>
+    	<servlet-class>ucare.biz.wfm.servlet.FstFactorServlet</servlet-class>
+	</servlet>
+
+    <servlet>
+    	<servlet-name>DataSetServlet</servlet-name>
+    	<display-name>DataSetServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.DataSetServlet</servlet-class>
+	</servlet>
+
+	<servlet>
+    	<servlet-name>ComGraphServlet</servlet-name>
+    	<display-name>ComGraphServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.ComGraphServlet</servlet-class>
+	</servlet>
+
+    <servlet>
+    	<servlet-name>ComPieServlet</servlet-name>
+    	<display-name>ComPieServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.ComPieServlet</servlet-class>
+	</servlet>
+
+	<servlet>
+    	<servlet-name>WiseGridServlet</servlet-name>
+    	<display-name>WiseGridServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.WiseGridServlet</servlet-class>
+	</servlet>
+
+	<servlet>
+    	<servlet-name>WiseGridWriteServlet</servlet-name>
+    	<display-name>WiseGridWriteServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.WiseGridWriteServlet</servlet-class>
+	</servlet>
+
+	<servlet>
+    	<servlet-name>SaveFileResultServlet</servlet-name>
+    	<display-name>SaveFileResultServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.SaveFileResultServlet</servlet-class>
+	</servlet>
+
+	<servlet>
+    	<servlet-name>SendMailResultServlet</servlet-name>
+		<display-name>SendMailResultServlet</display-name>
+    	<servlet-class>ucare.jpattern.common.servlet.SendMailResultServlet</servlet-class>
+	</servlet>
+
+	<servlet>
+		 <servlet-name>ThreadPool</servlet-name>
+		 <servlet-class>ucare.jpattern.common.servlet.ThreadPool</servlet-class>
+		 <load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet>
+		 <servlet-name>CVS</servlet-name>
+		 <servlet-class>/error.jsp</servlet-class>
+	</servlet>
+
+	<!-- 스케쥴러 등록-->
+	<servlet>
+		 <servlet-name>Scheduler</servlet-name>
+		 <servlet-class>ucare.jpattern.common.servlet.StartServlet</servlet-class>
+		 <load-on-startup>2</load-on-startup>
+	</servlet>
+
+    <servlet-mapping>
+        <servlet-name>action</servlet-name>
+        <url-pattern>*.do</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+    	<servlet-name>CommonResultServlet</servlet-name>
+    	<url-pattern>/CommonResultServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+    	<servlet-name>ComboResultServlet</servlet-name>
+    	<url-pattern>/ComboResultServlet</url-pattern>
+    </servlet-mapping>
+    <!--
+    <servlet-mapping>
+    	<servlet-name>XhtmlServlet</servlet-name>
+    	<url-pattern>*.xml</url-pattern>
+    </servlet-mapping>
+
+	<servlet-mapping>
+    	<servlet-name>XhtmlServlet</servlet-name>
+    	<url-pattern>*.xtl</url-pattern>
+    </servlet-mapping>
+    -->
+    <servlet-mapping>
+    	<servlet-name>PageServlet</servlet-name>
+    	<url-pattern>*.ds</url-pattern>
+    </servlet-mapping>
+
+	<servlet-mapping>
+    	<servlet-name>CommonJspServlet</servlet-name>
+    	<url-pattern>/CommonJspServlet</url-pattern>
+    </servlet-mapping>
+
+     <servlet-mapping>
+    	<servlet-name>DataSetServlet</servlet-name>
+    	<url-pattern>/DataSetServlet</url-pattern>
+    </servlet-mapping>
+
+     <servlet-mapping>
+    	<servlet-name>ComGraphServlet</servlet-name>
+    	<url-pattern>/ComGraphServlet</url-pattern>
+    </servlet-mapping>
+
+     <servlet-mapping>
+    	<servlet-name>ComPieServlet</servlet-name>
+    	<url-pattern>/ComPieServlet</url-pattern>
+    </servlet-mapping>
+
+     <servlet-mapping>
+    	<servlet-name>FstFactorServlet</servlet-name>
+    	<url-pattern>/FstFactorServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+    	<servlet-name>SaveFileResultServlet</servlet-name>
+    	<url-pattern>/SaveFileResultServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+    	<servlet-name>SendMailResultServlet</servlet-name>
+    	<url-pattern>/SendMailResultServlet</url-pattern>
+    </servlet-mapping>
+
+	<servlet-mapping>
+    	<servlet-name>WiseGridServlet</servlet-name>
+    	<url-pattern>/WiseGridServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+    	<servlet-name>WiseGridWriteServlet</servlet-name>
+    	<url-pattern>/WiseGridWriteServlet</url-pattern>
+    </servlet-mapping>
+
+	<!--js-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/asset/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/common/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/dashboard/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/expense/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/holiday/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/information/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/main/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/management/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/project/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/sample/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/sms/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/system/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/ucare/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/ucareprogram/CVS/*</url-pattern></servlet-mapping>
+	<!--jsp-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/asset/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/common/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/dashboard/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/expense/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/holiday/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/homepage/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/homepage/css/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/homepage/images/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/include/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/information/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/main/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/management/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/project/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/sample/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/system/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/ucareprogram/CVS/*</url-pattern></servlet-mapping>
+	<!--view 와 그 하위 기본폴더-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/applets/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/jsp/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/sample/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/sample/js/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/screditor/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/screditor/editimg/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/screditor/js/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/screditor/js/popups/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/webadmin/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/webadmin/common/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/webadmin/common/js/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/webadmin/images/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/webadmin/system/CVS/*</url-pattern></servlet-mapping>
+	<!--html-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/cab/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/fileupload/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/js/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/style/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/xml/CVS/*</url-pattern></servlet-mapping>
+	<!--fileupload-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/fileupload/fileimg/CVS/*</url-pattern></servlet-mapping>
+	<!--fileupload/fileimg-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/fileupload/fileimg/board/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/fileupload/fileimg/data/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/fileupload/fileimg/excel/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/fileupload/fileimg/identification/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/fileupload/fileimg/notice/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/fileupload/fileimg/prj/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/fileupload/fileimg/sch/CVS/*</url-pattern></servlet-mapping>
+	<!--images-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/bar_cti/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/btn/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/button/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/common/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/cti/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/cti_icon/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/editimg/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/error/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/flash/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/hdcc/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/home/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/icon/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/layout/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/login/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/main/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/menu/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/menu/type_1/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/menu/type_2/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/menu/type_3/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/phone/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/sample/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/schedule/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/slider/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/smallbtn/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/sms/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/tab/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/html/images/title/CVS/*</url-pattern></servlet-mapping>
+	<!--javaapi-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/resources/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/CVS/*</url-pattern></servlet-mapping>
+	<!--javaapi/ucare-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaddition/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaf/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/CVS/*</url-pattern></servlet-mapping>
+	<!--javaapi/ucare/jaddition-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaddition/action/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaddition/action/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaddition/bean/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaddition/bean/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaddition/servlet/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaddition/servlet/class-use/CVS/*</url-pattern></servlet-mapping>
+	<!--javaapi/ucare/jaf-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaf/common/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaf/common/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaf/database/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaf/database/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaf/exception/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaf/exception/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaf/lang/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaf/lang/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaf/loader/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jaf/loader/class-use/CVS/*</url-pattern></servlet-mapping>
+	<!--javaapi/ucare/jpattern-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/common/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/service/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/service/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/taglib/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/taglib/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/xmlhandler/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/xmlhandler/class-use/CVS/*</url-pattern></servlet-mapping>
+	<!--javaapi/ucare/jpattern/common-->
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/common/action/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/common/action/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/common/actionform/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/common/actionform/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/common/bean/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/common/bean/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/common/servlet/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/common/servlet/class-use/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/common/util/CVS/*</url-pattern></servlet-mapping>
+	<servlet-mapping><servlet-name>CVS</servlet-name><url-pattern>/javaapi/ucare/jpattern/common/util/class-use/CVS/*</url-pattern></servlet-mapping>
+
+	<error-page>
+		<error-code>404</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+</web-app>

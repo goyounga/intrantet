@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<query>
+	<queryinfo>
+		<query-id>UCMAP001S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+				user_id
+				, rank
+				, user_nm
+				, cur_pos
+				, work_stts
+				, call_recv
+				, call_proc
+				, tel
+				, pda_tel
+				, lat
+				, lng
+			FROM TestWorkerMap
+			]]>
+		</query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>작업자 SELECT</query-descript>
+	</queryinfo>
+
+</query>
+
+

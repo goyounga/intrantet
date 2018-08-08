@@ -1,0 +1,16 @@
+ucare.jaddition.action
+ucare.jaddition.bean
+ucare.jaddition.servlet
+ucare.jaf.common
+ucare.jaf.database
+ucare.jaf.exception
+ucare.jaf.lang
+ucare.jaf.loader
+ucare.jpattern.common.action
+ucare.jpattern.common.actionform
+ucare.jpattern.common.bean
+ucare.jpattern.common.servlet
+ucare.jpattern.common.util
+ucare.jpattern.service
+ucare.jpattern.taglib
+ucare.jpattern.xmlhandler

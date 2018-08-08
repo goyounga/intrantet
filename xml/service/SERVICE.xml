@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+
+<service>
+	<service-info>
+		<service-alias>SQLSERVICE</service-alias>								<!-- 서비스의 Alias 			-->
+		<service-class>ucare.jpattern.service.CSQLServiceManager</service-class>		<!-- 서비스를 실행할 Class  	-->
+		<service-session>true</service-session>									<!-- 하나의 인스턴스 사용여부	-->		
+		<service-descript>DB 호출을 위한 기본 서비스 클래스</service-descript>	<!-- Description 				-->
+	</service-info>
+	
+	<service-info>
+		<service-alias>BATCHSERVICE</service-alias>								
+		<service-class>ucare.jpattern.service.CBatchServiceManager</service-class>
+		<service-session></service-session>
+		<service-descript>업로드된 파일을 읽어 Batch 실행 클래스</service-descript>
+	</service-info>
+
+	<service-info>
+		<service-alias>REGICAMPSERVICE</service-alias>								
+		<service-class>ucare.jpattern.service.RegiCampServiceManager</service-class>
+		<service-session>true</service-session>
+		<service-descript>캠페인 등록 클래스</service-descript>
+	</service-info>
+	
+	<service-info>
+		<service-alias>RECYCLESERVICE</service-alias>								
+		<service-class>ucare.jpattern.service.RecycleDataServiceManager</service-class>
+		<service-session>true</service-session>
+		<service-descript>DATA 회수 클래스</service-descript>
+	</service-info>
+	
+	<service-info>
+		<service-alias>ALLOCSERVICE</service-alias>								
+		<service-class>ucare.jpattern.service.AllocServiceManager</service-class>
+		<service-session>true</service-session>
+		<service-descript>상담원 캠페인할당</service-descript>
+	</service-info>
+
+	<service-info>
+		<service-alias>EXTRACTSERVICE</service-alias>								
+		<service-class>ucare.jpattern.service.ExtractServiceManager</service-class>
+		<service-session>true</service-session>
+		<service-descript>캠페인 DB로 추출 클래스</service-descript>
+	</service-info>
+	
+	<service-info>
+		<service-alias>HOSTSERVICE</service-alias>								
+		<service-class>ucare.jpattern.service.HostServiceManager</service-class>
+		<service-session>true</service-session>	
+		<service-descript>HOST 호출을 위한 기본 서비스 클래스</service-descript>
+	</service-info>
+</service>

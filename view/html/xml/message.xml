@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MESSAGE>
+    <!-- Confirm용 메시지 -->
+    <MSG type="N" id="DelConfirm"						desc="삭제하시겠습니까?"/>
+    <MSG type="N" id="ChgConfirm"					desc="수정하시겠습니까?"/>
+    <MSG type="N" id="SavConfirm"					desc="저장하시겠습니까?"/>
+    <MSG type="N" id="CopConfirm"					desc="복사하시겠습니까?"/>
+    <MSG type="N" id="aplConfirm"						desc="적용하시겠습니까?"/>
+    <MSG type="N" id="RegConfirm"					desc="등록하시겠습니까?"/>
+    <MSG type="N" id="AsgConfirm"					desc="할당하시겠습니까?"/>
+    <MSG type="N" id="NAsgConfirm"					desc="할당취소하시겠습니까?"/>
+    <MSG type="N" id="RetConfirm"						desc="회수하시겠습니까?"/>
+    <MSG type="N" id="MovConfirm"					desc="이동하시겠습니까?"/>
+    <MSG type="N" id="PasswordConfirm"				desc="비밀번호를 변경 하시겠습니까?"/>
+
+    <!-- 공통알림  메시지 -->
+    <MSG type="N" id="Required" 						desc="는(은) 필수입력 항목 입니다."/>
+    <MSG type="N" id="Format" 						desc="는(은) 유효하지 않은 형식입니다."/>
+    <MSG type="N" id="NotChecked"					desc="선택된 건이 없습니다."/>
+    <MSG type="N" id="NotSelectedGrid"				desc="조회된 건이 없습니다."/>
+    <MSG type="N" id="TransURL" 						desc="URL을 설정하세요.\n\nex) open('x','xxx.do')"/>
+    <MSG type="N" id="TransSvc" 						desc="서비스 아이디를 설정하세요.\n\nex) setSvc('xxxx')"/>
+    <MSG type="N" id="TransNoAutoMode"				desc="CRUD가 자동조회일 경우 DataSetID를 설정할 수 없습니다."/>
+    <MSG type="N" id="TransError" 					desc=""/>
+    <MSG type="N" id="MaxSizeOver"					desc="이(가) 최대 크기를 초과하였습니다." />
+    <MSG type="N" id="SelectFail"   					desc="이(가) 선택되지 않았습니다."/>
+    <MSG type="N" id="SelectFail2"   				desc="검색조건을 선택하세요."/>
+    <MSG type="N" id="SelectFail3"   				desc="을(를) 선택하세요."/>
+    <MSG type="N" id="InputFail"						desc="을(를) 입력하세요."/>
+	<MSG type="N" id="HeaderClick"					desc="은(는) 정렬기능을 사용할 수 없습니다."/>
+	<MSG type="N" id="IsNum"							desc="은(는) 숫자만 입력 가능합니다."/>
+    <MSG type="N" id="NotFromdate"  					desc="시작일자(시간) 객체를 확인하세요."	memo="개발자용"/>
+    <MSG type="N" id="NotTodate"  					desc="종료일자(시간) 객체를 확인하세요."	memo="개발자용"/>
+    <MSG type="N" id="BadTerm"  						desc="시작일자가 종료일자보다 늦습니다."/>
+    <MSG type="N" id="BadTermTime"					desc="시작시간이 종료시간보다 늦습니다."/>
+    <MSG type="N" id="BadTermMonth"					desc="시작월이 종료월보다 늦습니다."/>
+
+    <!-- 결과  메시지 -->
+    <MSG type="N" id="Success" 						desc="처리되었습니다."/>
+    <MSG type="N" id="InfSuccess"						desc="저장에 성공하였습니다."/>
+    <MSG type="N" id="InfFail" 							desc="저장에 실패했습니다. 관리자에게 문의 바랍니다."/>
+    <MSG type="N" id="Fail" 								desc="실패했습니다. 관리자에게 문의 바랍니다."/>
+
+    <!-- WiseGrid 관련 메시지 -->
+    <MSG type="N" id="NotWiseGrid" 					desc="를(을) 찾을 수 없습니다."/>
+    <MSG type="N" id="NotWiseRowIndex"		 	desc="의 RowIndex를 찾을 수 없습니다."/>
+
+    <!-- 로그인 관련 메시지-->
+    <MSG type="N" id="LoginErrPassword1"	desc="비밀번호는 ID와 동일하게 사용할 수 없습니다."/>
+    <MSG type="N" id="LoginErrPassword2"	desc="비밀번호는 6자리 이상이여야 합니다."/>
+    <MSG type="N" id="LoginErrPassword3"	desc="비밀번호는 영문+숫자 조합이여야 합니다."/>
+	<MSG type="N" id="LoginNewPassword"	desc="새 비밀번호 확인값이 일치하지 않습니다."/>
+	<MSG type="N" id="LoginPassword"   	desc="현재 비밀번호가 일치 하지 않습니다."/>
+	<MSG type="N" id="LoginUser"   		desc="입력한 아이디가 존재하지 않습니다."/>
+
+    <!-- 예측 관련 메시지 -->
+    <MSG type="N" id="FCSHasData" 					desc="이미 존재하는 유효일자입니다."/>
+
+	<!-- 정보 관련 메시지 -->
+	<MSG type="N" id="INFUserExist"				desc="이미 등록된 사용자ID 입니다."/>
+	<MSG type="N" id="INFUserExist"				desc="이미 등록된 사용자ID 입니다."/>
+	<MSG type="N" id="INFAuthFailMod"			desc="수정 권한이 없습니다."/>
+	<MSG type="N" id="INFAuthFailDel"			desc="삭제 권한이 없습니다."/>
+    <MSG type="N" id="INFOpenScreen" 				desc="최대갯수를 초과하였습니다. 기존화면을 Close하시겠습니까?"/>
+	<MSG type="N" id="INFCloseScreen" 				desc="더이상 화면을 닫을 수 없습니다."/>
+	
+      <!-- 시스템 관련 메시지 -->
+    <MSG type="N" id="SYSNotReg" 					desc="을(를) 등록할수 없습니다."/>
+    <MSG type="N" id="SYSNotCnt" 					desc="적용할 데이타가 없습니다.\n\n사용자를 추가하세요."/>
+    <MSG type="N" id="SYSDupFail" 					desc="을(를) 중복체크 하셔야 합니다."/>
+    <MSG type="N" id="SYSCipher" 					desc="자리 입니다."/>
+    <MSG type="N" id="SYSUseCode"					desc="이미 등록된 코드입니다."/>
+    <MSG type="N" id="SYSNotUseCode"					desc="사용가능한 코드입니다."/>
+    <MSG type="N" id="SYSLogin"						desc="임의로 로그인 할 수 없습니다."/>
+	<MSG type="N" id="SYSDel"						desc="삭제할 수 없습니다."/>
+	<MSG type="N" id="SYSSelectRow"					desc="선택된 ROW가 없습니다."/>
+	<MSG type="N" id="SYSReg"						desc="이미등록되었습니다"/>
+
+    <!-- 주간보고 관련 메시지 -->
+    <MSG type="N" id="RPTError1"					desc="승인과 반려를 둘 다 선택하실 수 없습니다."/>
+    <MSG type="N" id="RPTError2"					desc="사용자의 결재대상이 아닙니다."/>
+    <MSG type="N" id="RPTError3"					desc="이미 결재가 진행되어 수정하실 수 없습니다."/>
+    <MSG type="N" id="RPTError4"					desc="이미 결재가 진행되어 삭제하실 수 없습니다."/>
+</MESSAGE>

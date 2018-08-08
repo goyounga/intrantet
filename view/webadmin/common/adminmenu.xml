@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="euc-kr"?>
+<menus>
+	<menu name="SYSTEM" id="0100">
+		<element id="0101" useyn="Y" name="cpu" value="/webadmin/system/cpu.jsp"/>
+		<element id="0102" useyn="Y" name="memory" value="/webadmin/system/memory.jsp"/>
+		<element id="0103" useyn="Y" name="Thread" value="/webadmin/system/thread.jsp"/>
+		<element id="0104" useyn="Y" name="DBPool" value="/webadmin/system/dbpool.jsp"/>
+		<element id="0105" useyn="Y" name="동시사용자" value="/webadmin/system/curuser.jsp"/>
+		<element id="0106" useyn="Y" name="접속자수" value="/webadmin/system/sessionuser.jsp"/>
+	</menu>
+	<menu name="MVC" id="0200">
+		<element id="0201" useyn="Y" name="service" value=""/>
+		<element id="0202" useyn="Y" name="화면검색" value=""/>
+		<element id="0203" useyn="Y" name="query" value=""/>
+		<element id="0204" useyn="Y" name="Action" value=""/>
+	</menu>
+	<menu name="DATABASE" id="0300">
+		<element id="0301" useyn="Y" name="Table" value="/webadmin/tableMng.jsp"/>
+	</menu>
+	<menu name="ENVIRONMENT" id="0400">
+		<element id="0401" useyn="Y" name="global.properties" value=""/>
+	</menu>
+</menus>

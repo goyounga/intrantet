@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<!--
+  PROJ : Intranet
+  NAME : sample.xml
+  DESC : 샘플소스 관련 쿼리
+  Author : 김은수 과장
+  VER  : 1.0
+  Copyright 2009 Nexfron All rights reserved
+  ============================================================================================
+  								변		경		사		항
+  ============================================================================================
+  VERSION		DATE		AUTHOR		DESCRIPTION
+  ============================================================================================
+  1.0		2009.09.08		김은수		주석추가
+  -->
+  
+<query>
+	
+	<queryinfo>
+    	<query-id>FTCSMP001M</query-id>
+    	<query-exec-type>MERGE</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-statement><![CDATA[
+		MERGE INTO TEST a
+			USING (SELECT
+							  ? AS aa
+							, ? AS bb
+							, ? AS cc
+						FROM dual) b
+				ON (  a.aa = b.aa   )
+			WHEN MATCHED THEN
+			UPDATE  SET
+				  a.bb = b.bb,
+				  a.cc = b.cc
+			WHEN NOT MATCHED THEN
+			INSERT ( aa, bb, cc )
+			VALUES ( b.aa, b.bb, b.cc )
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="aa"	type="STRING"/>
+     		<query-argument id="bb"	type="STRING"/>
+     		<query-argument id="cc"	type="STRING"/>
+   		</query-arguments>
+   		<query-descript></query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>FTCSMP001I</query-id>
+    	<query-exec-type>INSERT</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-statement><![CDATA[
+		INSERT INTO TEST ( aa, bb ) VALUES ( 'TEST', ? )
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="user_rid"	type="STRING"	option="M"/>
+   		</query-arguments>
+   		<query-descript></query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>FTCSMP001S</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type>FREE</query-view-type>
+    	<query-statement><![CDATA[
+		SELECT bb AS de_user_rid FROM TEST WHERE aa = 'TEST'
+     	]]></query-statement>
+     	<query-arguments>
+   		</query-arguments>
+   		<query-descript></query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>FTCSMP002S</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type>GRID</query-view-type>
+    	<query-statement><![CDATA[
+		SELECT aa, bb AS de_user_rid, cc FROM TEST WHERE aa = 'TEST'
+     	]]></query-statement>
+     	<query-arguments>
+   		</query-arguments>
+   		<query-descript></query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>KTSMP001S</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type>GRID</query-view-type>
+    	<query-statement><![CDATA[
+		SELECT user_id, user_nm, home_addr FROM uc_com_user
+     	]]></query-statement>
+     	<query-arguments>
+   		</query-arguments>
+   		<query-descript></query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>KTSMP002S</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type>FREE</query-view-type>
+    	<query-statement><![CDATA[
+		SELECT code, code_nm, up_cd FROM uc_com_codebook WHERE up_cd = 'AST001' AND code = '01'
+     	]]></query-statement>
+     	<query-arguments>
+   		</query-arguments>
+   		<query-descript></query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCTES001I</query-id>
+    	<query-exec-type>INSERT_SEQ</query-exec-type>
+    	<query-view-type></query-view-type>
+		<query-sequence>UC_TEST</query-sequence>
+    	<query-statement><![CDATA[
+			insert into uc_test (test) values( ?)
+     	]]></query-statement>
+     	<query-arguments>
+        	<query-argument id="test"     		type="STRING"/>	
+   		</query-arguments>
+   		<query-descript></query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>test01</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-statement><![CDATA[
+			select * from dual
+     	]]></query-statement>
+     	<query-arguments>
+   		</query-arguments>
+   		<query-descript></query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>TEST000000001</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement>
+				SELECT up_cd, code , code_nm
+			FROM uc_com_codebook
+		</query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>TEST</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+		<query-id>SMPCODEBOOKS</query-id>
+		<query-exec-type>PAGE</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement>
+		SELECT code, code_nm, up_cd, etc1, etc2, etc3, use_f, lup_ord, rg_dt, rg_tm, rg_id, mdf_dt, mdf_tm, mdf_id,
+			   up_cd AS old_up_cd, code AS old_code 
+		  FROM uc_com_codebook
+		  @myuppercd
+        ORDER BY up_cd, lup_ord
+		</query-statement>
+		<query-arguments>
+			<query-argument id="myuppercd"      type="QUERY"		condition="WHERE up_cd = ?"/>
+            <query-argument id="myuppercd"      type="STRING"		condition=""/>
+		</query-arguments>
+		<query-descript>TEST</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+	    <query-id>SMPCODEBOOKI</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+        	INSERT INTO uc_com_codebook(up_cd, code, code_nm, etc1, etc2, etc3, lup_ord, use_f)
+        	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ]]>
+        </query-statement>
+        <query-arguments>
+        	<query-argument id="up_cd"  		type="STRING"/>
+        	<query-argument id="code"     		type="STRING"/>
+        	<query-argument id="code_nm"     	type="STRING"/>
+        	<query-argument id="etc1"     		type="STRING"/>
+        	<query-argument id="etc2"     		type="STRING"/>
+            <query-argument id="etc3"     		type="STRING"/>
+            <query-argument id="lup_ord"   		type="INTEGER"/>
+            <query-argument id="use_f"     		type="STRING"/>
+        </query-arguments>
+        <query-descript>query exec type - MULTI ( smpCodebook.js )</query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+	    <query-id>SMPCODEBOOKU</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+        	UPDATE uc_com_codebook
+        	   SET up_cd = ?, 
+        	   	   code = ?, 
+        	   	   code_nm = ?, 
+        	   	   etc1 = ?, 
+        	   	   etc2 = ?, 
+        	   	   etc3 = ?, 
+        	   	   lup_ord = ?, 
+        	   	   use_f = ?
+			WHERE up_cd = ?
+			  AND code = ?
+        ]]>
+        </query-statement>
+        <query-arguments>
+        	<query-argument id="up_cd"  		type="STRING"/>
+        	<query-argument id="code"     		type="STRING"/>
+        	<query-argument id="code_nm"     	type="STRING"/>
+        	<query-argument id="etc1"     		type="STRING"/>
+        	<query-argument id="etc2"     		type="STRING"/>
+            <query-argument id="etc3"     		type="STRING"/>
+            <query-argument id="lup_ord"    	type="INTEGER"/>
+            <query-argument id="use_f"     		type="STRING"/>
+        	<query-argument id="old_up_cd" 		type="STRING"/>
+        	<query-argument id="old_code"    	type="STRING"/>
+        </query-arguments>
+        <query-descript>query exec type - MULTI ( smpCodebook.js )</query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+	    <query-id>SMPCODEBOOKD</query-id>
+        <query-exec-type>MULTI</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+        	DELETE FROM uc_com_codebook
+			WHERE up_cd = ?
+			  AND code = ?
+        ]]>
+        </query-statement>
+        <query-arguments>
+        	<query-argument id="old_up_cd"  		type="STRING"/>
+        	<query-argument id="old_code"     		type="STRING"/>
+        </query-arguments>
+        <query-descript>query exec type - MULTI ( smpCodebook.js )</query-descript>
+    </queryinfo>
+	
+	<queryinfo>
+		<query-id>SMPCODEBOOKS2</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement>
+		SELECT code, code_nm, up_cd, etc1, etc2, etc3, use_f, lup_ord, rg_dt, rg_tm, rg_id, mdf_dt, mdf_tm, mdf_id 
+		  FROM uc_com_codebook
+		</query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>TEST</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+		<query-id>UCTES001S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement>
+				SELECT up_cd, code, code_nm, use_f 
+				  FROM uc_com_codebook
+				 WHERE up_cd = 'USEYN'
+				   AND use_f = 'Y'
+		</query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>TEST</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+	    <query-id>smpradio</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-statement><![CDATA[
+          SELECT code, code_nm
+			FROM uc_com_codebook
+		   WHERE up_cd = 'SYS020'
+			 AND code IN ('01', '02')
+        ]]>
+        </query-statement>
+        <query-arguments>
+            <query-argument id=""      type=""/>
+        </query-arguments>
+        <query-descript>query exec type - SELECT ( smpQuery.js )</query-descript>
+    </queryinfo>
+    
+    <queryinfo>
+        <query-id>samplecombobyquery</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-statement><![CDATA[
+		  SELECT etc1, code_nm
+		    FROM UC_COM_CODEBOOK
+		   WHERE up_cd = 'COM003'
+			 AND etc1 IS NOT NULL
+		]]>
+        </query-statement>
+        <query-arguments>
+            <query-argument id=""		type=""/>
+        </query-arguments>
+        <query-descript>쿼리를 이용해서 COMBOBOX 만들기 ( smpSelect.jsp )</query-descript>
+    </queryinfo>
+    <!-- 
+    <queryinfo>
+	    <query-id>SMPCODEBOOKS</query-id>
+        <query-exec-type>SELECT</query-exec-type>
+        <query-view-type>GRID</query-view-type>
+        <query-statement><![CDATA[
+          SELECT up_cd, code, code_nm, etc1, etc2, etc3, lup_ord, use_f, 
+          		 '0' AS chk, '20090101' AS dd, 1500 AS num1, 20.35 AS num2,
+          		 up_cd AS old_uppercd, code AS old_code 
+            FROM uc_com_codebook 
+           @myuppercd
+        ORDER BY up_cd, lup_ord
+        ]]>
+        </query-statement>
+        <query-arguments>
+            <query-argument id="myuppercd"      type="QUERY"		condition="WHERE up_cd = ?"/>
+            <query-argument id="myuppercd"      type="STRING"		condition=""/>
+        </query-arguments>
+        <query-descript>for chart sample ( smpCodebook.js )</query-descript>
+    </queryinfo> -->
+    
+    <queryinfo>
+		<query-id>UCSMP000S</query-id>
+		<query-pool>db2DataPool</query-pool>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement>
+		SELECT code, codenm
+		  FROM uc_com_codebook
+		 WHERE uppercd = 'USEYN'
+		  order by code
+		</query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>TEST</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+		<query-id>UCSMP001S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement>
+		SELECT	user_nm, dbo.FN_CODEBOOK('SYS013', pos_cd) AS pos_nm, hdp_no, em_addr 
+		FROM	uc_com_user
+		WHERE	use_f = 'Y'
+		AND		user_id NOT IN ('nexfron')
+		@user_nm
+		ORDER BY user_nm
+		</query-statement>
+		<query-arguments>
+			<query-argument id="user_nm"      type="QUERY"		condition="AND user_nm LIKE '%'+?+'%'"/>
+            <query-argument id="user_nm"      type="STRING"		condition=""/>
+		</query-arguments>
+		<query-descript>넥스프론 전체 직원 조회</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+		<query-id>UCSMP002S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement>
+		SELECT	chrg_id, chrg_nm, clnt_co, clnt_type, tel_no, 
+				hdp_no, em_addr, memo  
+		FROM	uc_com_chrg
+		WHERE	1=1
+		@q_clnt_type
+		@q_clnt_co
+		@q_chrg_nm
+		ORDER BY clnt_co, chrg_nm
+		</query-statement>
+		<query-arguments>
+			<query-argument id="q_clnt_type"	type="QUERY"		condition="AND clnt_type = ?"/>
+            <query-argument id="q_clnt_type"	type="STRING"		condition=""/>
+            <query-argument id="q_clnt_co"      type="QUERY"		condition="AND clnt_co LIKE '%'+?+'%'"/>
+            <query-argument id="q_clnt_co"      type="STRING"		condition=""/>
+            <query-argument id="q_chrg_nm"      type="QUERY"		condition="AND chrg_nm LIKE '%'+?+'%'"/>
+            <query-argument id="q_chrg_nm"      type="STRING"		condition=""/>
+		</query-arguments>
+		<query-descript>업체담당자 조회</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+		<query-id>UCSMP002I</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-statement><![CDATA[
+		INSERT INTO uc_com_chrg (
+			  clnt_type, clnt_co, chrg_nm, tel_no, hdp_no
+			, em_addr, memo, rg_dt, rg_tm, rg_id
+			, mdf_dt, mdf_tm, mdf_id
+		) VALUES (
+			  ?, ?, ?, ?, ?
+			, ?, ?
+			, CONVERT(VARCHAR(8),GETDATE(),112)
+			, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			, ?
+			, CONVERT(VARCHAR(8),GETDATE(),112)
+			, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			, ?
+		)
+        ]]>
+		</query-statement>
+		<query-arguments>
+            <query-argument id="clnt_type"	type="STRING"/>
+            <query-argument id="clnt_co"	type="STRING"/>
+            <query-argument id="chrg_nm"	type="STRING"/>
+            <query-argument id="tel_no"		type="STRING"	option="M"/>
+            <query-argument id="hdp_no"		type="STRING"	option="M"/>
+            <query-argument id="em_addr"	type="STRING"/>
+            <query-argument id="memo"		type="STRING"/>
+            <query-argument id="userid"		type="STRING"/>
+          	<query-argument id="userid"		type="STRING"/>
+		</query-arguments>
+		<query-descript>업체담당자 추가</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+		<query-id>UCSMP002D</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-statement><![CDATA[
+		DELETE FROM uc_com_chrg WHERE chrg_id = ?
+        ]]>
+		</query-statement>
+		<query-arguments>
+            <query-argument id="chrg_id"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript>업체담당자 삭제</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+		<query-id>UCSMP002U</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-statement><![CDATA[
+		UPDATE uc_com_chrg SET
+			  clnt_type = ?
+			, clnt_co = ?
+			, chrg_nm = ?
+			, tel_no = ?
+			, hdp_no = ?
+			, em_addr = ?
+			, memo = ?
+			, mdf_dt = CONVERT(VARCHAR(8),GETDATE(),112)
+			, mdf_tm = REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+			, mdf_id = ?
+		WHERE chrg_id = ?
+        ]]>
+		</query-statement>
+		<query-arguments>
+			<query-argument id="clnt_type"	type="STRING"/>
+            <query-argument id="clnt_co"	type="STRING"/>
+            <query-argument id="chrg_nm"	type="STRING"/>
+            <query-argument id="tel_no"		type="STRING"	option="M"/>
+            <query-argument id="hdp_no"		type="STRING"	option="M"/>
+            <query-argument id="em_addr"	type="STRING"/>
+            <query-argument id="memo"		type="STRING"/>
+          	<query-argument id="userid"		type="STRING"/>
+            <query-argument id="chrg_id"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript>업체담당자 수정</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+		<query-id>TEST_QUERY</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement>
+			select * from uc_com_ucare_help_func
+		</query-statement>
+		<query-arguments>
+			<query-argument id=""      type=""		condition=""/>
+		</query-arguments>
+		<query-descript>조회</query-descript>
+	</queryinfo>
+	
+	
+</query>

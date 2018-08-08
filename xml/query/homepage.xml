@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<!--
+  PROJ : Nexfron APP
+  NAME : homepage.xml
+  DESC : 홈페이지 쿼리
+  Author : 박준규
+  VER  : 1.0
+  Copyright ⓒ 2011 Nexfron All rights reserved
+  ============================================================================================
+  								변		경		사		항
+  ============================================================================================
+  VERSION		DATE		AUTHOR		DESCRIPTION
+  ============================================================================================
+  1.0		2011.10.19		박준규		주석추가
+  -->
+<query>
+	<queryinfo>
+		<query-id>UCHPG001S</query-id>
+		<query-exec-type>PAGE</query-exec-type>
+		<query-statement><![CDATA[
+            SELECT NOTICE_SEQ  BORD_SEQ
+                 , NOTICE_SBJT BORD_TITLE
+                 --, NOTICE_CONT BORD_CNTN
+                 --, (SELECT USER_NM FROM UC_COM_USER WHERE USER_ID=A.RG_ID) USER_NM
+                 , '관리자' USER_NM
+                 , CONVERT(VARCHAR(10), CAST(RG_DT  AS DATETIME), 111) REG_DATE
+                 , QRY_CNT
+                 , NOTICE_TYPE GUBUN
+                 , (SELECT '['+CODE_NM+']' FROM UC_COM_CODEBOOK WHERE UP_CD='COM014' AND USE_F='Y' AND CODE=A.NOTICE_TYPE) GUBUNNM
+            FROM   UC_COM_NOTICE A
+            WHERE  BOARD_TP_SEQ=16
+            ORDER  BY BORD_SEQ DESC
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+        <query-descript> 홈페이지 뉴스공지 목록 조회 () </query-descript>
+    </queryinfo>
+	<queryinfo>
+		<query-id>UCHPG002S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-statement><![CDATA[
+            SELECT --NOTICE_SEQ  BORD_SEQ ,
+                   NOTICE_SBJT BORD_TITLE
+                 , NOTICE_CONT BORD_CNTN
+                 --, (SELECT USER_NM FROM UC_COM_USER WHERE USER_ID=A.RG_ID) USER_NM
+                 , '관리자' USER_NM
+                 , CONVERT(VARCHAR(10), CAST(RG_DT  AS DATETIME), 111) REG_DATE
+                 --, QRY_CNT
+                 --, NOTICE_TYPE GUBUN
+                 --, (SELECT '['+CODE_NM+']' FROM UC_COM_CODEBOOK WHERE UP_CD='COM014' AND USE_F='Y' AND CODE=A.NOTICE_TYPE) GUBUNNM
+            FROM   UC_COM_NOTICE A
+            WHERE  NOTICE_SEQ = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="notice_seq"     	type="INTEGER" />
+		</query-arguments>
+        <query-descript> 홈페이지 뉴스공지 내용 조회 (hpgCorpNewsSearchActView.jsp) </query-descript>
+    </queryinfo>
+    <queryinfo>
+        <query-id>UCHPG003U</query-id>
+        <query-exec-type>UPDATE</query-exec-type>
+        <query-view-type>NONE</query-view-type>
+        <query-insensitive>false</query-insensitive>
+        <query-statement><![CDATA[
+            UPDATE UC_COM_NOTICE
+            SET    QRY_CNT    = QRY_CNT + 1
+            WHERE  NOTICE_SEQ = ?
+      	]]></query-statement>
+        <query-arguments>
+        	<query-argument id="notice_seq"     	type="INTEGER" />
+        </query-arguments>
+        <query-descript>공지사항 조회수 증가</query-descript>
+    </queryinfo>
+	<queryinfo>
+		<query-id>UCHPG004S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-statement><![CDATA[
+            SELECT * FROM (
+                SELECT --NOTICE_SEQ  BORD_SEQ ,
+                       NOTICE_SBJT BORD_TITLE
+                     , NOTICE_CONT BORD_CNTN
+                     --, (SELECT USER_NM FROM UC_COM_USER WHERE USER_ID=A.RG_ID) USER_NM
+                     , '관리자' USER_NM
+                     , CONVERT(VARCHAR(10), CAST(RG_DT  AS DATETIME), 111) REG_DATE
+                     --, QRY_CNT
+                     --, NOTICE_TYPE GUBUN
+                     --, (SELECT '['+CODE_NM+']' FROM UC_COM_CODEBOOK WHERE UP_CD='COM014' AND USE_F='Y' AND CODE=A.NOTICE_TYPE) GUBUNNM
+                     , (ROW_NUMBER() OVER(ORDER  BY NOTICE_SEQ DESC)) rnum
+                FROM   UC_COM_NOTICE A
+            WHERE  BOARD_TP_SEQ=16
+            ) A WHERE A.rnum = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="notice_seq"     	type="INTEGER" />
+		</query-arguments>
+        <query-descript> 홈페이지 뉴스공지 내용 조회2-홈에서 (hpgCorpNewsSearchActView.jsp) </query-descript>
+    </queryinfo>
+
+	<queryinfo>
+		<query-id>UCHPG005S</query-id>
+		<query-exec-type>PAGE</query-exec-type>
+		<query-statement><![CDATA[
+            SELECT NOTICE_SEQ  BORD_SEQ
+                 , NOTICE_SBJT BORD_TITLE
+                 --, NOTICE_CONT BORD_CNTN
+                 --, (SELECT USER_NM FROM UC_COM_USER WHERE USER_ID=A.RG_ID) USER_NM
+                 , '관리자' USER_NM
+                 , CONVERT(VARCHAR(10), CAST(RG_DT  AS DATETIME), 111) REG_DATE
+                 , QRY_CNT
+                 , NOTICE_TYPE GUBUN
+                 , (SELECT '['+CODE_NM+']' FROM UC_COM_CODEBOOK WHERE UP_CD='COM014' AND USE_F='Y' AND CODE=A.NOTICE_TYPE) GUBUNNM
+            FROM   UC_COM_NOTICE A
+            WHERE  BOARD_TP_SEQ=16 --AND 1=2
+            ORDER  BY BORD_SEQ DESC
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+        <query-descript> 홈페이지 뉴스공지 목록 조회 () </query-descript>
+    </queryinfo>
+
+</query>

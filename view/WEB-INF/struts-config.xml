@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="EUC-KR" ?>
+
+<!DOCTYPE struts-config PUBLIC
+          "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN"
+          "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+
+<struts-config>
+	<form-beans>
+		<form-bean name="comForm" 		type="ucare.jpattern.common.actionform.ComActionForm"/>
+		<form-bean name="uploadForm" 	type="ucare.jpattern.common.actionform.UploadActionForm"/>
+		<form-bean name="gridForm" 		type="ucare.jpattern.common.actionform.WiseGridActionForm"/>
+ 		<form-bean name="mailForm" 		type="ucare.jpattern.common.actionform.SendMailActionForm"/>
+	</form-beans>
+	
+	<action-mappings>
+		<!-- 고객조회 Action 정의 -->
+		<action path="/common"
+				type="ucare.jpattern.common.action.CommonAction"
+				name="comForm"
+				scope="request"
+				input="/test.jsp"
+				unknown="false"
+				validate="false">
+		<forward name="commonresult"	path="/CommonResultServlet"	redirect="false"/>
+		<forward name="comboresult"		path="/ComboResultServlet"	redirect="false"/>
+		<forward name="commonjsp"		path="/CommonJspServlet"	redirect="false"/>
+		<forward name="dsl"				path="/DataSetServlet"		redirect="false"/>
+		<forward name="fstfactor"		path="/FstFactorServlet"	redirect="false"/>
+		</action>
+		
+		<!-- codebook 메모리 cache -->
+		<action path="/cachereaction"
+				type="ucare.jpattern.common.action.CodeCacheReloadAction"
+				name="comForm"
+				scope="request"
+				input="/test.jsp"
+				unknown="false"
+				validate="false">
+		<forward name="dsl"				path="/DataSetServlet"		redirect="false"/>
+		</action>
+
+		<action path="/wisegrid"
+				type="ucare.jpattern.common.action.WiseGridAction"
+				name="gridForm"
+				scope="request"
+				input="/test.jsp"
+				unknown="false"
+				validate="false">
+		<forward name="wgdsl" 		path="/WiseGridServlet"			redirect="false"/>
+		<forward name="wgwrite" 	path="/WiseGridWriteServlet"	redirect="false"/>
+		</action>
+	
+		<action path="/savefile"
+				type="ucare.jpattern.common.action.UploadAction"
+				name="uploadForm"
+				scope="request"
+				input="/test.jsp"
+				unknown="false"
+				validate="false">
+		<forward name="savefileresult"	path="/SaveFileResultServlet"	redirect="false"/>
+		</action>
+		
+		<action path="/readdir"
+				type="ucare.jpattern.common.action.ReadDirAction"
+				name="comForm"
+				scope="request"
+				input="/test.jsp"
+				unknown="false"
+				validate="false">
+		<forward name="dsl"				path="/DataSetServlet"		redirect="false"/>
+		</action>
+		
+		<action path="/readfile"
+				type="ucare.jpattern.common.action.ReadFileAction"
+				name="comForm"
+				scope="request"
+				input="/test.jsp"
+				unknown="false"
+				validate="false">
+		<forward name="dsl"				path="/DataSetServlet"		redirect="false"/>
+		</action>
+
+		<action path="/forward"
+				type="ucare.jpattern.common.action.ForwardAction"
+				name="comForm"
+				scope="request"
+				input="/test.jsp"
+				unknown="false"
+				validate="false">
+		<forward name="dsl"				path="/DataSetServlet"		redirect="false"/>
+		<forward name="commonjsp"		path="/CommonJspServlet"	redirect="false"/>
+		</action>
+
+		<action path="/reload"
+				type="ucare.jpattern.common.action.ReloadStrutsConfigAction">
+		</action>
+		
+		<action path="/host"
+				type="ucare.jpattern.common.action.HostAction"
+				name="comForm"
+				scope="request"
+				input="/test.jsp"
+				unknown="false"
+				validate="false">
+		<forward name="commonjsp"		path="/CommonJspServlet"	redirect="false"/>
+		<forward name="dsl"				path="/DataSetServlet"		redirect="false"/>
+		</action>
+
+		<action path="/ExpenseExcelExportAction"
+				type="ucare.biz.action.ExpenseExcelExportAction"
+				name="comForm"
+				scope="request"
+				input="/test.jsp"
+				unknown="false"
+				validate="false">
+		<forward name="commonjsp"		path="/CommonJspServlet"	redirect="false"/>
+		<forward name="dsl"				path="/DataSetServlet"		redirect="false"/>
+		</action>
+		
+		<action path="/mail"
+				type="ucare.jpattern.common.action.SendMailAction"
+				name="mailForm"
+				scope="request"
+				input="/test.jsp"
+				unknown="false"
+				validate="false">
+		<forward name="mailresult"		path="/SendMailResultServlet"	redirect="false"/>
+		</action>
+	</action-mappings>
+	
+	<!-- 파일 업로드 용량 제한 1G -->
+	<controller  processorClass="org.apache.struts.action.RequestProcessor"
+		contentType="text/html"
+		maxFileSize="1G" />
+
+	<!-- 메세지 리소스 정의 -->
+	<message-resources parameter="MessgeResources_ko"/>
+
+</struts-config>

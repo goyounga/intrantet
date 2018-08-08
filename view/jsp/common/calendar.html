@@ -1,0 +1,462 @@
+<HTML>
+<HEAD>
+<TITLE>달력</TITLE>
+<style> 
+      table {FONT-SIZE: 9pt; FONT-FAMILY: 굴림} 
+     A:hover {text-decoration: none;color:#404040;} 
+     A:link { text-decoration: none;color:#404040;} 
+     A:visited { text-decoration: none;color:#404040;} 
+     A:active { text-decoration: none;color:#404040;} 
+     select{font-family:"돋움";font-size:11px;color:#555555;border-style:solid;border-width:1;border-color:#CECECE;margin:0 0 0 0;;height:18px}
+	.btnup{
+		display:inline;	
+		background: url(/images/icon/btn_up.gif) no-repeat left  top;}
+	} 
+	.btndown{
+		display:inline;	
+		background: url(/images/icon/btn_down.gif) no-repeat left  top;}
+	}       
+</style> 
+</HEAD>
+<body leftMargin=0 topMargin=0 bgcolor='#ECF3F6' style="border:1px solid #DDDDDD" >
+<script language="JavaScript" >
+//달력생성자
+function Calendar(elementName,divId,elementPoint,currentDate){
+	
+	this.elementName = elementName; //Textbox이름
+	this.divId = divId;                         //Div이름
+	this.elementPoint = elementPoint;  //Textbox좌표객체 
+	this.currentDate = currentDate       //날짜정보객체
+}
+
+//날짜 생성자
+function CurrentDate(year,month,date){
+	this.year = year;
+	this.month = month;
+	this.date = date;
+}
+
+//x,y좌표 생성자
+function Point(x,y){
+	this.x = x;
+	this.y = y;
+}
+
+
+//달력 참조변수 
+var calendar = null;
+
+var docStatus = "main";
+var winheight = 0;
+//====================== 처음실행하는 메소드 ======================// 
+function service(elementName,tempDivId,hsize ){
+	
+	var divId = tempDivId;
+	if(arguments.length == 1){
+	    //고정값 프레임을 둘러싼 div id가 calDiv로 되어있어야한다. 
+		divId = parent.document.all.calDiv;	
+	}
+	else if(arguments.length == 2 &&  tempDivId =="pop"){
+		divId = parent.document.all.calDiv;	
+		docStatus = tempDivId;
+	}
+	else if(arguments.length == 3){
+		divId = parent.document.all.calDiv;	
+		docStatus = "pop_size";
+		winheight = hsize;
+	}
+	 
+	var elementPoint = getElementPoint(elementName);
+	var currentDate = getNowDate();
+	
+	// 기존DATA존재
+	if(elementName.value.length > 1){
+		var dateStr = replaceAll(elementName.value,"-","");
+		var year = dateStr.substr(0,4);
+		var month = dateStr.substr(4,2);
+		var date = dateStr.substr(6,2);
+		var nowDate = new Date();
+		if(month.length == 0 ) month = nowDate.getMonth()+1;
+		if(date.length == 0) date = nowDate.getDate();
+		currentDate = new CurrentDate(year,month,date);
+	}
+	
+	
+	//calenar객체를 생성하여 모든것을 참조할수 있게한다.
+	calendar = new Calendar(elementName,divId,elementPoint,currentDate);	
+	setDivStyle(divId);
+
+	
+
+	//셀렉트박스에 셋팅
+	setSelectBox(calendar.currentDate.year,calendar.currentDate.month);
+	setViewDate(currentDate.year,Number(currentDate.month));
+	
+}
+//===============================================================//
+/*
+replaceAll한다.
+*/
+function replaceAll(strTemp, strValue1, strValue2){
+  while(1){
+    if( strTemp.indexOf(strValue1) != -1 )
+       strTemp = strTemp.replace(strValue1, strValue2);
+    else
+       break;
+  }
+   return strTemp;
+}
+
+//날짜를 뿌려준다.
+function setViewDate(year,month){
+	//viewDate <== id이름
+	
+	var firstDay = (new Date(year,parseInt(month)-1,1)).getDay();//해당월의 1일이 몇요일인지
+	var date = (new Date()).getDate();
+	var days = getDays(year,month);//해당월이 몇일까지 있는지를 얻어온다.
+	var dayCount = 1;
+	var fcolor = "";
+	var fbold = "";
+	
+	for(i=0 ; i< viewDate.length; i++){
+		if(i >= firstDay &&  dayCount <= days){
+		    var day = (new Date(year,parseInt(month)-1,dayCount)).getDay(); //요일
+		    if(date == dayCount ){
+		    	fcolor = "#003F62";
+		    	fbold = "bold";
+		    }
+		    else{
+		        fbold = "none";
+			    if(day == 0 ) fcolor = "red";		
+				else if(day == 6) fcolor = "blue";
+				else fcolor = "black";
+			}
+			viewDate[i].innerHTML="<a style='font-size:11px;font-family:굴림;width:17px;color:"+fcolor+";font-weight:"+fbold+"' href='javascript:setElementView("+year+","+month+","+dayCount+",0);'>"+dayCount+"</a>";
+			viewDate[i].style.cursor="hand";
+			dayCount++;
+		}
+		else{
+			viewDate[i].innerHTML="&nbsp;";
+			viewDate[i].style.cursor="";
+		}
+	}
+    	
+}
+
+//요소에 날짜를 넣는다.
+function setElementView(year,month,date,state){
+	if(state == "cancel" ){
+		calendar.divId.style.display="none";
+	}
+	else if( state == "delete"){
+		calendar.elementName.value= "";
+		calendar.divId.style.display="none";
+	}
+	else{
+		month = (month < 10) ? "0"+month : month;
+		date = ( date < 10 ) ? "0"+date : date;
+		calendar.elementName.value=year+"-"+month+"-"+date;
+		calendar.divId.style.display="none";
+	}
+	if(docStatus == "pop_size"){
+		parent.window.resizeBy("0",-winheight);
+	}
+		
+}
+
+
+//오늘의 날짜 정보를 가져온다.
+function getNowDate(){
+	
+	
+	var nowDate = new Date();
+	var currentDate = new CurrentDate("","","");
+	
+	currentDate.year = nowDate.getYear();
+	currentDate.month = nowDate.getMonth()+1;
+	currentDate.date = nowDate.getDate();
+	
+	return currentDate;
+}
+
+
+//요소위치값알아내기
+function getElementPoint(elementName){
+	/* 
+		offsetLeft와 offsetTop 자신의 상위 태그에대하여
+	    상대좌표를 가지기 때문에 offsetParent를 사용하여 현재요소부터
+		상위 모든태그의 좌표를 더해야 현재요소의 좌표를 얻을수있다.
+	*/
+	
+	//요소의 x,y좌표를 저장할 객체를 생성한다.
+	var point = new Point(0,0);
+	//offsetLeft - 요소의 X좌표를 얻는다.
+	point.x = elementName.offsetLeft;
+	//offsetTop - 요소의 Y좌표를 얻는다.
+	point.y = elementName.offsetTop;
+	//offsetParent 요소의 좌표체계를 정의한다.
+	var elementParent = elementName.offsetParent;
+
+	//tagName - 요소의 태그명 
+	while(elementParent.tagName.toUpperCase() != "BODY"){
+	 	point.x = parseInt(point.x) + elementParent.offsetLeft;
+		point.y = parseInt(point.y) + elementParent.offsetTop;
+		elementParent = elementParent.offsetParent;
+	}
+	var height = elementName.offsetHeight;
+	var width  = elementName.offsetWidth; 
+
+	if(docStatus == "pop"){
+		point.y=point.y+height;
+	}
+	else{
+		point.y=point.y+height+70;//70는 상단메뉴 높이;
+		point.x=point.x+22;
+	}
+	//70을 하는 이유는 top.윈도우의 달력을 호출했기때문에 상단 메뉴 높이는 계산에서 제외되었기 때문이다.
+	
+	//화면사이즈  1250,920   //달력 170,180
+	if((point.y+180) > 920 ){
+		point.y = point.y-height-180;
+	}
+	if((point.x+174) > 1230){
+		point.x = 1230-170;	//화면 width - 달력 width
+	}
+	return point;
+}
+
+//해당월이 몇일까지있는지를 알려준다.
+function getDays(year,month){
+	/*
+	-- 윤년 계산방법 --
+	먼저 해당연수가 4로 나누어 떨어지면 윤년, 그렇지 않으면 평년입니다. (1996년은 윤년이었죠)
+	그러나 해당연수가 100으로 나누어 떨어지면 평년입니다. (1900년은 평년입니다)
+	그러나 해당연수가 400으로 나누어 떨어지면 다시 윤년입니다.(2000년은 윤년이죠)
+	*/
+	
+	var arryMonth1 = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];  //평년의 월
+	var arryMonth2 = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];  //윤년의 월
+
+    var resultDays = 0; 
+	
+	if ((year % 4) == 0) {
+        
+		if ((year % 100) == 0 && (year % 400) != 0){
+            resultDays = arryMonth1[parseInt(month) -1];
+		}
+		else{
+			resultDays = arryMonth2[parseInt(month) -1];
+		}
+        
+    }
+	else{ 
+        resultDays = arryMonth1[parseInt(month) -1];
+	}
+
+	return resultDays;
+}
+
+
+
+//div 스타일셋팅하는 메소드
+function setDivStyle(divId){
+	
+	var divStyle = divId.style;
+	
+	divStyle.borderStyle="none";
+	divStyle.borderWidth="thin";
+	divStyle.position="absolute";
+	divStyle.display="block";
+	divStyle.left= calendar.elementPoint.x;
+	divStyle.top= calendar.elementPoint.y-parseInt(winheight);
+	
+	if(docStatus == "pop_size"){
+		parent.window.resizeBy("0",winheight);
+	}
+	
+}
+
+function bgColorChagne(tdID,dateID,state){
+
+	if(dateID.innerHTML != "&nbsp;"){
+		
+		if(state == 1){
+			tdID.style.backgroundColor="#92C3D6";
+		}
+		else{
+			tdID.style.backgroundColor="white";
+		}
+	}
+
+}
+
+function drawCalendar() {
+  
+  var weekDay = new Array("일","월","화","수","목","금","토");
+  var idCount = 0;
+  
+  with (document) {
+    var fcolor = "block";
+    write("<tr align=center>");
+	for(i=0; i<7; i++){
+		if(i == 0 ){
+			fcolor = "red";		
+		}
+		else if(i == 6){
+			fcolor = "blue";
+		}
+		else fcolor = "block";
+	write("	<td bgcolor='#E3EBF1' style='FONT-FAMILY: 돋움;font-size:11px;color:"+fcolor+"'>"+weekDay[i] + "</td>");
+	}
+	write("</tr>");
+  	for (i = 1; i <= 6; i++) {
+	write("<tr align=center >");
+		var fcolor = "block";
+		for (j = 1; j <= 7; j++) {
+		
+	write("	<td bgcolor='#FFFFFF' id='tdID' style='cursor:hand' onmouseout='bgColorChagne(tdID["+idCount+"],this,0)' onmouseover='bgColorChagne(tdID["+idCount+"],this,1)' > ");
+	write("		<div id=viewDate >&nbsp; </div>" );
+	write("	</td>");
+			idCount++;
+		}
+	write("</tr>");
+	}
+
+	
+  }
+}
+
+//년월에 대한 셀렉트 박스 셋팅 
+function setSelectBox(year,month){
+	
+	with(document.calForm){
+		//년도
+		var startYear = selectYear.options[0].value;
+		var yearIndex = parseInt(year) - parseInt(startYear);
+		selectYear.options[yearIndex].selected= true;
+		//월
+		var monthIndex = Number(month)-1;
+		selectMonth.options[monthIndex].selected = true;
+	}	
+
+}
+
+//이전월에 대한 날짜 
+function preDate(year,month){
+	
+	var preMonth = parseInt(month)-1;
+	var preYear = year;
+	
+	if(preMonth == 0 ){
+		preYear = parseInt(year)-1;
+		preMonth = 12;
+	}
+	
+	if(preYear < 1970 ){
+		alert("해당 년이 존재하지 않습니다.");
+	}
+	else{	
+		setSelectBox(preYear,preMonth);
+		setViewDate(preYear,preMonth);
+	}
+}
+
+//다음월에 대한 날짜
+function nextDate(year,month){
+	
+	var nextMonth = parseInt(month)+1;
+	var nextYear = year;
+
+	if(nextMonth == 13){
+		nextYear = parseInt(year)+1;
+		nextMonth = 1;
+	}
+
+	if(parseInt(getNowDate().year)+5 < nextYear){
+		alert("해당 년이 존재하지 않습니다.");
+	}
+	else{
+		setSelectBox(nextYear,nextMonth);
+		setViewDate(nextYear,nextMonth);
+	}
+}
+
+
+//이전년에 대한 날짜
+function preYear(year,month){
+	
+	if(1970 > (parseInt(year)-1)){
+		alert("해당 년이 존재하지 않습니다.");
+	}
+	else{
+		setSelectBox(parseInt(year)-1,month);
+		setViewDate(parseInt(year)-1,month);
+	}	
+
+}
+
+//다음년에 대한 날짜
+function nextYear(year,month){
+	
+	if(parseInt(getNowDate().year)+5 < (parseInt(year)+1)){
+		alert("해당 년이 존재하지 않습니다.");
+	}
+	else{
+		setSelectBox(parseInt(year)+1,month);
+		setViewDate(parseInt(year)+1,month);
+	}	
+}
+
+with (document) {
+	write("<form name='calForm' >");
+	write("<table bgcolor='#ECF3F6' width='95%' align=center  id='popTable' border='0' cellpadding=2 cellspacing=0 >");
+	write("<tr><td colspan=3 height=2 ></td></tr>");
+	write("	<tr >");
+	write("		<td  > ");
+	write("       <table border=0 cellpadding=0 cellspacing=0 >");
+	write("         <tr><td valign='bottom' align='center' ><img src='/images/icon/btn_up.gif' style='cursor:hand;' border=0 onClick='nextYear(document.calForm.selectYear.value,document.calForm.selectMonth.value);' ></td></tr><tr><td height='2'></td></tr>");
+	write("           <tr><td valign='top' align='center'><img src='/images/icon/btn_down.gif' style='cursor:hand;'  border=0 onClick='preYear(document.calForm.selectYear.value,document.calForm.selectMonth.value);'></td></tr></table>");
+	write("		</td>");
+	write("		<td  align='center'>");
+	write("			<select name='selectYear' onChange='setViewDate(this.value,document.calForm.selectMonth.value);' >");
+	for(i=1970;i<= parseInt(getNowDate().year)+5;i++)
+	write("				<option value='"+i+"'>"+i+"년</option>");
+	write("			</select>&nbsp;");
+	write("			<select name='selectMonth'  onChange='setViewDate(document.calForm.selectYear.value,this.value);' >");
+	for (i=0; i<12; i++)
+	write("				<option value='"+(i+1)+"'>"+(i+1)+"월</option>");
+	write("			</select>");
+	write("		</td>");
+	write("		<td  > ");
+	write("       <table border=0 cellpadding=0 cellspacing=0 >");
+	write("         <tr><td valign='bottom' align='center' ><img src='/images/icon/btn_up.gif'  style='cursor:hand;' border=0 onClick='nextDate(document.calForm.selectYear.value,document.calForm.selectMonth.value);'></td></tr><tr><td height='2'></td></tr>");
+	write("           <tr><td valign='top' align='center'><img src='/images/icon/btn_down.gif'  style='cursor:hand;' border=0 onClick='preDate(document.calForm.selectYear.value,document.calForm.selectMonth.value);'></td></tr></table>");
+	write("		</td></tr>");
+	write("   <tr>");
+	write("		<td align='center' colspan=3>");
+	write("		<div style='background-color:#D1D1D1;'>");
+	write("			<table width='100%' border='0' cellpadding='2' cellspacing='1'>");
+	drawCalendar();
+	write("			</table>");
+	write("       </div>");
+	write("		</td>");
+	write("	</tr>");
+	write("	<tr>");
+	write("		<td align='center' colspan=3>");
+	write("      <input type='button' onclick='setElementView("+getNowDate().year+","+getNowDate().month+","+getNowDate().date+",0);'  onfocus='this.blur();' style='height:16px;cursor:hand;border:solid 1px #90CFE6;background-color:#F8F8F8;color:#7099BC;font-size:11px' value='오늘'> ");
+	write("      <input type='button' onclick='setElementView(0,0,0,\"cancel\");' onfocus='this.blur();' style='height:16px;cursor:hand;border:solid 1px #90CFE6;background-color:#F8F8F8;color:#7099BC;font-size:11px' value='취소'> ");
+	//write("      <input type='button' onclick='setElementView(0,0,0,\"delete\");'  onfocus='this.blur();'style='cursor:hand;border:solid 1px #90CFE6;background-color:#F8F8F8;color:#7099BC;font-size:11px'  value='삭제'> ");
+	
+	//write("			<font style='cursor:hand;font:13 굴림' " );
+	//write("           onclick='setElementView("+getNowDate().year+","+getNowDate().month+","+getNowDate().date+",0);' >[오늘]</font>");
+	//write("			<font style='cursor:hand;font:13 굴림' onclick='setElementView(0,0,0,\"cancel\");' >[취소]</font>");
+	//write("			<font style='cursor:hand;font:13 굴림' onclick='setElementView(0,0,0,\"delete\");' >[삭제]</font>");
+	write("		</td>");
+	write("   </tr>");
+	write("</table>");
+	write("</form>");
+}
+</script>
+
+</BODY>
+</HTML>

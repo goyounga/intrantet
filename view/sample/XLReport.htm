@@ -1,0 +1,82 @@
+<html>
+<OBJECT 
+ NAME=obj
+ ID="FileUpX1" 
+ WIDTH=0 HEIGHT=0
+ CLASSID="CLSID:D707F5BB-06BF-4841-AB76-14E6C6CF2F2C"
+ CODEBASE="FileUpXProj.ocx#version=1,0,0,0" >
+</OBJECT>
+
+<script language="javascript">
+function Save(url, file, id)
+{
+   obj.SaveFile(url, file, id);
+   
+}
+
+function saveFile()
+{
+	var fMan = new ActiveXObject("FileMan.FileUpLoad");
+		
+}
+</script>
+
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=euc-kr">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<p align="center"><b><font size="3"><br>
+  EXCEL FILES</font></b></p>
+<hr>
+<table width="593" border="1" align="center">
+  <tr bgcolor="#336666"> 
+    <td width="57"> 
+      <div align="center"><font size="2" color="#FFFFFF">Up</font></div>
+    </td>
+    <td width="264"> 
+      <div align="center"><font size="2" color="#FFFFFF">화일명</font></div>
+    </td>
+    <td width="250"> 
+      <div align="center"><font size="2" color="#FFFFFF">설명</font></div>
+    </td>
+  </tr>
+  <tr> 
+    <td width="57"> 
+      <div align="center"><font size="2"> 
+        <input type="button" name="Button" OnClick="Save('http://192.168.100.159:8089/sample/XLReport.jsp','c:\\sample01.xls','FileName')">
+        </font></div>
+    </td>
+    <td width="264"><font size="2"><a href="./sample01.xls" target="_blank">sample01.xls</a></font></td>
+    <td width="250"><font size="2">XL SAMPLE 01</font></td>
+  </tr>
+  <tr> 
+    <td width="57"> 
+      <div align="center"><font size="2"> 
+        <input type="button" name="Button2" OnClick="Save('http://url을 입력하세요/XLReport.asp','c:\\temp\\sample01.xls','FileName')">
+        </font></div>
+    </td>
+    <td width="264"><font size="2"><a href="./sample02.xls" target="_blank">sample02.xls</a></font></td>
+    <td width="250"><font size="2">XL SAMPLE 02</font></td>
+  </tr>
+  <tr> 
+    <td width="57"> 
+      <div align="center"><font size="2"> 
+        <input type="button" name="Button3" OnClick="Save('http://url을 입력하세요/XLReport.asp','c:\\temp\\sample03.xls','FileName')">
+        </font></div>
+    </td>
+    <td width="264"><font size="2"><a href="./sample03.xls" target="_blank">sample03.xls</a></font></td>
+    <td width="250"><font size="2">XL SAMPLE 03</font></td>
+  </tr>
+  <tr> 
+    <td width="57"> 
+      <div align="center"><font size="2"> 
+        <input type="button" name="Button4" onClick="saveFile()">
+        </font></div>
+    </td>
+  </tr>
+</table>
+<p>&nbsp; </p>
+</body>
+</html>

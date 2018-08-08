@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<!--
+  PROJ : Nexfron APP
+  NAME : sms.xml
+  DESC : sms전송
+  Author : 박준규
+  VER  : 1.0
+  Copyright ⓒ 2011 Nexfron All rights reserved
+  ============================================================================================
+  								변		경		사		항
+  ============================================================================================
+  VERSION		DATE		AUTHOR		DESCRIPTION
+  ============================================================================================
+  1.0		2012.03.15		박준규		주석추가
+  -->
+<query>
+	<queryinfo>
+    	<query-id>UCSMS001S</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type>GRID</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			SELECT cmp_msg_id
+					, msg_gb
+					, wrt_dttm
+					, snd_dttm
+					, snd_phn_id
+					, rcv_phn_id
+					, callback
+					, snd_msg
+					, expire_val
+					, sms_st
+					, rslt_val
+					, rsrvd_wd
+			FROM TELINK_SMS
+     	]]></query-statement>
+     	<query-arguments>
+
+   		</query-arguments>
+   		<query-descript>SMSv?</query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCSMS001I</query-id>
+		<query-exec-type>multi</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            INSERT INTO TELINK_SMS
+            (
+                CMP_MSG_ID   , CMP_USR_ID , ODR_FG       , SMS_GB       , USED_CD
+              , MSG_GB       , WRT_DTTM   , SND_DTTM     , SND_PHN_ID   , RCV_PHN_ID
+              , CALLBACK     , SND_MSG    , CMP_SND_DTTM , CMP_RCV_DTTM , REG_SND_DTTM
+              , REG_RCV_DTTM , EXPIRE_VAL , SMS_ST       , RSLT_VAL     , RSRVD_ID
+              , RSRVD_WD
+            )
+            (SELECT
+                (SELECT CONVERT(VARCHAR(8),GETDATE(),112)+REPLACE(CONVERT(VARCHAR(12),GETDATE(),114),':','')+
+                        (CASE WHEN COUNT(*)<9  THEN '00'+ CAST(COUNT(*)+1 AS VARCHAR(1))
+                              WHEN COUNT(*)<99 THEN '0' + CAST(COUNT(*)+1 AS VARCHAR(2))
+                              ELSE CAST(COUNT(*)+1 AS VARCHAR(2)) END)
+                 FROM   TELINK_SMS
+                 WHERE  CMP_MSG_ID LIKE (CONVERT(VARCHAR(8),GETDATE(),112)+REPLACE(CONVERT(VARCHAR(12),GETDATE(),114),':','')+'%'))-- 순번20자리, varchar(20)
+              , '00000' , '1' , '1' , '00' --사용안함 (4개)
+
+              , 'A'   -- A:sms,B:url,C:해외sms
+              , REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '') --입력시간
+              , REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '') --전송할시간
+              , ?     -- 자기번호 - 개인휴대폰 or 넥스프론 대표번호 or null
+              , ?     -- 수신번호
+
+              , ?     -- 콜백
+              , ?     -- 메시지 80Byte, varchar(200)
+              , NULL  -- NEXFRON  -> SKTL     시간
+              , NULL  -- SKTELINK -> NEXFRON  시간
+              , NULL  -- SKTELINK -> 통신사   시간
+
+              , NULL  -- 통신사   -> SKTELINK 시간
+              , 0     -- 유효시간
+              , 0     -- 메시지상태 0:전송할건,1:전송성공, 기타값:에러
+              , 99    -- 전송결과  99:전송대기,-100:성공 , 기타값:에러
+              , NULL  -- 분리과금필드
+
+              , NULL  -- 최종착신이통사 SKT:S,KTF:K,LGT:L,NULL:N
+            )
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="snd_phn_id"       	type="STRING" />
+			<query-argument id="rcv_phn_id"       	type="STRING" />
+			<query-argument id="snd_phn_id"       	type="STRING" />
+			<query-argument id="snd_msg"       		type="STRING" />
+		</query-arguments>
+		<query-descript> SMS등록 ( 공통,일반형 ) </query-descript>
+	</queryinfo>
+	<queryinfo>
+		<query-id>UCSMS002I</query-id>
+		<query-exec-type>INSERT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+            INSERT INTO TELINK_SMS
+            (
+                CMP_MSG_ID   , CMP_USR_ID , ODR_FG       , SMS_GB       , USED_CD
+              , MSG_GB       , WRT_DTTM   , SND_DTTM     , SND_PHN_ID   , RCV_PHN_ID
+              , CALLBACK     , SND_MSG    , CMP_SND_DTTM , CMP_RCV_DTTM , REG_SND_DTTM
+              , REG_RCV_DTTM , EXPIRE_VAL , SMS_ST       , RSLT_VAL     , RSRVD_ID
+              , RSRVD_WD
+            )(
+                SELECT (SELECT CONVERT(VARCHAR(8),GETDATE(),112)+REPLACE(CONVERT(VARCHAR(12),GETDATE(),114),':','')+
+                               (CASE WHEN COUNT(*)<9  THEN '00'+ CAST(COUNT(*)+1 AS VARCHAR(1))
+                                     WHEN COUNT(*)<99 THEN '0' + CAST(COUNT(*)+1 AS VARCHAR(2))
+                                     ELSE CAST(COUNT(*)+1 AS VARCHAR(2)) END)
+                        FROM   TELINK_SMS
+                        WHERE  CMP_MSG_ID LIKE (CONVERT(VARCHAR(8),GETDATE(),112)+REPLACE(CONVERT(VARCHAR(12),GETDATE(),114),':','')+'%'))-- 순번20자리, varchar(20)
+                     , '00000' , '1' , '1' , '00' -- 사용안함 (4개)
+
+                     , 'A'   -- A:sms,B:url,C:해외sms
+                     , REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '') --입력시간
+                     , REPLACE(REPLACE(REPLACE(CONVERT(CHAR , GETDATE(), 120), '-', ''), ':', ''), ' ', '') --전송할시간
+                     , '028906201'     -- 자기번호:넥스프론 대표번호
+                     , (CASE ?
+                        WHEN 'REQUEST'  THEN
+                             (SELECT HDP_NO
+                              FROM   UC_COM_USER
+                              WHERE  USE_F   = 'Y'
+                              AND    USER_ID = (CASE ? WHEN 1 THEN SIGN_ID1
+                                                       WHEN 2 THEN SIGN_ID2
+                                                       WHEN 3 THEN SIGN_ID3 END))
+                        WHEN 'APPROVAL' THEN
+                             (SELECT HDP_NO FROM UC_COM_USER WHERE USE_F = 'Y' AND USER_ID = A.HLDY_ID)
+                        WHEN 'REJECT'   THEN
+                             (SELECT HDP_NO FROM UC_COM_USER WHERE USE_F = 'Y' AND USER_ID = A.HLDY_ID)
+                        END)-- 수신번호
+                     , '028906201'     -- 콜백:발신번호 넥스프론 대표번호
+                     , (CASE ?
+                        WHEN 'REQUEST' THEN
+                           ( '[휴가결재요청]' + CHAR(10)
+                           + '이름:' + (SELECT USER_NM FROM UC_COM_USER WHERE USE_F='Y' AND USER_ID=A.HLDY_ID) + CHAR(10)
+                           + (SELECT HLDY_KND_NM FROM UC_HLDY_KND WHERE HLDY_KND_SEQ=A.HLDY_KND_SEQ) +'('+CAST(HLDY_DY AS VARCHAR)+'일)' + CHAR(10)
+                           + REPLACE(DBO.UF_SYSDATE(A.ST_DT ,'YYYY-MM-DD',''),'-','.') + '~'
+                           + REPLACE(DBO.UF_SYSDATE(A.END_DT,'YYYY-MM-DD',''),'-','.') )
+                        WHEN 'APPROVAL' THEN
+                           ( '휴가가 승인 되었습니다.' + CHAR(10)
+                           + (SELECT USER_NM FROM UC_COM_USER WHERE USE_F='Y' AND USER_ID=A.HLDY_ID) + '/'
+                           + (SELECT HLDY_KND_NM FROM UC_HLDY_KND WHERE HLDY_KND_SEQ=A.HLDY_KND_SEQ) + '('+CAST(HLDY_DY AS VARCHAR)+'일)' + CHAR(10)
+                           + REPLACE(DBO.UF_SYSDATE(A.ST_DT ,'YYYY-MM-DD',''),'-','.') + '~'
+                           + REPLACE(DBO.UF_SYSDATE(A.END_DT,'YYYY-MM-DD',''),'-','.') )
+                        WHEN 'REJECT'   THEN
+                           ( '휴가가 반려 되었습니다.' + CHAR(10)
+                           + '인트라넷을 확인하세요.'  + CHAR(10)
+                           + (SELECT USER_NM FROM UC_COM_USER WHERE USE_F='Y' AND USER_ID=A.HLDY_ID) + '/'
+                           + (SELECT HLDY_KND_NM FROM UC_HLDY_KND WHERE HLDY_KND_SEQ=A.HLDY_KND_SEQ) + '('+CAST(HLDY_DY AS VARCHAR)+'일)' + CHAR(10) )
+                        END) -- 메시지 80Byte, varchar(200)
+                     , NULL  -- NEXFRON  -> SKTL     시간
+                     , NULL  -- SKTELINK -> NEXFRON  시간
+                     , NULL  -- SKTELINK -> 통신사   시간
+
+                     , NULL  -- 통신사   -> SKTELINK 시간
+                     , 0     -- 유효시간
+                     , 0     -- 메시지상태 0:전송할건,1:전송성공, 기타값:에러
+                     , 99    -- 전송결과  99:전송대기,-100:성공 , 기타값:에러
+                     , NULL  -- 분리과금필드
+
+                     , NULL  -- 최종착신이통사 SKT:S,KTF:K,LGT:L,NULL:N
+                FROM   UC_HLDY A
+                INNER  JOIN UC_SIGN_HST B ON (SIGN_TP_CD='01' AND A.HLDY_SEQ=B.SIGN_HST_ID)
+                WHERE  A.HLDY_SEQ=(CASE ? WHEN 'INSERT' THEN IDENT_CURRENT('UC_HLDY') ELSE ? END)
+            )
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="send_mode"				type="STRING"	/>
+			<query-argument id="now_sign_stg_cd"		type="INTEGER"	/>
+			<query-argument id="send_mode"				type="STRING"	/>
+			<query-argument id="saveflag"				type="STRING"	/>
+			<query-argument id="hldy_seq"				type="INTEGER"	/>
+		</query-arguments>
+		<query-descript> SMS등록 - 휴가신청 결재SMS 발송 (hldHolidayList.js) </query-descript>
+	</queryinfo>
+</query>

@@ -1,0 +1,66 @@
+/* CSS Document */
+
+/* ==================== General Define ========================== */
+
+body {
+	font-family:"¸¼Àº °íµñ","Tahoma"; 
+	font-size: 12px; color: #666; 
+	line-height:20px; 
+	}
+body {
+	scrollbar-face-color: #FFF; 
+	scrollbar-shadow-color: #B6B6B6; 
+	scrollbar-highlight-color: #B6B6B6; 
+	scrollbar-3dlight-color: #FFF;
+	scrollbar-darkshadow-color: #FFF; 
+	scrollbar-track-color: #EFEFEF; 
+	scrollbar-arrow-color: #B6B6B6; 
+}
+
+td {font-size: 12px; line-height:20px; text-decoration: none; word-break:break-all;}
+a:link {text-decoration: none ; color: #666;}
+a:visited {text-decoration: none ; color: #888;}
+a:active {text-decoration: none ; color: #3C9EDF;}
+a:hover {text-decoration: none ; color: #3C9EDF;}
+
+
+/* Contents */
+.line_map {
+background:url(../images/line.gif) repeat-x ;
+color:#AAAAAA; 
+font-family:"±¼¸²","Tahoma"; 
+font-Size:11px;
+line-height:15px; 
+height:50px;  
+text-align:right; 
+text-decoration:none;  
+padding: 30px 0px 0px 0px; 
+}
+.line_map  a:link {color:#AAAAAA; text-decoration: none;}
+.line_map  a:visited  {color:#AAAAAA; text-decoration: none;}
+.line_map  a:active  {color:#AAAAAA; text-decoration: none; }
+.line_map  a:hover   {color:#AAAAAA; text-decoration: none;}
+
+.currnet {color:#FA6D4D; font-family:"±¼¸²","Tahoma"; font-Size:11px;}
+
+
+/* Table */
+.table_line {background-color:#cfcfcf;}
+.table_header {background-color:#f7f7f7; color:#333333; font-size: 12px;line-height:16px; font-weight: bold; padding: 3px 3px 7px 3px;}
+.table_header2 {background-color:#ffffff; color:#333333; font-size: 12px;line-height:16px; text-align:center; font-weight: bold; padding: 3px 3px 3px 3px;}
+.table_data {background-color:#f7f7f7; color:#777777; font-size: 11px;line-height:16px; padding:5px 3px 10px 3px;}
+.list_table_header {background:url(../images/line_table_header.gif) repeat-x ; text-align:center;
+ color:#333333; font-size: 12px; height:30px; font-weight: bold; padding:3px 3px 3px 3px;}
+ .list_table_header2 {background:url(../images/line_table_header.gif) repeat-x ; 
+ color:#333333; font-size: 12px; height:30px; font-weight: bold; padding:3px 3px 3px 10px;}
+ .list_table_data { color:#777777; font-size: 12px;line-height:16px; height:28px; padding:5px 3px 7px 3px;}
+
+/* Font */
+.font_small {color:#888888; font-size: 11px;}
+.font_red {font-family:"¸¼Àº °íµñ","Tahoma"; color:#CB5E18; font-size: 12px; font-weight: bold;}
+.font_red_title {font-family:"¸¼Àº °íµñ","Tahoma"; color:#CB5E18; font-size: 15px; font-weight: bold;}
+.font_blue {font-family:"¸¼Àº °íµñ","Tahoma"; color:#3C9EDF; font-size: 12px; font-weight: bold;}
+.font_navy {font-family:"¸¼Àº °íµñ","Tahoma"; color:#234B86; font-size: 12px; font-weight: bold;}
+
+
+ 

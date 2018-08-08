@@ -1,0 +1,1084 @@
+<?xml version="1.0" encoding="EUC-KR"?>
+<query>	
+	
+	<!-- 경비 공통 쿼리 시작 -->
+	
+	<queryinfo>
+		<query-id>UCEXP000S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT 	prj_seq AS code
+					, prj_nm AS codenm
+			FROM UC_PRJ
+			ORDER BY rl_st_dt DESC
+		]]></query-statement>
+		<query-arguments>
+		</query-arguments>
+		<query-descript>프로젝트 종류 조회</query-descript>
+	</queryinfo>
+	
+	<!-- 경비 공통 쿼리 끝 -->
+	
+	<!-- 경비 신청/조회 시작 -->
+	
+	<queryinfo>
+		<query-id>UCEXP010S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT
+			        0 AS chk
+			        , A.exps_seq
+			        , A.exps_sum
+			        , A.pmt_dt
+			        , A.pmt_amt
+			        , A.upmt_amt
+			        , A.ptt_stts_cd
+			        , A.prcs_stts_cd
+			        , DBO.FN_CODEBOOK('EXP005', A.prcs_stts_cd) AS prcs_stts_nm
+			        , A.prj_seq
+			        , A.rg_id
+			        , A.rg_dt
+			        , B.sign_prgs_stts_cd
+			     	, DBO.FN_CODEBOOK('SYS019', B.sign_prgs_stts_cd) AS sign_prgs_stts_nm
+			     	, B.sign_stg_cd
+			     	, DBO.FN_CODEBOOK('SYS018', B.sign_stg_cd ) AS sign_stg_nm
+			     	, B.rtn_f_cd
+					, CASE 
+						WHEN B.sign_f_cd1 = 'N' THEN B.sign_id1 
+						ELSE 
+							CASE 
+								WHEN B.sign_f_cd2 = 'N' THEN B.sign_id2 
+								ELSE 
+									CASE 
+										WHEN B.sign_f_cd3 = 'N' THEN B.sign_id3 
+										ELSE '결재완료' 
+									END 
+							END 
+				   	  END AS sign_id
+					, CASE 
+						WHEN B.sign_f_cd1 = 'N' THEN DBO.FN_USER(B.sign_id1,'') 
+						ELSE 
+							CASE 
+								WHEN B.sign_f_cd2 = 'N' THEN DBO.FN_USER(B.sign_id2,'') 
+								ELSE 
+									CASE 
+										WHEN B.sign_f_cd3 = 'N' THEN DBO.FN_USER(B.sign_id3,'') 
+										ELSE '결재완료' 
+									END 
+							END 
+				   	  END AS sign_nm
+					, CASE 
+						WHEN B.sign_f_cd1 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '1' ) 
+						ELSE 
+							CASE 
+								WHEN B.sign_f_cd2 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '2' ) 
+								ELSE 
+									CASE 
+										WHEN B.sign_f_cd3 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '3' ) 
+										ELSE '결재완료' 
+									END 
+							END 
+				   	  END AS now_sign_stg 
+			FROM UC_EXPS A, UC_SIGN_HST B
+			WHERE A.exps_seq = B.sign_hst_id
+			AND B.sign_tp_cd = '03'
+			AND A.rg_dt BETWEEN ? AND ?
+				  @q_userid
+				  @q_ptt_stts_cd
+				  @q_sign_prgs_stts_cd
+			ORDER BY rg_dt DESC
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="q_date_from"			type="STRING"	option="M"/>
+            <query-argument id="q_date_to"				type="STRING"	option="M"/>
+            <query-argument id="q_userid"				type="STRING"	condition=" AND A.rg_id = ? "/>
+            <query-argument id="q_ptt_stts_cd"			type="STRING"	condition=" AND A.ptt_stts_cd = ? "/>
+            <query-argument id="q_sign_prgs_stts_cd"	type="STRING"	condition=" AND B.sign_prgs_stts_cd = ? "/>
+		</query-arguments>
+		<query-descript>경비 신청 내역 조회</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP010U</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			UPDATE UC_EXPS 
+						SET ptt_stts_cd = ?
+							, prj_seq = ?
+							, mdf_dt = CONVERT(varchar(8),GETDATE(), 112)
+							, mdf_tm = REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+							, mdf_id = ?
+							@cmplt_dt
+			WHERE  	exps_seq = ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="ptt_stts_cd"	type="STRING"/>
+     		<query-argument id="prj_seq"		type="INTEGER"/>
+     		<query-argument id="user_id"		type="STRING"/>
+     		<query-argument id="cmplt_dt"		type="STRING" option="R" />
+     		<query-argument id="exps_seq"		type="INTEGER"/>
+   		</query-arguments>
+   		<query-descript>경비 신청 UPDATE</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP010I</query-id>
+    	<query-exec-type>INSERT</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			INSERT INTO 
+			UC_EXPS(	ptt_stts_cd
+						, prj_seq
+						, rg_id
+						, rg_dt
+						, rg_tm ) 
+			VALUES( ?, ?, ?
+					, CONVERT(varchar(8),GETDATE(), 112)
+			        , REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+					)
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="ptt_stts_cd"	type="STRING"/>
+     		<query-argument id="prj_seq"		type="INTEGER"/>
+     		<query-argument id="user_id"		type="STRING"/>
+   		</query-arguments>
+   		<query-descript>경비 신청</query-descript>
+	</queryinfo>
+	
+<!--  	<queryinfo>
+    	<query-id>UCEXP013I</query-id>
+    	<query-exec-type>INSERT</query-exec-type>
+    	<query-view-type>NONE</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			INSERT INTO UC_SIGN_HST
+				( 	sign_tp_cd
+					, sign_hst_id
+					, sign_id1
+					, sign_f_cd1
+					, sign_dt1
+					, sign_id2
+					, sign_f_cd2
+					, sign_dt2
+					, sign_id3
+					, sign_f_cd3
+					, sign_dt3
+					, sign_stg_cd
+					, rtn_f_cd
+					, sign_prgs_stts_cd
+					, rg_id
+					, rg_dt
+					, rg_tm	)
+			SELECT TOP 1 sign_tp_cd
+					, @@IDENTITY
+					, sign_id1
+					, 'N'
+					, ''
+					, sign_id2
+					, CASE sign_stg_cd WHEN 2 THEN 'N' ELSE NULL END
+					, ''
+					, sign_id3
+					, CASE sign_stg_cd WHEN 3 THEN 'N' ELSE NULL END
+					, ''
+					, sign_stg_cd
+					, 'N'
+					, '01'
+					, ?
+					, CONVERT(varchar(8),GETDATE(), 112)
+					, REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+			FROM UC_SIGN_INFO
+			WHERE SIGN_TP_CD = '03'
+			AND   USE_YN = 'Y' 
+     	]]></query-statement>
+     	<query-arguments>
+			<query-argument id="user_id"	type="STRING"/>
+			<query-argument id="user_id"	type="STRING"/>
+   		</query-arguments>
+   		<query-descript>비용 결재자 등록</query-descript>
+	</queryinfo>
+	-->
+	<queryinfo>
+		<query-id>UCEXP010D</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-view-type></query-view-type>
+		<query-statement><![CDATA[
+			DELETE FROM UC_EXPS
+			WHERE exps_seq = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="exps_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript>경비 신청 삭제</query-descript>
+	</queryinfo>
+
+	<queryinfo>
+		<query-id>UCEXP011S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT 
+					0 AS chk
+					, expt_hst_seq
+					, exps_seq
+					, expt_amt
+					, expt_c_cd
+					, expt_act_cd
+					, rip_doc_f
+					, expt_rmk
+					, expt_dt
+					, rg_dt
+					, rg_tm
+					, rg_id
+			FROM UC_EXPT_HST
+			WHERE exps_seq = ?
+			ORDER BY expt_dt ASC
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="exps_seq"	type="INTEGER"	option="M"/>
+		</query-arguments>
+		<query-descript>지출 내역 조회</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP011U</query-id>
+    	<query-exec-type>UPDATE</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			UPDATE UC_EXPS
+					SET exps_sum = ?
+			WHERE  	exps_seq = ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="exps_sum"		type="INTEGER"/>
+     		<query-argument id="exps_seq"		type="INTEGER"/>
+   		</query-arguments>
+   		<query-descript>경비 지출 합산 금액  UPDATE</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP013U</query-id>
+    	<query-exec-type>UPDATE</query-exec-type>
+    	<query-view-type>NONE</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			UPDATE A SET
+					  A.sign_id1			= B.sign_id1
+					, A.sign_dt1			= ''
+					, A.sign_f_cd1			= 'N'
+					, A.sign_id2			= B.sign_id2
+					, A.sign_dt2			= ''
+					, A.sign_f_cd2			= CASE B.sign_stg_cd WHEN 2 THEN 'N' ELSE NULL END
+					, A.sign_id3			= B.sign_id3
+					, A.sign_dt3			= ''
+					, A.sign_f_cd3			= CASE B.sign_stg_cd WHEN 3 THEN 'N' ELSE NULL END
+					, A.sign_stg_cd			= B.sign_stg_cd
+					, A.rtn_f_cd			= 'N'
+					, A.sign_prgs_stts_cd	= '01'
+					, A.sign_rsn			= ''
+			FROM UC_SIGN_HST A RIGHT OUTER JOIN UC_SIGN_INFO B
+			ON A.sign_tp_cd = B.sign_tp_cd
+			WHERE B.sign_tp_cd = '03'
+			AND   B.ORG_CD in (SELECT isnull(isnull(view_org_3,view_org_2),view_org_1) FROM uc_com_user WHERE user_id = ? )
+			AND   A.sign_hst_id = ?
+     	]]></query-statement>
+     	<query-arguments>
+			<query-argument id="user_id"		type="STRING"/>
+			<query-argument id="exps_seq"	type="INTEGER"/>
+   		</query-arguments>
+   		<query-descript>비용 결재자 UPDATE</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+		<query-id>UCEXP011D</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-statement><![CDATA[
+			DELETE FROM UC_EXPT_HST
+			WHERE exps_seq = ?
+				  @expt_hst_seq
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="exps_seq"		type="INTEGER"/>
+			<query-argument id="expt_hst_seq"	type="INTEGER"	condition=" AND expt_hst_seq = ? "/>
+		</query-arguments>
+		<query-descript>경비 신청 삭제</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+		<query-id>UCEXP013D</query-id>
+		<query-exec-type>MULTI</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			DELETE FROM UC_SIGN_HST 
+			WHERE sign_tp_cd = '03'
+			AND sign_hst_id = ?
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="exps_seq"	type="INTEGER"/>
+		</query-arguments>
+		<query-descript>비용 결재자 삭제</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP011I</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type>NONE</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			INSERT INTO 
+			UC_EXPT_HST(	exps_seq
+							, expt_amt
+							, expt_c_cd
+							, expt_act_cd
+							, rip_doc_f
+							, expt_rmk
+							, expt_dt
+							, rg_id
+							, rg_dt
+							, rg_tm ) 
+			VALUES( ?, ?, ?, ?, ?, ?, ?, ?
+					, CONVERT(varchar(8),GETDATE(), 112)
+			        , REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+					)
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="exps_seq"		type="INTEGER"/>
+     		<query-argument id="expt_amt"		type="INTEGER"/>
+     		<query-argument id="expt_c_cd"		type="STRING"/>
+     		<query-argument id="expt_act_cd"	type="STRING"/>
+     		<query-argument id="rip_doc_f"		type="STRING"/>
+     		<query-argument id="expt_rmk"		type="STRING"/>
+     		<query-argument id="expt_dt"		type="STRING"/>
+     		<query-argument id="userid"			type="STRING"/>
+   		</query-arguments>
+   		<query-descript>지출 내역 등록</query-descript>
+	</queryinfo>
+
+	<!-- 경비 신청/조회 끝 -->
+	
+	
+	<!-- 경비 관리 시작 -->
+	
+	<queryinfo>
+		<query-id>UCEXP020S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT 
+					? AS chk
+					, ? AS alnc
+					, ? AS rtn
+					, exps_seq
+					, exps_sum
+					, pmt_dt
+					, pmt_amt
+					, upmt_amt
+					, prj_seq
+					, (SELECT prj_nm FROM UC_PRJ WHERE prj_seq = C.prj_seq) AS prj_nm
+					, ptt_stts_cd
+					, DBO.FN_CODEBOOK('EXP004', ptt_stts_cd) AS ptt_stts_nm
+					, rg_id
+					, DBO.FN_USER(rg_id, '') AS rg_nm
+					, rg_dt
+					, sign_prgs_stts_cd
+					, DBO.FN_CODEBOOK('SYS019', sign_prgs_stts_cd) AS sign_prgs_stts_nm
+					, sign_stg_cd
+					, DBO.FN_CODEBOOK('SYS018', sign_stg_cd ) AS sign_stg_nm
+					, rtn_f_cd
+					, sign_id
+					, sign_nm
+					, now_sign_stg
+			FROM ( 
+					SELECT
+							A.exps_seq
+							, A.exps_sum
+							, A.pmt_dt
+							, A.pmt_amt
+							, A.upmt_amt
+							, A.prj_seq
+							, A.ptt_stts_cd
+							, A.rg_id
+							, A.rg_dt
+							, B.sign_prgs_stts_cd
+			     			, B.sign_stg_cd
+			     			, B.rtn_f_cd
+							, CASE 
+								WHEN B.sign_f_cd1 = 'N' THEN B.sign_id1 
+								ELSE 
+									CASE 
+										WHEN B.sign_f_cd2 = 'N' THEN B.sign_id2 
+										ELSE 
+											CASE 
+												WHEN B.sign_f_cd3 = 'N' THEN B.sign_id3 
+												ELSE '결재완료' 
+											END 
+									END 
+				   			  END AS sign_id
+							, CASE 
+								WHEN B.sign_f_cd1 = 'N' THEN DBO.FN_USER(B.sign_id1,'') 
+								ELSE 
+									CASE 
+										WHEN B.sign_f_cd2 = 'N' THEN DBO.FN_USER(B.sign_id2,'') 
+										ELSE 
+											CASE 
+												WHEN B.sign_f_cd3 = 'N' THEN DBO.FN_USER(B.sign_id3,'') 
+												ELSE '결재완료' 
+											END 
+									END 
+				   			  END AS sign_nm
+							, CASE 
+								WHEN B.sign_f_cd1 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '1' ) 
+								ELSE 
+									CASE 
+										WHEN B.sign_f_cd2 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '2' ) 
+										ELSE 
+											CASE 
+												WHEN B.sign_f_cd3 = 'N' THEN DBO.FN_CODEBOOK('SYS018', '3' ) 
+												ELSE '결재완료' 
+											END 
+									END 
+				   			  END AS now_sign_stg 
+					FROM UC_EXPS A, UC_SIGN_HST B
+					WHERE A.exps_seq = B.sign_hst_id
+					AND B.sign_tp_cd = '03'
+					AND A.ptt_stts_cd = '02'
+					AND A.rg_dt BETWEEN ? AND ?
+					 	@q_user_id
+				  		@q_sign_prgs_stts_cd
+			) C
+			WHERE 1 = 1
+				@q_sign_id
+			ORDER BY C.rg_dt DESC 
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="q_chk"					type="INTEGER"/>
+			<query-argument id="q_alnc_rtn"				type="INTEGER"/>
+			<query-argument id="q_alnc_rtn"				type="INTEGER"/>
+			<query-argument id="q_date_from"			type="STRING"	option="M"/>
+            <query-argument id="q_date_to"				type="STRING"	option="M"/>
+            <query-argument id="q_user_id"				type="STRING"	condition=" AND A.rg_id = ? "/>
+            <query-argument id="q_sign_prgs_stts_cd"	type="STRING"	condition=" AND B.sign_prgs_stts_cd = ? "/>
+            <query-argument id="q_sign_id"				type="STRING"	condition=" AND C.sign_id = ? "/>
+		</query-arguments>
+		<query-descript>경비 신청 내역 조회</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+		<query-id>UCEXP021S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>GRID</query-view-type>
+		<query-statement><![CDATA[
+			SELECT 
+					0 AS chk
+					, expt_hst_seq
+					, exps_seq
+					, expt_amt
+					, expt_c_cd
+					, expt_act_cd
+					, rip_doc_f
+					, expt_rmk
+					, expt_dt
+					, rg_dt
+					, rg_tm
+					, rg_id
+			FROM UC_EXPT_HST
+			WHERE exps_seq = ?
+			ORDER BY expt_dt ASC
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="exps_seq"	type="INTEGER"	option="M"/>
+		</query-arguments>
+		<query-descript>지출 내역 조회</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP020U</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			UPDATE UC_EXPS
+					SET pmt_dt 		= CASE ? WHEN 'R' THEN '' ELSE ? END
+						, pmt_amt 	= CASE ? WHEN 'R' THEN 0  ELSE ? END
+						, upmt_amt 	= CASE ? WHEN 'R' THEN 0  ELSE ? END
+			WHERE  	exps_seq = ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="alnc_rtn"		type="STRING"/>
+     		<query-argument id="pmt_dt"			type="STRING"/>
+     		<query-argument id="alnc_rtn"		type="STRING"/>
+     		<query-argument id="pmt_amt"		type="INTEGER"/>
+     		<query-argument id="alnc_rtn"		type="STRING"/>
+     		<query-argument id="upmt_amt"		type="INTEGER"/>
+     		<query-argument id="exps_seq"		type="INTEGER"/>
+   		</query-arguments>
+   		<query-descript>경비 지급 UPDATE</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP021U</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type>NONE</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			UPDATE UC_SIGN_HST
+				SET	  sign_dt1		= 	CASE WHEN sign_prgs_stts_cd = '01' THEN 
+												CASE ? WHEN 'A' THEN CONVERT(varchar(8),GETDATE(), 112) ELSE '' END
+											 ELSE sign_dt1
+										END
+					, sign_dt2		=	CASE WHEN sign_prgs_stts_cd = '02' THEN 
+												CASE ? WHEN 'A' THEN CONVERT(varchar(8),GETDATE(), 112) ELSE '' END
+											 ELSE sign_dt2
+										END
+					, sign_dt3		=	CASE WHEN sign_prgs_stts_cd = '03' THEN 
+												CASE ? WHEN 'A' THEN CONVERT(varchar(8),GETDATE(), 112) ELSE '' END
+											 ELSE sign_dt3
+										END
+					, sign_f_cd1	=	CASE WHEN sign_prgs_stts_cd = '01' THEN
+												CASE ? WHEN 'A' THEN 'Y' ELSE 'N' END
+											 ELSE sign_f_cd1
+										END
+					, sign_f_cd2	=	CASE WHEN sign_prgs_stts_cd = '02' THEN 
+												CASE ? WHEN 'A' THEN 'Y' ELSE 'N' END
+											 ELSE sign_f_cd2
+										END
+					, sign_f_cd3	=	CASE WHEN sign_prgs_stts_cd = '03' THEN
+												CASE ? WHEN 'A' THEN 'Y' ELSE 'N' END
+											 ELSE sign_f_cd3
+										END
+					, rtn_f_cd		=	CASE ? WHEN 'R' THEN 'Y' ELSE 'N' END
+					, sign_prgs_stts_cd	=	CASE ?
+												WHEN 'A' THEN 	-- 승인
+													CASE sign_prgs_stts_cd
+														WHEN '01' THEN
+															CASE WHEN CAST(sign_prgs_stts_cd AS int) < CAST(sign_stg_cd AS int) THEN '02' ELSE '04' END
+														WHEN '02' THEN
+															CASE WHEN CAST(sign_prgs_stts_cd AS int) < CAST(sign_stg_cd AS int) THEN '03' ELSE '04' END
+														WHEN '03' THEN '04'
+														ELSE sign_prgs_stts_cd
+													END
+												WHEN 'R' THEN 
+													CASE sign_prgs_stts_cd
+														WHEN '02' THEN '01'
+														WHEN '03' THEN '02'
+														WHEN '04' THEN --최종결재 단계
+															CASE sign_stg_cd 
+																WHEN 1 THEN '01' 
+																WHEN 2 THEN '02'
+																WHEN 3 THEN '03'
+															END
+														ELSE sign_prgs_stts_cd
+													END
+											END
+					, sign_rsn		= ?
+			WHERE sign_tp_cd = '03'
+			AND   sign_hst_id = ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="alnc_rtn"			type="STRING"/>
+     		<query-argument id="sign_rsn"			type="STRING"/>
+     		<query-argument id="exps_seq"			type="INTEGER"/>
+   		</query-arguments>
+   		<query-descript>경비 결재 UPDATE </query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP023U</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			UPDATE UC_EXPS
+					SET pmt_dt 		= ?
+						, pmt_amt 	= ?
+						, upmt_amt 	= ?
+			WHERE  	exps_seq = ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="pmt_dt"			type="STRING"/>
+     		<query-argument id="pmt_amt"		type="INTEGER"/>
+     		<query-argument id="upmt_amt"		type="INTEGER"/>
+     		<query-argument id="exps_seq"		type="INTEGER"/>
+   		</query-arguments>
+   		<query-descript>경비 지급정보 UPDATE</query-descript>
+	</queryinfo>
+	
+	<!-- 경비 관리 끝 -->
+		
+	<queryinfo>
+    	<query-id>UCEXP024S</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+		SELECT
+			A.expt_dt
+			, A.expt_amt
+			, A.expt_c_cd
+			, DBO.FN_CODEBOOK('EXP002', A.expt_c_cd) AS expt_c_nm
+			, A.expt_act_cd
+			, DBO.FN_CODEBOOK('EXP003', A.expt_act_cd) AS expt_act_nm
+			, A.rip_doc_f
+			, A.expt_rmk
+			, A.rg_id
+			, DBO.FN_USER(A.rg_id, '') AS rg_nm
+			, B.prj_seq
+			, (SELECT prj_nm FROM UC_PRJ WHERE prj_seq = B.prj_seq) AS prj_nm
+			, C.pmt_dt 
+			, C.exps_sum 
+			, C.pmt_amt 
+			, C.upmt_amt 
+		FROM UC_EXPT_HST A, UC_EXPS B
+			, (SELECT
+				rg_id
+				, MAX(pmt_dt) as pmt_dt
+				, SUM(exps_sum) as exps_sum
+				, SUM(pmt_amt) as pmt_amt
+				, SUM(upmt_amt) as upmt_amt
+			FROM uc_exps
+			WHERE 1=1 --prcs_stts_cd = '03'
+			AND cmplt_dt BETWEEN ? + '01' AND ? + '31'
+			GROUP BY rg_id) C
+		WHERE A.exps_seq = B.exps_seq
+		AND A.rg_id = C.rg_id
+		--AND B.prcs_stts_cd = '03'
+		AND B.cmplt_dt BETWEEN ? + '01' AND ? + '31'
+		ORDER BY rg_nm
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="q_date_from"		type="STRING" option="M"/>
+     		<query-argument id="q_date_to"			type="STRING" option="M"/>
+     		<query-argument id="q_date_from"		type="STRING" option="M"/>
+     		<query-argument id="q_date_to"			type="STRING" option="M"/>
+   		</query-arguments>
+   		<query-descript>경비 Excel 다운 쿼리</query-descript>
+	</queryinfo>
+	
+	<!-- 주말/휴일 근무 신청 시작-->
+	
+	<queryinfo>
+    	<query-id>UCEXP025S</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type>GRID</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+	    SELECT	  '0' AS chk, a.id, a.seq_no
+	    		, a.work_dt
+				, a.start_tm
+				, a.end_tm
+				, a.rg_id
+				, a.rg_dt
+				, a.prj_seq
+				, a.content
+				, a.dayw
+				, a.hldy_nm
+				, b.prj_nm
+				, dbo.fn_user(a.rg_id,'') AS usernm
+				, dbo.uf_sec_to_time(CAST(a.work_tm_sec AS INT)) AS work_tm
+				, a.work_tm_sec
+				, (case when a.hldy_nm is not null then a.hldy_nm
+						else (case a.dayw when '1' then '일요일'
+										  when '2' then '월요일'
+										  when '3' then '화요일'
+										  when '4' then '수요일'
+										  when '5' then '목요일'
+										  when '6' then '금요일'
+										  when '7' then '토요일'   end ) end ) AS week
+		FROM	(
+				SELECT	  x.id, x.seq_no, x.work_dt, x.start_tm, x.end_tm
+						, x.rg_id, x.rg_dt, x.prj_seq, x.content, x.dayw, x.hldy_nm
+						, dbo.uf_timediff_exp(x.work_dt+x.start_tm+'00', x.work_dt+x.end_tm+'00', '') AS work_tm_sec
+				FROM	(
+						SELECT	  rpt.id, rpt.seq_no, rpt.work_dt, rpt.start_tm, rpt.end_tm
+								, rpt.rg_id, rpt.rg_dt, rpt.prj_seq, rpt.content
+								, cal.dayw, cal.hldy_nm
+						FROM	 uc_wk_rpt mst, uc_wk_rpt_dtl rpt, uc_com_cld cal
+						WHERE	mst.id = rpt.id
+						AND		rpt.work_dt = cal.bse_dt
+						AND		mst.statcd = '04'
+						AND		rpt.holi_gb = 'W'
+						AND		rpt.work_dt >= '20101001'
+						AND		(cal.dayw IN ('1', '7') OR cal.hldy_f = 'Y')
+						AND		rpt.rg_id = ?
+						@q_date_from						
+						) x
+				WHERE	NOT EXISTS 
+						(
+						SELECT	'Y' 
+						FROM	(
+								SELECT  sgn.appl_user, sgn.work_dt
+                                FROM    uc_exps_hldy_hst sgn
+								WHERE	sgn.work_dt >= ' 20100101'
+								AND		sgn.appl_user = ?
+								) y
+						WHERE	x.rg_id = y.appl_user
+						AND		x.work_dt = y.work_dt
+						)
+				) a, uc_prj b 
+		WHERE 	a.prj_seq = b.prj_seq
+		AND		a.work_tm_sec > 0
+		ORDER BY usernm, a.work_dt
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="userid"				type="STRING"/>
+     		<query-argument id="q_date_from"	    type="QUERY" 	condition=" AND rpt.work_dt BETWEEN ? AND ?"/>
+     	  	<query-argument id="q_date_from"	    type="STRING" 	option="M" 	condition=""/>
+	       	<query-argument id="q_date_to" 	 		type="STRING" 	option="M" 	condition=""/>     	  	
+     	  	<query-argument id="userid"				type="STRING"/>
+   		</query-arguments>
+   		<query-descript>주말/휴일 근무 신청 조회</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP028S</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type>GRID</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+    	SELECT	  appchk, rtnchk, appl_month, appl_user, appl_seq
+    			, time_blw, time_more, work_amt, work_cnt
+    			, appl_user_nm, work_tm, nowsignid, nowsignnm, nowdepth
+    			, statcd, sign_prgs_stts_cd, sign_stg_cd, sign_f_cd1
+		FROM	(    			
+    		 SELECT	  '0' AS appchk, '0' AS rtnchk, a.appl_month, a.appl_user, a.appl_seq
+					, b.time_blw, b.time_more, b.work_amt, b.work_cnt
+					, dbo.fn_user(a.appl_user,'') AS appl_user_nm
+					, dbo.uf_sec_to_time(b.work_tm_sec) AS work_tm
+					, case when c.sign_f_cd1='N' then c.sign_id1 else case when c.sign_f_cd2='N' then c.sign_id2 else case when c.sign_f_cd3='N' then c.sign_id3 else '결재완료' end end end nowsignid
+                    , dbo.fn_user((case when c.sign_f_cd1='N' then c.sign_id1 else case when c.sign_f_cd2='N' then c.sign_id2 else case when c.sign_f_cd3='N' then c.sign_id3 else '결재완료' end end end),'Y') nowsignnm
+                    , case when c.sign_f_cd1 = 'N' then '1' else case when c.sign_f_cd2 = 'N' then '2' else case when c.sign_f_cd3 = 'N' then '3' else '4' end end end nowdepth
+                    , c.sign_prgs_stts_cd AS statcd
+                    , c.sign_prgs_stts_cd
+                    , c.sign_stg_cd
+                    , sign_f_cd1
+			FROM	uc_exps_hldy a,
+					(
+					SELECT	  appl_month, appl_user
+							, SUM(time_blw) AS time_blw
+							, SUM(time_more) AS time_more
+							, SUM(work_tm) AS work_tm_sec
+							, SUM(work_amt) AS work_amt
+							, COUNT(1) AS work_cnt
+					FROM	uc_exps_hldy_hst
+					WHERE	work_dt BETWEEN ? AND ?
+					@rg_id
+					GROUP BY appl_month, appl_user
+					) b,
+					uc_sign_hst c
+			WHERE	a.appl_month = b.appl_month
+			AND		a.appl_user = b.appl_user
+			AND		a.appl_seq = c.sign_hst_id
+			AND		c.sign_tp_cd = '04'
+				) t
+		WHERE	1=1 @subGubun
+		ORDER BY appl_user, appl_month						
+     	]]></query-statement>
+     	<query-arguments>
+     	  	<query-argument id="q_date_from"	type="STRING" 	option="M"/>
+	       	<query-argument id="q_date_to" 	 	type="STRING" 	option="M"/>
+	       	<query-argument id="rg_id"			type="QUERY"	condition=" AND appl_user = ?"/>
+     	  	<query-argument id="rg_id"			type="STRING"	condition=""/>
+     	  	<query-argumnet id="subGubun"		type="QUERY"	condition="AND (? = '01' AND nowsignid = ?)"/>
+     	  	<query-argumnet id="subGubun"		type="STRING"	condition=""/>
+     	  	<query-argumnet id="subUser"		type="STRING"	condition=""/>
+   		</query-arguments>
+   		<query-descript>주말/휴일 근무 신청 및 결재 내역 조회</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP029S</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type>GRID</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+	        SELECT	  '0' AS chk, a.appl_user, a.work_dt, b.start_tm, b.end_tm, a.work_amt, d.prj_nm, b.content
+	        		, dbo.fn_user(appl_user,'') AS appl_user_nm
+					, dbo.uf_sec_to_time(a.work_tm) AS work_tm
+					, (case when c.hldy_nm is not null then hldy_nm
+					        else  (case c.dayw when '1' then '일요일'
+				                               when '2' then '월요일'
+				                               when '3' then '화요일'
+				                               when '4' then '수요일'
+				                               when '5' then '목요일'
+				                               when '6' then '금요일'
+				                               when '7' then '토요일' end) end) AS week
+			FROM	uc_exps_hldy_hst a, uc_wk_rpt_dtl b, uc_com_cld c, uc_prj d
+			WHERE	a.work_dt = b.work_dt
+			AND		a.appl_user = b.rg_id
+			AND		a.work_dt = c.bse_dt
+			AND		b.prj_seq = d.prj_seq
+			AND		a.appl_month = ?
+			AND		a.appl_user	= ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="appl_month"	type="STRING"	option="M"/>
+     		<query-argument id="appl_user"	type="STRING"/>
+   		</query-arguments>
+   		<query-descript>월별 주말/휴일 근무 신청 및 결재 내역 조회</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP030S</query-id>
+    	<query-exec-type>SELECT</query-exec-type>
+    	<query-view-type>NONE</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+	        SELECT	TOP 1 'Y' AS isreq,  sign_f_cd1
+	        FROM	uc_exps_hldy a, uc_sign_hst c
+			WHERE	appl_month 	= ?
+			AND		appl_user	= ?
+			AND     a.appl_seq = c.sign_hst_id
+            AND     c.sign_tp_cd = '04'
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="appl_month"	type="STRING"	option="M"/>
+     		<query-argument id="userid"		type="STRING"/>
+   		</query-arguments>
+   		<query-descript>월별 주말/휴일 근무 신청 및 결재 내역 조회</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP012I</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type>NONE</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			INSERT INTO uc_exps_hldy_hst (
+				  appl_month
+				, appl_user
+				, work_dt
+				, work_tm
+				, time_blw
+				, time_more
+				, work_amt
+				, rg_id
+				, rg_dt
+				, rg_tm)
+			SELECT	  appl_month, appl_user, work_dt, work_tm
+					, (CASE WHEN work_tm < 18000 THEN 1 ELSE 0 END) AS time_blw
+					, (CASE WHEN work_tm >= 18000 THEN 1 ELSE 0 END) AS time_more
+					, CAST((SELECT etc1 FROM uc_com_codebook WHERE up_cd = 'EXP006' AND code = (CASE WHEN work_tm < 18000 THEN '5UND' ELSE '5MOR' END)) AS INT) AS work_amt
+					, rg_id
+					, CONVERT(varchar(8),GETDATE(), 112)
+			        , REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+			FROM	(		
+					SELECT    ? AS appl_month
+							, ? AS appl_user
+							, ? AS work_dt
+							, CAST(? AS INT) AS work_tm
+							, ? AS rg_id
+					) t				
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="appl_month"			type="STRING"	option="M"/>
+     		<query-argument id="chk_appl_user"		type="STRING"/>
+     		<query-argument id="chk_work_dt"		type="STRING"/>
+     		<query-argument id="chk_work_tm"		type="STRING"/>
+     		<query-argument id="userid"				type="STRING"/>
+   		</query-arguments>
+   		<query-descript>주말/휴일 근무 신청</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP014I</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			INSERT INTO uc_exps_hldy (
+				  appl_month
+				, appl_user
+				, statcd
+				, prj_seq
+				, nex_sign_id
+				, rg_id
+				, rg_dt
+				, rg_tm
+				, mdf_id
+				, mdf_dt
+				, mdf_tm)
+			SELECT	  ? AS appl_month
+					, ? AS appl_user
+					, '01'	AS statcd
+					, ? AS prj_seq
+					, ? AS nex_sign_id
+					, ? AS rg_id
+					, CONVERT(varchar(8),GETDATE(), 112)
+			        , REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')
+			        , ? AS mdf_id
+					, CONVERT(varchar(8),GETDATE(), 112)
+			        , REPLACE(CONVERT(varchar(8),GETDATE(),114), ':', '')	
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="appl_month"		type="STRING"	option="M"/>
+     		<query-argument id="appl_user"		type="STRING"/>
+     		<query-argument id="prj_seq"		type="INTEGER"/>
+     		<query-argument id="sign_id1"		type="STRING"/>
+     		<query-argument id="userid"			type="STRING"/>
+     		<query-argument id="userid"			type="STRING"/>    		
+   		</query-arguments>
+   		<query-descript>주말/휴일 근무 신청</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+        <query-id>UCEXP016D</query-id>
+        <query-exec-type>DELETE</query-exec-type>
+        <query-statement>
+            DELETE FROM uc_sign_hst WHERE sign_tp_cd = '04' AND sign_hst_id = ?
+        </query-statement>
+        <query-arguments>
+			<query-argument id="appl_seq"	type="INTEGER"/>
+        </query-arguments>
+        <query-descript>휴일근무 비용청구 결재내역 저장</query-descript>
+    </queryinfo>
+	<!--  
+	<queryinfo>
+        <query-id>UCEXP015I</query-id>
+        <query-exec-type>INSERT</query-exec-type>
+        <query-statement>
+            INSERT INTO uc_sign_hst
+            (
+				sign_tp_cd
+				,sign_hst_id
+				,sign_id1
+				,sign_f_cd1
+				,sign_id2
+				,sign_f_cd2
+				,sign_id3
+				,sign_f_cd3
+				,sign_stg_cd
+				,sign_prgs_stts_cd
+				,rg_dt
+				,rg_tm
+				,rg_id
+				,mdf_dt
+				,mdf_tm
+				,mdf_id
+			)(
+				SELECT TOP 1	sign_tp_cd
+						, ISNULL(@@IDENTITY, ?)
+						,sign_id1
+						, 'N'
+						,sign_id2
+						, 'N'
+						,sign_id3
+						, 'N'
+						,sign_stg_cd
+						, '01'
+						, CONVERT(VARCHAR(8),GETDATE(),112)
+						, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+						, ?
+						, CONVERT(VARCHAR(8),GETDATE(),112)
+						, REPLACE(CONVERT(char , GETDATE(), 108), ':', '')
+						, ?
+				  FROM uc_sign_info
+				 WHERE sign_tp_cd = '04'	
+				 AND   USE_YN='Y'
+			)
+        </query-statement>
+        <query-arguments>
+        	<query-argument id="appl_seq"	type="INTEGER"/>
+			<query-argument id="userid"		type="STRING"/>
+			<query-argument id="userid"		type="STRING"/>
+        </query-arguments>
+        <query-descript>휴일근무 비용청구 결재내역 저장</query-descript>
+    </queryinfo>
+	-->
+	<queryinfo>
+    	<query-id>UCEXP014D</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type></query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			DELETE FROM uc_exps_hldy_hst
+			WHERE appl_month = ?
+			AND	appl_user = ?
+			AND work_dt = ?
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="appl_month"		type="STRING"/>
+     		<query-argument id="chk_appl_user"		type="STRING"/>
+     		<query-argument id="chk_work_dt"		type="STRING"/>
+   		</query-arguments>
+   		<query-descript>주말/휴일 근무 신청 삭제</query-descript>
+	</queryinfo>
+	
+	<queryinfo>
+    	<query-id>UCEXP017D</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type>NONE</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			DELETE FROM uc_sign_hst
+			WHERE 	sign_tp_cd = '04'
+			AND		sign_hst_id = (
+				SELECT 	appl_seq FROM uc_exps_hldy 
+				WHERE	appl_month = ?
+				AND		appl_user = ?
+				AND (SELECT COUNT(1) FROM uc_exps_hldy_hst 
+				 	 WHERE 	appl_month = ?
+				 	 AND	appl_user = ?) = 0
+				 	 )
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="appl_month"			type="STRING"/>
+     		<query-argument id="appl_user"			type="STRING"/>
+     		<query-argument id="appl_month"			type="STRING"/>
+     		<query-argument id="appl_user"			type="STRING"/>
+   		</query-arguments>
+   		<query-descript>주말/휴일 근무 신청 삭제</query-descript>
+	</queryinfo>
+	<queryinfo>
+    	<query-id>UCEXP015D</query-id>
+    	<query-exec-type>MULTI</query-exec-type>
+    	<query-view-type>NONE</query-view-type>
+    	<query-message></query-message>
+    	<query-statement><![CDATA[
+			DELETE FROM uc_exps_hldy
+			WHERE appl_month = ?
+			AND	appl_user = ?
+			AND (SELECT COUNT(1) FROM uc_exps_hldy_hst 
+				 WHERE 	appl_month = ?
+				 AND	appl_user = ?) = 0
+     	]]></query-statement>
+     	<query-arguments>
+     		<query-argument id="appl_month"			type="STRING"/>
+     		<query-argument id="appl_user"			type="STRING"/>
+     		<query-argument id="appl_month"			type="STRING"/>
+     		<query-argument id="appl_user"			type="STRING"/>
+   		</query-arguments>
+   		<query-descript>주말/휴일 근무 신청 삭제</query-descript>
+	</queryinfo>
+		
+	<queryinfo>
+		<query-id>UCEXP001S</query-id>
+		<query-exec-type>SELECT</query-exec-type>
+		<query-view-type>NONE</query-view-type>
+		<query-statement><![CDATA[
+			SELECT	prj_seq, sign_id1, sign_id2, sign_id3
+			FROM	UC_SIGN_INFO a
+			WHERE	sign_tp_cd = '04'
+			AND    USE_YN = 'Y' 
+			AND    ORG_CD in (SELECT isnull(isnull(view_org_3,view_org_2),view_org_1) FROM uc_com_user WHERE user_id = ? )
+		]]></query-statement>
+		<query-arguments>
+			<query-argument id="user_id"		type="STRING"/>
+		</query-arguments>
+		<query-descript>휴가 결재를 위한 프로젝트 조회</query-descript>
+	</queryinfo>
+		
+	<!-- 주말/휴일 근무 신청 끝-->
+	
+</query>
